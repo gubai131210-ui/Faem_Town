@@ -1,0 +1,6 @@
+~ bed
+要睡到明天吗？
+- 睡吧
+	do EventBus.request_sleep()
+- 再等等
+=> END

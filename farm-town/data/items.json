@@ -1,0 +1,39 @@
+[
+	{
+		"id": "hoe",
+		"name": "锄头",
+		"kind": "tool",
+		"icon": "hoe",
+		"stack": 1,
+		"price": 0,
+		"desc": "开垦土地。"
+	},
+	{
+		"id": "watering_can",
+		"name": "水壶",
+		"kind": "tool",
+		"icon": "can",
+		"stack": 1,
+		"price": 0,
+		"desc": "给耕地浇水。"
+	},
+	{
+		"id": "white_radish_seed",
+		"name": "白萝卜种子",
+		"kind": "seed",
+		"icon": "seeds",
+		"stack": 99,
+		"price": 10,
+		"crop": "white_radish",
+		"desc": "春季作物，5 天成熟。"
+	},
+	{
+		"id": "white_radish",
+		"name": "白萝卜",
+		"kind": "crop",
+		"icon": "turnip",
+		"stack": 99,
+		"price": 35,
+		"desc": "脆生生的白萝卜。"
+	}
+]

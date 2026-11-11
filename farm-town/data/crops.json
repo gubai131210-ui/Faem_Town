@@ -1,0 +1,10 @@
+[
+	{
+		"id": "white_radish",
+		"name": "白萝卜",
+		"seed": "white_radish_seed",
+		"produce": "white_radish",
+		"stage_days": [1, 2, 2],
+		"seasons": ["spring"]
+	}
+]

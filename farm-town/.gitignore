@@ -1,0 +1,10 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# 自动截图和素材预览
+/_preview/
+
+# Blender 渲染的临时文件和备份
+/tools/_tmp/
+*.blend1

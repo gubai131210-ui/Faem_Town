@@ -1,0 +1,48 @@
+---
+description: 本项目的 GDScript 编码规范（Godot 4.7）
+globs: **/*.gd
+alwaysApply: false
+---
+
+# GDScript 规范
+
+完整的组织方式见 `docs/架构.md`。
+
+## 类型
+
+- 变量、参数、返回值都写类型；能推断的用 `:=`。从 `Array`、`Dictionary` 取出的值先赋给带类型的变量再用。
+- 集合尽量用带类型的：`Array[Vector2i]`、`Dictionary[StringName, int]`。
+- 数学函数用带类型的版本：`roundf`、`floori`、`absf`、`clampi`。`round()` 返回 `Variant`，会让 `:=` 推断失败。
+- 整数相除会截断，需要小数时写 `5.0 / 2`。
+
+## 结构
+
+- 脚本内顺序：`class_name`、`extends`、文档注释、信号、枚举、常量、`@export`、公有变量、私有变量（`_` 开头）、`@onready`、内置回调、公有方法、私有方法。
+- 命名：文件和变量 `snake_case`，类和节点 `PascalCase`，常量 `ALL_CAPS`，信号用过去式（`crop_harvested`）。
+- 向下调用，向上发信号。不调用 `get_parent()` 的方法。
+- `features/a/` 不引用 `features/b/` 的文件，联动走 `core/` 里的系统或 `EventBus`。
+- 游戏状态放在不依赖节点的对象里；节点只显示状态和接收输入。
+
+## 节点与信号
+
+- 节点引用用 `@onready var x: Type = %Name`，不在 `_process` 里用 `$` 或 `get_node`。
+- 信号用对象写法：`button.pressed.connect(_on_pressed)`、`harvested.emit(id)`，不用字符串。
+- `@export` 和 `@onready` 不加在同一个变量上。
+- 遍历字典时不增删它的键，先复制键列表。
+- `await` 之后节点可能已被释放，继续使用前用 `is_instance_valid` 检查。
+
+## 其他
+
+- 不留调试用的 `print`；需要报告问题用 `push_error`、`push_warning`。
+- 单帧步长要有上限（`minf(delta, 0.05)`），避免卡顿时穿墙或跳过时间。
+- 注释写“为什么”，用中文；不写复述代码的注释。
+
+```gdscript
+# 不好：类型丢失，子节点调父节点
+var crop = crops[tile]
+get_parent().add_money(crop.price)
+
+# 好：带类型，向上发信号
+var crop: CropState = crops[tile]
+harvested.emit(crop.def.id, crop.quality)
+```
