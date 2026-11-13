@@ -1,0 +1,31 @@
+{
+	"name": "shishu",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": "headband",
+	"hair": "short",
+	"outfit": "apron",
+	"bulk": 1.18,
+	"beard": true,
+	"parts": {
+		"shirt": "gray",
+		"blue": "charcoal",
+		"apron": "leather",
+		"hair": "hair_black",
+		"band": "red",
+		"boot": "charcoal",
+		"skin": "skin_tan"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "calm",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "flat",
+		"jaw": "square",
+		"crop": true
+	}
+}

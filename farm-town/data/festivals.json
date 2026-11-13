@@ -1,0 +1,64 @@
+[
+	{
+		"id": "sowing", "name": "播种节", "term": "chunfen", "day": 1, "map": "town", "from": "9:00", "to": "17:00",
+		"note": "上午九点到傍晚五点，在镇广场。阿禾摆种子摊，柏先生主持播种比赛",
+		"host": "bai", "host_tile": [22, 12], "keeper": "ahe", "keeper_tile": [17, 15], "counter": [[16, 16], [17, 16]], "focus": [22, 15],
+		"crowd": [[19, 13], [25, 13], [19, 15], [25, 15], [20, 16], [24, 16], [18, 14], [26, 14], [20, 12], [24, 12], [18, 17], [26, 17]],
+		"goods": ["strawberry_seed"],
+		"rivals": {"sow": [{"npc": "ahe", "score": 20}, {"npc": "qingzhu", "score": 12}, {"npc": "xiaoman", "score": 5}]},
+		"prizes": [500, 250, 100]
+	},
+	{
+		"id": "lantern", "name": "放河灯", "term": "qingming", "day": 1, "map": "nanxi", "from": "18:00", "to": "22:00",
+		"note": "傍晚六点到夜里十点，在南溪码头。找老周领一盏灯",
+		"host": "laozhou", "host_tile": [19, 15], "focus": [20, 18], "gate": [19, 0],
+		"crowd": [[21, 14], [22, 14], [24, 14], [25, 14], [16, 14], [15, 14], [18, 13], [17, 13], [23, 14], [13, 15], [26, 14]],
+		"floaters": [
+			{"npc": "xiaoman"}, {"npc": "ahe", "lamp": "plaza"}, {"npc": "laozhou", "lamp": "river"}, {"npc": "amu", "lamp": "pasture"},
+			{"npc": "laoqin", "lamp": "well"}, {"npc": "egret", "lamp": "east"}, {"npc": "jiang", "lamp": "shrine"}
+		]
+	},
+	{
+		"id": "firefly", "name": "萤火夜", "term": "dashu", "day": 1, "map": "nanxi", "from": "19:00", "to": "23:00",
+		"note": "晚上七点到十一点，在南溪北岸的草地。小满带大家捉萤火虫",
+		"host": "xiaoman", "host_tile": [21, 9], "focus": [20, 14], "gate": [19, 0],
+		"crowd": [[14, 8], [17, 9], [23, 8], [25, 10], [12, 10], [27, 9], [10, 7], [29, 11], [24, 6], [15, 6], [13, 12]]
+	},
+	{
+		"id": "harvest", "name": "丰收集", "term": "qiufen", "day": 1, "map": "town", "from": "9:00", "to": "17:00",
+		"note": "上午九点到傍晚五点，在镇广场。作物、鱼、畜产各评一回，拿着东西找柏先生",
+		"host": "bai", "host_tile": [22, 11], "keeper": "bai", "counter": [[21, 12], [22, 12], [23, 12]], "focus": [22, 13],
+		"crowd": [[19, 13], [25, 13], [19, 15], [25, 15], [20, 16], [24, 16], [18, 14], [26, 14], [20, 12], [24, 12], [18, 17], [26, 17]],
+		"rivals": {
+			"crop": [{"npc": "ahe", "score": 240}, {"npc": "amu", "score": 130}, {"npc": "jiang", "score": 70}],
+			"fish": [{"npc": "laozhou", "score": 150}, {"npc": "egret", "score": 80}, {"npc": "luyuan", "score": 40}],
+			"animal": [{"npc": "amu", "score": 200}, {"npc": "yunniang", "score": 120}, {"npc": "xiaoman", "score": 60}]
+		},
+		"prizes": [800, 400, 150]
+	},
+	{
+		"id": "dumpling", "name": "饺子宴", "term": "dongzhi", "day": 1, "map": "town", "from": "17:00", "to": "21:00",
+		"note": "傍晚五点到夜里九点，在镇广场。每人带一样馅，拿着交给云娘",
+		"host": "yunniang", "host_tile": [22, 11], "keeper": "yunniang", "counter": [[21, 12], [22, 12], [23, 12]], "focus": [22, 13],
+		"crowd": [[19, 13], [25, 13], [19, 15], [25, 15], [20, 16], [24, 16], [18, 14], [26, 14], [20, 12], [24, 12], [18, 17], [26, 17]],
+		"fillings": {
+			"sweet": ["strawberry", "watermelon", "osmanthus", "loquat", "peach", "persimmon", "mandarin", "bayberry", "hawthorn",
+				"honey_wild", "honey_rape", "honey_sunflower", "honey_chrys", "honey_osmanthus", "honey_camellia"],
+			"rich": ["egg", "duck_egg", "goat_milk", "milk", "cheese"],
+			"veg": ["pickles"],
+			"odd": ["cotton", "tea_leaf", "fog_bell", "lotus_flower", "sunflower", "chrysanthemum", "wintersweet", "camellia", "peach_blossom", "pine_cone"]
+		}
+	},
+	{
+		"id": "newyear", "name": "除夕灯会", "term": "dahan", "day": 4, "map": "town", "from": "18:00", "to": "25:00",
+		"note": "傍晚六点起，在镇广场。柏先生念这一年的账，大家一起守岁",
+		"host": "bai", "host_tile": [22, 12], "focus": [22, 15],
+		"crowd": [[19, 13], [25, 13], [19, 15], [25, 15], [20, 16], [24, 16], [18, 14], [26, 14], [20, 12], [24, 12], [18, 17], [26, 17]],
+		"decor": [
+			[21, 13], [23, 13], [21, 17], [23, 17],
+			[15, 11], [29, 11], [15, 17], [29, 17],
+			[18, 16], [26, 16], [15, 14], [29, 14], [19, 11], [25, 11],
+			[17, 15], [27, 15], [20, 11], [24, 11], [16, 13], [28, 13]
+		]
+	}
+]

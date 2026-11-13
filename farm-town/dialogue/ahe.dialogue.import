@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://dhsu7fq585jm7"
+path="res://.godot/imported/ahe.dialogue-1c76421dce140e05509e54116d21d491.tres"
+
+[deps]
+
+source_file="res://dialogue/ahe.dialogue"
+dest_files=["res://.godot/imported/ahe.dialogue-1c76421dce140e05509e54116d21d491.tres"]
+
+[params]
+
+defaults=true

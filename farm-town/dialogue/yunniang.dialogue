@@ -1,0 +1,107 @@
+~ first
+云娘: 哟，新客人！快让我看看——太瘦了，得多吃。 [#happy]
+云娘: 我是云娘，这间茶馆是我的，也管饭。
+云娘: 今天的招牌菜叫“春水煮云”。昨天它叫“白玉翻江”。……其实都是豆腐汤。
+云娘: 灶台这两天还在收拾，等开了火，你头一个来尝。说定了啊。
+=> END
+
+~ work
+if GameState.has_flag("lamp_plaza") and Crafting.has_lesson("yunniang")
+	do Crafting.learn("yunniang")
+	云娘: 来得正好！我教你一道菜。今天它叫“{{Crafting.last_dish}}”。 [#happy]
+	云娘: 做法我写在纸上了，你回去在自家灶台上试。名字明天我兴许就改了，做法不改。
+	=> END
+if Residents.owes_thanks("yunniang")
+	云娘: 上回你给的{{Residents.gift_name("yunniang")}}，我做成菜了，客人都说好。名字嘛……我忘了起的什么了。 [#happy]
+	do Residents.thanked("yunniang")
+elif Residents.away("yunniang") >= 4
+	云娘: 哎呀你可来了！这几天上哪儿去了，脸都晒黑了。
+if Residents.weather_is("rain") or Residents.weather_is("storm") or Residents.weather_is("snow")
+	% 云娘: 这天气还有客人，我高兴！灶还没收拾好，你先在檐下站会儿。
+	% 云娘: 下雨天最适合喝热汤。可惜我这汤还没开张。
+elif Residents.is_evening()
+	% 云娘: 晚上茶馆最热闹。说是热闹，也就那几个人。
+	% 云娘: 老秦又来打酒了。他嘴上凶，酒钱倒是一文不少。
+elif Residents.topic("yunniang", 6) == 0
+	云娘: 来啦！今天的招牌菜叫“雾里看花”。
+	云娘: ……还是豆腐汤。你别笑。 [#happy]
+elif Residents.topic("yunniang", 6) == 1
+	云娘: 我刚才哼的那支曲子，你听过没有？
+	云娘: 我只会前两句，后面怎么也接不上。哼了多少年了，就卡在那儿。
+elif Residents.topic("yunniang", 6) == 2
+	云娘: 你地里有什么新鲜菜，拿来我看看。我给它起个好名字。
+	云娘: 起名字我在行。做菜嘛……也还行。
+elif Residents.topic("yunniang", 6) == 3
+	云娘: 楼上住着两位外地客人，一个整天写字，一个整天画画，都不怎么吃饭。
+	云娘: 我看着都替他们饿。
+elif Residents.topic("yunniang", 6) == 4
+	云娘: 你吃过了没？
+	- 吃过了
+		云娘: 吃的什么？算了，肯定没我做的好。 [#happy]
+	- 还没
+		云娘: 那怎么行！等我灶台弄好，天天给你留一碗。
+else
+	if Residents.knows("yunniang", 60)
+		云娘: 跟你说啊，那支曲子，我老觉得是有人教我的。两个人一块儿唱的。
+		云娘: 另一个人是谁，我想不起来。只记得她唱后半段。 [#sad]
+	else
+		云娘: 姜婆婆老说我菜里盐放多了。我说婆婆，是您口淡。
+=> END
+
+~ daily
+if Residents.is_evening()
+	云娘: 我出来透口气，灶上还温着水呢。
+else
+	% 云娘: 我去阿禾那儿称点东西，一会儿就回。
+	% 云娘: 阿禾这秤我看着不太准。……开玩笑的，你可别跟她说。 [#happy]
+=> END
+
+~ again
+if Residents.nth("yunniang") == 2
+	% 云娘: 还想听菜名？明天有新的。
+	% 云娘: 怎么啦，舍不得走？ [#happy]
+else
+	% 云娘: 忙着呢忙着呢，回头聊！
+	% 云娘: 哎哟我水要开了——
+=> END
+
+~ gift_love
+云娘: 哎呀！这个好，这个太好了！ [#happy]
+云娘: 今晚就拿它做一道菜。名字我都想好了，叫“故人来”。
+=> END
+
+~ gift_like
+% 云娘: 新鲜！谢谢你啦。 [#happy]
+% 云娘: 哟，这个能下锅。你有心了。 [#happy]
+=> END
+
+~ gift_ok
+% 云娘: 谢谢，我收下了。
+% 云娘: 给我的呀？行，我想想能做成什么。
+=> END
+
+~ gift_dislike
+云娘: 这个……下不了锅呀。 [#sad]
+云娘: 算啦，心意我收到了。
+=> END
+
+~ quest_yunniang_purse
+云娘: 荠菜！好好好，今天这道菜有着落了。 [#happy]
+云娘: 菜名我想好了，叫“春在手”。明天叫什么明天再说。
+云娘: 钱拿着，晚上来吃，给你多盛一勺。
+=> END
+
+~ memory_1
+云娘: 这是工尺谱……
+云娘: 这首歌我会唱。你听——
+云娘: ♪ 山那边——雾起了——
+云娘: 后面呢？后面是什么？
+云娘: 我记得我在灶上炒菜，有人在厨房外头跟着哼。我回头，他已经走了。 [#sad]
+云娘: 是谁呢。嗓子挺好的。
+=> END
+
+~ ending_news
+云娘: 那首歌我唱完了。原来后头还有两句。 [#sad]
+云娘: 在厨房外头跟着哼的那个人，我也想起来了。
+云娘: 今天这道菜就叫它本来的名字。往后不改了。 [#happy]
+=> END

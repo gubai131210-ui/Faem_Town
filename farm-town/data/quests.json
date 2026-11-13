@@ -1,0 +1,18 @@
+[
+	{"id": "jiang_radish", "npc": "jiang", "item": "white_radish", "count": 3, "money": 80, "relic": "old_wick", "from_day": 1,
+	 "title": "求白萝卜三个", "text": "家里要炖汤，多做一副碗筷的那种。——药铺 姜"},
+	{"id": "ahe_potato", "npc": "ahe", "item": "potato", "count": 5, "money": 120, "relic": "ledger_page", "from_day": 2,
+	 "title": "收土豆五个", "text": "店里土豆断了货，给现钱。——杂货铺 阿禾"},
+	{"id": "xiaoman_fern", "npc": "xiaoman", "item": "fern", "count": 2, "money": 60, "relic": "old_sketch", "from_day": 2,
+	 "title": "要蕨菜两根", "text": "不是我吃，是做实验用的。别告诉姜婆婆。——小满"},
+	{"id": "yunniang_purse", "npc": "yunniang", "item": "shepherds_purse", "count": 3, "money": 100, "relic": "", "from_day": 3,
+	 "title": "荠菜三把", "text": "今天这道菜叫“春在手”，缺荠菜。——茶馆 云娘"},
+	{"id": "shishu_shoot", "npc": "shishu", "item": "spring_bamboo_shoot", "count": 2, "money": 90, "relic": "", "from_day": 3,
+	 "title": "春笋两根", "text": "下酒。——石"},
+	{"id": "bai_bokchoy", "npc": "bai", "item": "bok_choy", "count": 4, "money": 100, "relic": "", "from_day": 4,
+	 "title": "青菜四棵", "text": "镇公所午饭用，按市价付。——镇公所"},
+	{"id": "laozhou_pea", "npc": "laozhou", "item": "pea", "count": 3, "money": 110, "relic": "", "from_day": 5,
+	 "title": "豌豆三份", "text": "（字很大，写得很用力）豌豆。三份。送到镇上来。——周"},
+	{"id": "luyuan_rapeseed", "npc": "luyuan", "item": "rapeseed", "count": 3, "money": 130, "relic": "", "from_day": 5,
+	 "title": "油菜籽三份", "text": "想试着榨一点灯油。有兴趣的来镇公所门口找我。——陆远"}
+]

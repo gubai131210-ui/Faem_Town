@@ -1,0 +1,27 @@
+{
+	"name": "yunniang",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "long",
+	"outfit": "apron",
+	"bulk": 1.06,
+	"parts": {
+		"shirt": "pink",
+		"blue": "purple",
+		"apron": "white",
+		"hair": "hair_black",
+		"boot": "leather"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "calm",
+		"brow": "thin",
+		"fringe": "part",
+		"blush": true,
+		"mouth": "smile"
+	}
+}

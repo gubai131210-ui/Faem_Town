@@ -1,0 +1,17 @@
+[
+	{"item": "shepherds_purse", "season": "spring", "weight": 4},
+	{"item": "spring_bamboo_shoot", "season": "spring", "weight": 2},
+	{"item": "fern", "season": "spring", "weight": 3},
+	{"item": "bayberry", "season": "summer", "weight": 3},
+	{"item": "water_caltrop", "season": "summer", "weight": 3, "shore": true},
+	{"item": "mint", "season": "summer", "weight": 3},
+	{"item": "chestnut", "season": "autumn", "weight": 3},
+	{"item": "wild_mushroom", "season": "autumn", "weight": 3},
+	{"item": "hawthorn", "season": "autumn", "weight": 2},
+	{"item": "winter_bamboo_shoot", "season": "winter", "weight": 3, "from_term": "xiaoxue"},
+	{"item": "pine_cone", "season": "winter", "weight": 4},
+	{"item": "clam", "weight": 4, "beach": true},
+	{"item": "kelp", "weight": 3, "beach": true},
+	{"item": "conch", "weight": 2, "beach": true},
+	{"item": "oyster", "season": "winter", "weight": 3, "beach": true}
+]

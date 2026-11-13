@@ -1,0 +1,689 @@
+~ fest_sowing_host
+if Residents.fest_done("sow")
+	柏先生: 你的数我记在册子上了。集市开到傍晚五点，再逛逛。
+	=> END
+柏先生: 播种节。春分这天下的种，长得比哪天都好，老辈人传下来的。
+柏先生: 规矩很简单：今天在自家地里播了多少颗，来我这儿报个数。阿禾、青竹、小满都报过了。
+柏先生: ……这册子我是从柜子最底下翻出来的。上一回记数是哪一年，纸上的字洇了，看不清。 [#sad]
+- 报数
+	do Residents.festival_act("sow")
+- 我先去播种
+	柏先生: 去吧。阿禾的摊子上今天有草莓种子，一年只卖这一天。五点以前回来。
+=> END
+
+~ fest_sowing_none
+柏先生: 你今天还一颗都没播。
+柏先生: 不急。去地里播了再来，五点以前都算数。
+=> END
+
+~ fest_sowing_result_1
+柏先生: {{Residents.fest("count")}} 颗。……比阿禾还多。
+阿禾: 啊？！我可是天没亮就下地了！行吧行吧，愿赌服输。 [#happy]
+柏先生: 头名。这是镇上给的 {{Residents.fest("prize")}} 文。春分下的种，记得浇水。 [#happy]
+=> END
+
+~ fest_sowing_result_2
+柏先生: {{Residents.fest("count")}} 颗，第二。头名是{{Residents.fest("best")}}。
+阿禾: 我一个卖种子的，要是输给你还开什么铺子。明年再来！ [#happy]
+柏先生: 这是 {{Residents.fest("prize")}} 文。
+=> END
+
+~ fest_sowing_result_3
+柏先生: {{Residents.fest("count")}} 颗，第三。头名是{{Residents.fest("best")}}。
+青竹: 就赢了你几颗。我那是拉着线种的，一颗都没歪。 [#happy]
+柏先生: 这是 {{Residents.fest("prize")}} 文。
+=> END
+
+~ fest_sowing_result_4
+柏先生: {{Residents.fest("count")}} 颗。……记上了。
+小满: 我种了五颗！全种在姜婆婆的花盆里！ [#happy]
+柏先生: 前三名以外没有赏钱。不过春分下的种不会亏你，回去好好浇水。
+=> END
+
+~ fest_sowing_jiang
+姜婆婆: 春分的种子金贵。我年轻的时候，这天要给家里的小的缝一个装种子的布袋。
+姜婆婆: 给谁缝的来着。针线筐里倒是还有半个没缝完的。 [#sad]
+=> END
+
+~ fest_sowing_xiaoman
+小满: 草莓！阿禾姐姐说一年就卖这一天！你种不种？你种了我天天去看！ [#happy]
+小满: 大人们今天记性都好了一点。你看，没人提醒，他们自己就记得要过节。
+=> END
+
+~ fest_sowing_ahe
+阿禾: 草莓种子一年就今天卖！对着摊子喊我一声就成。 [#happy]
+=> END
+
+~ fest_sowing_shishu
+石叔: 锄头磨过了没有。
+石叔: 今天下种，家伙要快。钝了来找我，不收钱。……就今天。
+=> END
+
+~ fest_sowing_qingzhu
+青竹: 摊子是我昨晚搭的。棚布的条纹对齐了没有？你帮我看一眼。
+青竹: ……歪了半寸。算了，过节。 [#happy]
+=> END
+
+~ fest_sowing_yunniang
+云娘: 我带了一锅汤来，今天叫“春分一口鲜”！
+云娘: ……是豆腐汤。过节嘛，名字得应景。 [#happy]
+=> END
+
+~ fest_sowing_laozhou
+老周: ……人多。
+老周: 种地的日子。我看一眼就回码头。
+=> END
+
+~ fest_sowing_amu
+阿牧: 我、我把花花也牵来了，拴在镇口。它没见过这么多人。
+阿牧: 种子我不懂，草我懂。今年的草出得早，是好年景。 [#happy]
+=> END
+
+~ fest_sowing_laoqin
+老秦: 吵。
+老秦: ……地上头的热闹，比地底下的好。你种你的。
+=> END
+
+~ fest_sowing_luyuan
+陆远: 我记了一笔：“春分，全镇聚集，无人提醒。”
+陆远: 没人通知，大家自己就来了。身体比脑子记得牢。
+=> END
+
+~ fest_sowing_egret
+白鹭: 我在画这个摊子。红白条的棚子，我好像画过——不是在这儿，是在画里。
+白鹭: 画里的摊子后头站着两个人。今天只有阿禾一个。 [#sad]
+=> END
+
+~ fest_lantern_host
+if Residents.fest_done("float")
+	老周: 你那盏漂远了。
+	老周: ……看得见。还亮着。
+	=> END
+老周: 清明。放灯的日子。
+if Residents.floats("laozhou")
+	老周: 我扎了两盏。一盏给你。
+	老周: 另一盏……手自己就扎出来了。扎给谁的，我说不上来。 [#sad]
+else
+	老周: 灯是小满要扎的。我只管看着水。
+	老周: 这盏给你。我不放。……没有要放的人。
+- 把灯放进水里
+	do Residents.festival_act("float")
+- 再等等
+	老周: 嗯。十点以前。
+=> END
+
+~ fest_lantern_float
+你蹲在码头边上，把纸灯搁在水面。它转了半圈，顺着水走了。
+小满: 你那盏是放给谁的呀？
+你张了张嘴，答不上来。
+小满: 大人都这样。没关系，灯自己认得路。 [#happy]
+=> END
+
+~ fest_lantern_xiaoman
+小满: 我每年都放！往年就我一个人放，老周爷爷帮我看着。
+小满: 今年岸上站了这么多人。你数数水里有几盏？比去年多。 [#happy]
+=> END
+
+~ fest_lantern_jiang
+if Residents.floats("jiang")
+	姜婆婆: 我也不知道怎么的，今天手里就糊了一盏。糊的时候心里在念一个名字。
+	姜婆婆: 念完就忘了。灯倒是糊得很周正。 [#sad]
+else
+	姜婆婆: 清明啊。我记得是要上坟的……上谁的坟呢。
+	姜婆婆: 我就站这儿看看。水里有光，看着心里不慌。
+=> END
+
+~ fest_lantern_bai
+if Residents.floats("bai")
+	柏先生: 二十八盏。我数过了，一盏不少。
+	柏先生: 往年是我不让放的。……对不住。 [#sad]
+else
+	柏先生: 往年这一天，我是不出门的。
+	柏先生: 今年小满来敲镇公所的门，说岸上不能没有大人。……我就来了。
+=> END
+
+~ fest_lantern_ahe
+if Residents.floats("ahe")
+	阿禾: 我扎了一盏！扎完才想起来问自己：给谁的？
+	阿禾: 账上没这一笔。可手就是停不下来。 [#sad]
+else
+	阿禾: 我来凑个热闹。河灯是放给……放给谁的来着？
+	阿禾: 小时候好像有人牵着我来过。牵我的那只手很暖和。
+=> END
+
+~ fest_lantern_shishu
+if Residents.floats("shishu")
+	石叔: 给师父的。
+	石叔: 他叫什么，我还在想。灯先放着。 [#sad]
+else
+	石叔: ……
+	石叔: 灯架子是铁丝弯的。我弯的。别的我不懂。
+=> END
+
+~ fest_lantern_qingzhu
+if Residents.floats("qingzhu")
+	青竹: 给我爹的。
+	青竹: 桥是他造的。灯从桥底下过，他该看得见。 [#sad]
+else
+	青竹: 灯托是我削的。杉木，轻，不沉底。
+	青竹: 站在这儿，我总觉得溪上该有座桥，对面该有人走过来。
+=> END
+
+~ fest_lantern_yunniang
+if Residents.floats("yunniang")
+	云娘: 我一边放一边唱了。那首歌后半截是送人的。
+	云娘: 怪不得我以前唱不下去。 [#sad]
+else
+	云娘: 我蒸了一锅青团，放灯的不放灯的都有份！
+	云娘: 我刚才哼的是不是清明的调子？……谁教我的呢。
+=> END
+
+~ fest_lantern_amu
+if Residents.floats("amu")
+	阿牧: 我、我扎了一盏小的。给一条狗。
+	阿牧: 它鼻子好，灯漂到哪儿它都找得到。 [#sad]
+else
+	阿牧: 牛羊都圈好了我才来的。
+	阿牧: 水里有灯，它们在坡上也看得见。花花刚才朝这边叫了一声。
+=> END
+
+~ fest_lantern_laoqin
+if Residents.floats("laoqin")
+	老秦: 别看我。
+	老秦: ……我扎了一盏。底下的人怕黑。一盏不够，我知道。 [#sad]
+else
+	老秦: 我不放。
+	老秦: 灯是往下游漂的。我要找的人不在下游。……我说什么了？没说什么！
+=> END
+
+~ fest_lantern_luyuan
+if Residents.floats("luyuan")
+	陆远: 我放了一盏。给我来找的那个人。
+	陆远: 这一句我没写在胳膊上。不用写了。 [#sad]
+else
+	陆远: 我在数。小满说去年放灯的只有她一个，今年不止。
+	陆远: 这个数在涨。我记下来了。
+=> END
+
+~ fest_lantern_egret
+if Residents.floats("egret")
+	白鹭: 我扎了一盏，给一个小孩。窗台上量过个子的那个。
+	白鹭: ……是我自己吧。给自己放灯，算怎么回事。 [#sad]
+else
+	白鹭: 水上的灯最难画。光是活的，一笔下去它已经走了。
+	白鹭: 我画过这条溪。画里的灯比现在多得多。
+=> END
+
+~ fest_firefly_host
+if Residents.fest_done("release")
+	小满: 它们都飞回草里去了。明年还来！ [#happy]
+	=> END
+if Residents.fireflies_enough()
+	小满: 你捉到了！快，拢着手，别闷着它们。
+	小满: 我数一二三，一起松手。
+	- 松手
+		do Residents.festival_act("release")
+	- 再捉几只
+		小满: 那你快点，它们困了就不亮了。
+	=> END
+小满: 萤火夜！草里那些一闪一闪的就是。走到跟前，轻轻一拢就捉到了。
+小满: 捉五只来找我，我们一起放。大人说捉了不放，明年就没有了。
+小满: 你现在有 {{Residents.fireflies()}} 只。
+=> END
+
+~ fest_firefly_release
+小满: 一、二、三——
+手心一松，几点光晃晃悠悠升起来，在你们头顶绕了一圈，散进草里。
+小满: 它们明年还认得这儿。萤火虫记性好，跟我一样。 [#happy]
+=> END
+
+~ fest_firefly_jiang
+姜婆婆: 婆婆眼睛花了，捉不着。我给你们看着衣裳。
+姜婆婆: 萤火虫是草变的，老话这么说。所以别捉太多，草要心疼的。
+=> END
+
+~ fest_firefly_bai
+柏先生: 我不捉。
+柏先生: ……小时候捉过。装在纱布袋里，挂在帐子上。这个我倒记得。
+=> END
+
+~ fest_firefly_ahe
+阿禾: 我捉了三只，放跑了两只，还有一只钻我头发里了！
+阿禾: 你帮我看看它还在不在？ [#happy]
+=> END
+
+~ fest_firefly_shishu
+石叔: 手重。捉不了。
+石叔: ……看着也行。
+=> END
+
+~ fest_firefly_qingzhu
+青竹: 我编了个竹笼，缝留宽了，全跑了。
+青竹: 失算。明年改尺寸。 [#happy]
+=> END
+
+~ fest_firefly_yunniang
+云娘: 这么多小灯！今晚的茶我要叫“流萤”。
+云娘: ……还是那壶茶。 [#happy]
+=> END
+
+~ fest_firefly_laozhou
+老周: 水边的多。
+老周: 别踩进溪里。夜里水凉。
+=> END
+
+~ fest_firefly_amu
+阿牧: 嘘——你、你走轻一点，它们怕震。
+阿牧: 我在坡上见过一整片的，牛走过去它们都不飞。牛脚步轻。
+=> END
+
+~ fest_firefly_laoqin
+老秦: 虫子。
+老秦: ……井底下没有这种光。这种光不吃人。
+=> END
+
+~ fest_firefly_luyuan
+陆远: 它们为什么发光，我在书上读过。读过和看见是两回事。
+陆远: 我今晚什么都不记。
+=> END
+
+~ fest_firefly_egret
+白鹭: 别跟我说话，我在记颜色。
+白鹭: 黄里带一点绿，亮一下就没了。……画不出来。画不出来才好。 [#happy]
+=> END
+
+~ fest_firefly_heart_jiang
+if Residents.fog_lifted()
+	姜婆婆: 囡囡，过来。
+	姜婆婆: 你小时候捉了萤火虫，要装在药瓶里搁在我枕头边上。我嫌亮，你就拿手帕盖着。
+	姜婆婆: 盖着也是亮的。婆婆那时候没舍得说。 [#happy]
+else
+	姜婆婆: 孩子，你过来，婆婆跟你说句话。
+	姜婆婆: 那些信，我想起来是一封一封写的。写的时候旁边该有个小的，趴在柜台上看我研墨。
+	姜婆婆: 萤火虫一亮，我就觉得那孩子在跟前。你别笑话婆婆。 [#sad]
+	姜婆婆: 你常来坐。你来了，我多摆的那副碗筷就不算白摆。 [#happy]
+=> END
+
+~ fest_firefly_heart_bai
+柏先生: 借一步说话。
+柏先生: 那天盖的章，我说我忘了。我没忘。
+柏先生: 你把灯一盏一盏点起来，我拦过你没有？没有。往后也不拦。
+柏先生: 今晚不说别的。……谢谢你没来逼问我。 [#sad]
+=> END
+
+~ fest_firefly_heart_ahe
+阿禾: 哎，你过来，我跟你说个事。不记账的那种。
+阿禾: 招牌上的字是我娘写的。我现在闭上眼能看见她写字的手，就是看不见脸。
+阿禾: 你把那页纸带回来以前，我连“看不见”都不知道。……所以谢谢你。真的。 [#happy]
+=> END
+
+~ fest_firefly_heart_shishu
+石叔: ……
+石叔: 那把断凿子，我搁在炉子边上了。
+石叔: 师父说过，东西断了不丢人，丢了才丢人。
+石叔: 这句是你带回来的。……谢了。 [#happy]
+=> END
+
+~ fest_firefly_heart_qingzhu
+青竹: 你有空没有？就两句。
+青竹: 那张桥的图纸，笔迹我认出来了。我画图的毛病跟他一模一样，收笔往右甩。
+青竹: 我一直当手艺是自己琢磨出来的。原来是有人教的。……有人教，挺好。 [#happy]
+=> END
+
+~ fest_firefly_heart_yunniang
+云娘: 来来来，这儿没人。我唱给你听。
+云娘: 就前两句，再多半句。多出来的那半句是你带回来的。
+云娘: 厨房外头跟着哼的那个人，我还没看清。可我现在敢回头了。 [#happy]
+=> END
+
+~ fest_firefly_heart_laozhou
+老周: ……
+老周: 那枚钩子是我磨的。磨给一个孩子。
+老周: 他钓起过一条大鱼。他喊我看。
+老周: 我在码头上等的是他。我现在知道我在等了。 [#sad]
+=> END
+
+~ fest_firefly_heart_amu
+阿牧: 那、那个……我能跟你说句话吗。
+阿牧: 哨子我天天吹。还没有狗跑回来。
+阿牧: 可我吹的时候不难受了。以前是不知道少了什么才难受。现在知道了。 [#happy]
+=> END
+
+~ fest_firefly_heart_laoqin
+老秦: 你。过来。
+老秦: 二十八只钩子。我那天早上数的。
+老秦: 我守了三十年井，一直当自己是在拦人下去。
+老秦: ……不是。我是在等人上来。别往外说。 [#sad]
+=> END
+
+~ fest_firefly_heart_luyuan
+陆远: 打扰一下。这句话我想说出来，不想写在胳膊上。
+陆远: 车票上的地名是我自己填的。我是自己要来的。
+陆远: 医生不该说“直觉”。可我觉得，我要找的人还在这镇上。谢谢你让我想起我在找。 [#happy]
+=> END
+
+~ fest_firefly_heart_egret
+白鹭: 喂。陪我站一会儿。
+白鹭: 那张街角的画，街是真的。我小时候在上头跑过，鞋跟老磕在第三块石板上。
+白鹭: 我一直说自己是路过的。路过的人不会知道第三块石板是松的。 [#sad]
+=> END
+
+~ fest_harvest_host
+if Residents.fest_done("judge_crop") and Residents.fest_done("judge_fish") and Residents.fest_done("judge_animal")
+	柏先生: 三项你都评过了。……很多年没人把三张单子都填满了。 [#happy]
+	=> END
+柏先生: 丰收集。作物、鱼、畜产，各评一回。
+柏先生: 把最拿得出手的那一样拿在手里给我看。评过的东西留在台上，傍晚散了大家分着吃。
+- 评手里这一样
+	do Residents.festival_act("judge")
+- 先看看别人的
+	柏先生: 阿禾的南瓜、老周的鱼、阿牧的羊毛，都在台上。看好了再来。
+=> END
+
+~ fest_harvest_reject
+柏先生: 这一样不在评比里。
+柏先生: 只评三项：地里种的作物，水里钓的鱼，牲口出的蛋、奶、毛、蜜。野地里采的和灶上做的不算。
+=> END
+
+~ fest_harvest_twice
+柏先生: {{Residents.fest("category")}}这一项你评过了。一项只评一回，这是规矩。
+=> END
+
+~ fest_harvest_result_1
+柏先生: {{Residents.fest("item")}}。……好。
+柏先生: {{Residents.fest("category")}}这一项，头名。台上没有比它更好的。 [#happy]
+柏先生: 这是 {{Residents.fest("prize")}} 文。镇上很久没发过这笔钱了。
+=> END
+
+~ fest_harvest_result_2
+柏先生: {{Residents.fest("item")}}。不错。
+柏先生: {{Residents.fest("category")}}这一项，第二。头名是{{Residents.fest("best")}}。
+柏先生: 这是 {{Residents.fest("prize")}} 文。
+=> END
+
+~ fest_harvest_result_3
+柏先生: {{Residents.fest("item")}}。可以。
+柏先生: {{Residents.fest("category")}}这一项，第三。头名是{{Residents.fest("best")}}。
+柏先生: 这是 {{Residents.fest("prize")}} 文。
+=> END
+
+~ fest_harvest_result_4
+柏先生: {{Residents.fest("item")}}。我记上了。
+柏先生: {{Residents.fest("category")}}这一项，这回没进前三。头名是{{Residents.fest("best")}}。
+柏先生: 卖得上价的、品质好的，分数就高。明年再来。
+=> END
+
+~ fest_harvest_jiang
+姜婆婆: 我晒的陈皮也摆上去了。柏先生说药材不算，给我放在台子角上。
+姜婆婆: 放着就放着。谁咳嗽了自己会来拿。
+=> END
+
+~ fest_harvest_xiaoman
+小满: 我养了一只鸡！它下的蛋我摆上去了！
+小满: 阿牧哥哥说我的蛋比他的小。小怎么了，小的香。 [#happy]
+=> END
+
+~ fest_harvest_ahe
+阿禾: 看见台上那个南瓜没有？我的！
+阿禾: 我给它翻了一个月的身，晒得四面一样黄。你要是赢了我，我……我明年种两个。 [#happy]
+=> END
+
+~ fest_harvest_shishu
+石叔: 评比的秤是我校的。
+石叔: 不偏。谁的也不偏。
+=> END
+
+~ fest_harvest_qingzhu
+青竹: 台子我搭的，三格宽，不晃。
+青竹: 作物那项我也交了一样。别问是什么，没进前三。
+=> END
+
+~ fest_harvest_yunniang
+云娘: 散了集，台上的东西都归我下锅。
+云娘: 所以你交好的。我替全镇谢谢你。 [#happy]
+=> END
+
+~ fest_harvest_laozhou
+老周: 那条鱼是我的。
+老周: ……今早钓的。它本来不该这个季节咬钩。
+=> END
+
+~ fest_harvest_amu
+阿牧: 羊、羊毛是我剪的。剪之前我跟它商量过了。
+阿牧: 它说行。 [#happy]
+=> END
+
+~ fest_harvest_laoqin
+老秦: 我没东西交。
+老秦: 井里出的东西不该摆到太阳底下。……矿石除外。矿石他们又不评。
+=> END
+
+~ fest_harvest_luyuan
+陆远: 我交了一条鱼。第三。
+陆远: 我只是想知道“把东西交上去”是什么感觉。记下来了：手心出汗。 [#happy]
+=> END
+
+~ fest_harvest_egret
+白鹭: 我钓了一条鱼交上去，第二。
+白鹭: 别这么看我。画画的人有的是时间坐在水边。 [#happy]
+=> END
+
+~ fest_dumpling_host
+if Residents.fest_done("fill")
+	云娘: 吃饱了没有？锅里还有，自己捞！ [#happy]
+	=> END
+云娘: 冬至饺子宴！规矩是每人带一样馅，剁在一块儿包，吃到什么算什么。
+云娘: 姜婆婆带了荠菜，老周带了鱼，石叔……石叔带了一把刀，说他负责剁。
+云娘: 你带了什么？拿在手里给我看看。
+- 把手里的东西交给云娘
+	do Residents.festival_act("fill")
+- 我回去找找
+	云娘: 快去快回，九点收桌！种的、钓的、采的、鸡下的，都行。
+=> END
+
+~ fest_dumpling_reject
+云娘: 这个……这个包不进去呀。
+云娘: 拿样能吃的来。地里种的、水里钓的、野地里采的、鸡鸭牛羊出的，我都能给你剁成馅。
+=> END
+
+~ fest_dumpling_feast_veg
+云娘: {{Residents.fest("item")}}！好，素馅清口，正好压一压老周那条鱼的腥。
+一桌人围着长桌，热气把每个人的脸都蒸得发红。
+姜婆婆: 这一个是{{Residents.fest("item")}}馅的。谁带的？……是你呀。吃着像家里的味道。 [#happy]
+阿禾: 地里长的东西包进饺子里，这才叫没白种。再来一个！ [#happy]
+你吃了十几个，身上暖透了。
+=> END
+
+~ fest_dumpling_feast_fish
+云娘: {{Residents.fest("item")}}！鱼馅最鲜。老周，有人跟你带了一样的！
+老周: ……我看看。
+老周: 刺挑干净了。行。
+一桌人围着长桌，热气把每个人的脸都蒸得发红。
+小满: 我吃到鱼馅的了！没有刺！老周爷爷那个有刺！ [#happy]
+你吃了十几个，身上暖透了。
+=> END
+
+~ fest_dumpling_feast_wild
+云娘: {{Residents.fest("item")}}？野地里采的！这个我得起个名字——“踏雪寻春”饺。
+一桌人围着长桌，热气把每个人的脸都蒸得发红。
+姜婆婆: 野味的馅要多搁一点油。……这话是谁教我的来着。反正是对的。
+阿牧: 我、我在坡上天天看见这个，不知道能包饺子。 [#happy]
+你吃了十几个，身上暖透了。
+=> END
+
+~ fest_dumpling_feast_rich
+云娘: {{Residents.fest("item")}}！这个香。我给你单包一笼。
+一桌人围着长桌，热气把每个人的脸都蒸得发红。
+阿牧: 是、是牲口出的那种吗？它们知道了要得意的。 [#happy]
+陆远: 营养很全面。我记一笔……算了，今天不记，先吃。
+你吃了十几个，身上暖透了。
+=> END
+
+~ fest_dumpling_feast_sweet
+云娘: {{Residents.fest("item")}}……包饺子？甜的？
+云娘: 行！过节嘛。这个就叫“冬至一点甜”。 [#happy]
+一桌人围着长桌，热气把每个人的脸都蒸得发红。
+小满: 甜的！！我要吃那个！全给我！ [#happy]
+石叔: ……
+石叔: 甜的。也行。
+你吃了十几个，身上暖透了。
+=> END
+
+~ fest_dumpling_feast_odd
+云娘: {{Residents.fest("item")}}……？
+云娘: ……你是认真的。好，我包。云娘的饺子没有包不了的馅。
+席上传了一圈，那一只饺子谁都没敢先动。
+老秦: 给我。
+老秦: ……
+老秦: 硌牙。明年别带了。 [#sad]
+小满: 秦爷爷吃了！秦爷爷真的吃了！ [#happy]
+你吃了十几个别的馅的，身上暖透了。
+=> END
+
+~ fest_dumpling_jiang
+姜婆婆: 我带了荠菜。春天晒的，就等今天。
+姜婆婆: 擀皮我来。你们年轻人擀的皮厚，煮出来像面疙瘩。
+姜婆婆: ……我又多带了一副碗筷。今天人多，总算用得上了。 [#happy]
+=> END
+
+~ fest_dumpling_xiaoman
+小满: 冬至夜最长！所以要吃最久的饭！
+小满: 我负责数饺子。谁多吃了我都知道。 [#happy]
+=> END
+
+~ fest_dumpling_bai
+柏先生: 镇公所今天不办公。
+柏先生: ……我带了一坛醋。别告诉人是我自己酿的。
+=> END
+
+~ fest_dumpling_ahe
+阿禾: 我带了白菜，自家铺子的，记我账上。
+阿禾: 一人带一样，凑起来就是一桌。这买卖划算。 [#happy]
+=> END
+
+~ fest_dumpling_shishu
+石叔: 刀是今早磨的。
+石叔: 剁馅。别的我不会。
+=> END
+
+~ fest_dumpling_qingzhu
+青竹: 桌子我加了一条横撑，十二个人压上去也不晃。
+青竹: 我带的是冬笋，自己上山挖的，手都冻裂了。值。 [#happy]
+=> END
+
+~ fest_dumpling_laozhou
+老周: 带了鱼。
+老周: ……人多的时候，我话少。你吃你的。
+=> END
+
+~ fest_dumpling_amu
+阿牧: 我、我带了羊——不不不，是羊奶。羊都好好的。
+阿牧: 花花在镇口，我给它留了一把豆子。 [#happy]
+=> END
+
+~ fest_dumpling_laoqin
+老秦: 我带了酒。云娘那坛不掺水的，我盯着她打的。
+老秦: 夜最长的一天，井底下最黑。……今晚我不去想。喝。
+=> END
+
+~ fest_dumpling_luyuan
+陆远: 我带了姜。驱寒，药理上站得住。
+陆远: 姜婆婆说饺子馅里搁姜是她教我的。她确实教过，三遍。 [#happy]
+=> END
+
+~ fest_dumpling_egret
+白鹭: 我带了一把野葱，海边石头缝里拔的。
+白鹭: 画画的手包饺子，褶子捏得太齐，云娘说像假的。 [#happy]
+=> END
+
+~ fest_newyear_host
+柏先生: 除夕。
+if Residents.lantern_scale() == 0
+	柏先生: 灯笼只挂得起这几只。镇上亮着的灯少，夜里不敢太张扬。
+elif Residents.lantern_scale() == 1
+	柏先生: 今年的灯笼比往年多挂了一圈。是你点亮的那几盏灯给的胆子。
+elif Residents.lantern_scale() == 2
+	柏先生: 你看这广场。我有很多年没见过它这么亮了。 [#happy]
+else
+	柏先生: 满了。能挂的地方都挂满了。从前的灯会就是这样的——我现在敢说“从前”了。 [#happy]
+- 听听这一年
+	do Residents.festival_act("summary")
+- 和大家一起守岁 [if not Residents.fest_done("vigil") /]
+	do Residents.festival_act("vigil")
+- 再逛逛
+	柏先生: 去吧。想守岁了就回来找我。
+=> END
+
+~ fest_newyear_summary
+柏先生: 第 {{Residents.fest("year")}} 年的账，我念一遍。
+柏先生: 出货的进项，{{Residents.fest("income")}} 文。
+柏先生: 镇上亮着的灯，{{Residents.fest("lamps")}} 盏。今晚的灯笼，挂了 {{Residents.fest("lanterns")}} 只。
+柏先生: 找回来的旧事，{{Residents.fest("memories")}} 段。
+柏先生: 钓上来的鱼，{{Residents.fest("fish")}} 种。井下到过的最深处，第 {{Residents.fest("depth")}} 层。
+柏先生: 认得你的人，{{Residents.fest("met")}} 位。
+柏先生: ……账就是这些。有几笔，不是用文能记的。 [#happy]
+=> END
+
+~ fest_newyear_vigil
+你在长凳上坐下。小满挤过来挨着你，没一会儿就睡着了。
+灯笼里的蜡一截一截烧短。没有人走。
+姜婆婆: 守岁守岁，守的是身边的人。都在就好。 [#happy]
+远处山上有一点很淡的光动了一下，像有什么东西也在朝这边看。
+天快亮的时候，柏先生说了一句：过年了。
+do EventBus.request_sleep()
+=> END
+
+~ fest_newyear_jiang
+姜婆婆: 过年要穿新鞋。我给小满做了一双，还多做了一双大的。
+姜婆婆: 大的那双……你试试？不合脚再改。 [#happy]
+=> END
+
+~ fest_newyear_xiaoman
+小满: 我今晚不睡！守岁就是不睡！
+小满: 去年我也说不睡，后来是柏爷爷把我背回去的。今年不会了。 [#happy]
+=> END
+
+~ fest_newyear_ahe
+阿禾: 年底盘账！今年的账……哎，比去年厚。
+阿禾: 厚是好事。有进有出才叫日子。 [#happy]
+=> END
+
+~ fest_newyear_shishu
+石叔: 灯笼架子，我打的。
+石叔: 明年多打几个。
+=> END
+
+~ fest_newyear_qingzhu
+青竹: 杆子是我立的，一根一根量过间距。
+青竹: 明年镇上的灯要是更多，我就得把杆子立到街上去了。巴不得。 [#happy]
+=> END
+
+~ fest_newyear_yunniang
+云娘: 年夜饭在茶馆，散了都来！今晚的菜叫“岁岁有今朝”。
+云娘: ……是豆腐汤，加了年糕。 [#happy]
+=> END
+
+~ fest_newyear_laozhou
+老周: ……
+老周: 码头上也挂了一只。回来的人看得见。
+=> END
+
+~ fest_newyear_amu
+阿牧: 牛、牛羊圈里我也挂了一只小的。它们也过年。
+阿牧: 花花今晚多吃了一把豆子。 [#happy]
+=> END
+
+~ fest_newyear_laoqin
+老秦: 井口我锁了。今晚不守。
+老秦: ……一年就这一晚。你别到处说。
+=> END
+
+~ fest_newyear_luyuan
+陆远: 我来这儿以后的每一个除夕，都记在胳膊上。
+陆远: 今年这一条，我想写大一点。 [#happy]
+=> END
+
+~ fest_newyear_egret
+白鹭: 灯笼的红，我调了一晚上都调不对。
+白鹭: 后来不调了。看就行了。 [#happy]
+=> END

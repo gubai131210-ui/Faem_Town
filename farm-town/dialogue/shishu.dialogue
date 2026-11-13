@@ -1,0 +1,120 @@
+~ first
+石叔: ……
+石叔: 新来的？
+石叔: 我姓石，打铁的。锄头、水壶用旧了就拿来，我给你换好料重打。
+石叔: 价钱不讲。……手艺上的事，你问，我答。
+- 看看能打什么
+	do EventBus.request_shop("smith")
+- 知道了
+	石叔: 嗯。有事敲门板。
+=> END
+
+~ work
+if Residents.owes_thanks("shishu")
+	石叔: 上回的{{Residents.gift_name("shishu")}}，吃了。不错。
+	do Residents.thanked("shishu")
+elif Residents.away("shishu") >= 4
+	石叔: 有日子没来了。家伙还趁手？
+elif Residents.weather_is("rain") or Residents.weather_is("storm")
+	% 石叔: 雨天炉子不好烧。活照做。
+	% 石叔: 站里头点，别淋着。
+elif Residents.season_is("summer")
+	% 石叔: 热。离炉子远点。
+	% 石叔: 要打什么。
+elif Residents.knows("shishu", 50)
+	% 石叔: 来了。
+	% 石叔: 是你啊。炉子正热着。 [#happy]
+	% 石叔: 今天打什么？
+else
+	% 石叔: 要打什么。
+	% 石叔: 嗯。
+	% 石叔: 炉子热着。
+- 升级工具
+	do EventBus.request_shop("smith")
+- 随便聊聊
+	if Residents.topic("shishu", 6) == 0
+		石叔: 师父教过我七道工序。
+		石叔: 我现在只做六道。最后一道……怎么也想不起来。 [#sad]
+	elif Residents.topic("shishu", 6) == 1
+		石叔: 铁不骗人。火候到了就是到了，没到就是没到。
+		石叔: 比人好打交道。
+	elif Residents.topic("shishu", 6) == 2
+		石叔: 你那把锄头是老东西。料子不差，是以前的人打的。
+		石叔: ……看着眼熟。说不上来。
+	elif Residents.topic("shishu", 6) == 3
+		石叔: 阿禾话多。
+		石叔: 人不坏。
+	elif Residents.topic("shishu", 6) == 4
+		石叔: 你种地，我打铁。都是一下一下来的活。
+		石叔: 急不得。
+	else
+		if Residents.knows("shishu", 60)
+			石叔: 有时候锤子举到一半，我会忘了下一锤落哪儿。
+			石叔: 就那么举着。等它自己想起来。
+		else
+			石叔: 没什么可聊的。……不是嫌你。我就这样。
+- 没事
+	石叔: 嗯。
+=> END
+
+~ daily
+if Residents.owes_thanks("shishu")
+	石叔: 上回的{{Residents.gift_name("shishu")}}。……谢了。
+	do Residents.thanked("shishu")
+elif Residents.at("shishu", "bench")
+	% 石叔: 收工了。坐会儿。
+	% 石叔: 胳膊酸。老了。
+	% 石叔: 你也歇歇。地又跑不了。
+else
+	% 石叔: 这就回去。
+	% 石叔: 出来走走。你忙你的。
+=> END
+
+~ again
+if Residents.nth("shishu") == 2
+	石叔: 还有事？
+else
+	% 石叔: ……
+	% 石叔: 话说完了。
+=> END
+
+~ gift_love
+石叔: ……
+石叔: 好东西。 [#happy]
+石叔: 下回打铁，给你多敲两锤。
+=> END
+
+~ gift_like
+% 石叔: 嗯。谢了。
+% 石叔: 行。我收下。
+=> END
+
+~ gift_ok
+% 石叔: 嗯。
+% 石叔: 放那儿吧。
+=> END
+
+~ gift_dislike
+石叔: ……花哨的东西，我用不上。 [#sad]
+石叔: 拿回去吧。不是怪你。
+=> END
+
+~ quest_shishu_shoot
+石叔: 嗯。笋。
+石叔: 钱。
+石叔: ……下回有酒请你。
+=> END
+
+~ memory_1
+石叔: 这凿子。
+石叔: 我的。学徒那年用断的。师父骂了我一顿，又给我接了柄。
+石叔: 柄上这个“石”字是他刻的。他说，手艺传给你，字也传给你。
+石叔: 最后一道工序……他只教了我一半。 [#sad]
+石叔: 我一直以为是我忘了。
+=> END
+
+~ ending_news
+石叔: 最后一道工序，想起来了。
+石叔: 不难。就是得有人站在旁边，看着你做一遍。 [#sad]
+石叔: 往后你拿来的东西，我照师父的规矩打。
+=> END

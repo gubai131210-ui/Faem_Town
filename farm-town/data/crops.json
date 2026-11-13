@@ -1,10 +1,29 @@
 [
-	{
-		"id": "white_radish",
-		"name": "白萝卜",
-		"seed": "white_radish_seed",
-		"produce": "white_radish",
-		"stage_days": [1, 2, 2],
-		"seasons": ["spring"]
-	}
+	{"id": "bok_choy", "name": "小白菜", "seed": "bok_choy_seed", "produce": "bok_choy", "stage_days": [1, 1, 2], "seasons": ["spring"], "art": {"shape": "leafy", "leaf": "6fbf4a", "fruit": "eef3dc", "icon": "leafy"}},
+	{"id": "white_radish", "name": "白萝卜", "seed": "white_radish_seed", "produce": "white_radish", "stage_days": [1, 2, 2], "seasons": ["spring"], "art": {"shape": "root", "leaf": "7cc74f", "fruit": "f6efe6", "icon": "turnip"}},
+	{"id": "potato", "name": "土豆", "seed": "potato_seed", "produce": "potato", "stage_days": [1, 2, 3], "seasons": ["spring"], "extra_chance": 0.25, "art": {"shape": "root", "leaf": "5fa84a", "fruit": "d9b377", "icon": "round", "stem": false, "eyes": true}},
+	{"id": "pea", "name": "豌豆", "seed": "pea_seed", "produce": "pea", "stage_days": [2, 2, 3], "seasons": ["spring"], "regrow_days": 3, "art": {"shape": "bush", "leaf": "74c256", "fruit": "a6dc6a", "icon": "pods", "tall": true, "fruit_shape": "pod", "trellis": true}, "trellis": true},
+	{"id": "strawberry", "name": "草莓", "seed": "strawberry_seed", "produce": "strawberry", "stage_days": [2, 3, 3], "seasons": ["spring"], "regrow_days": 4, "shop": false, "art": {"shape": "bush", "leaf": "4f9f45", "fruit": "e2463f", "icon": "berry"}},
+	{"id": "rapeseed", "name": "油菜", "seed": "rapeseed_seed", "produce": "rapeseed", "stage_days": [2, 2, 2], "seasons": ["spring"], "art": {"shape": "stalk", "leaf": "6db648", "fruit": "f4d23c", "icon": "flower", "top": "flower"}},
+	{"id": "tomato", "name": "番茄", "seed": "tomato_seed", "produce": "tomato", "stage_days": [2, 3, 3], "seasons": ["summer"], "regrow_days": 4, "art": {"shape": "bush", "leaf": "58a548", "fruit": "e5503c", "icon": "round", "tall": true}},
+	{"id": "chili", "name": "辣椒", "seed": "chili_seed", "produce": "chili", "stage_days": [2, 2, 3], "seasons": ["summer"], "regrow_days": 3, "art": {"shape": "bush", "leaf": "4f9f45", "fruit": "d8382f", "icon": "chili", "fruit_shape": "long"}},
+	{"id": "corn", "name": "玉米", "seed": "corn_seed", "produce": "corn", "stage_days": [3, 3, 4], "seasons": ["summer", "autumn"], "regrow_days": 4, "art": {"shape": "stalk", "leaf": "79b84a", "fruit": "f2cf4f", "icon": "corn", "top": "ear"}},
+	{"id": "watermelon", "name": "西瓜", "seed": "watermelon_seed", "produce": "watermelon", "stage_days": [3, 4, 5], "seasons": ["summer"], "art": {"shape": "melon", "leaf": "4f9f45", "fruit": "74c264", "icon": "round", "stripes": "2f7a40", "big": true}, "giant_chance": 0.08},
+	{"id": "pumpkin", "name": "南瓜", "seed": "pumpkin_seed", "produce": "pumpkin", "stage_days": [3, 4, 5], "seasons": ["autumn"], "art": {"shape": "melon", "leaf": "5a9a44", "fruit": "e88a2e", "icon": "round", "ribs": true, "big": true, "squash": true}, "giant_chance": 0.08},
+	{"id": "sweet_potato", "name": "红薯", "seed": "sweet_potato_seed", "produce": "sweet_potato", "stage_days": [2, 2, 3], "seasons": ["autumn"], "extra_chance": 0.25, "art": {"shape": "root", "leaf": "5a9c50", "fruit": "b5524e", "icon": "long"}},
+	{"id": "soybean", "name": "大豆", "seed": "soybean_seed", "produce": "soybean", "stage_days": [2, 2, 2], "seasons": ["autumn"], "art": {"shape": "bush", "leaf": "7fb04c", "fruit": "d8c27a", "icon": "pods", "fruit_shape": "pod"}},
+	{"id": "napa_cabbage", "name": "大白菜", "seed": "napa_cabbage_seed", "produce": "napa_cabbage", "stage_days": [2, 3, 3], "seasons": ["autumn"], "art": {"shape": "leafy", "leaf": "8cc85c", "fruit": "f4f6e0", "icon": "cabbage"}, "hardy": true},
+	{"id": "cotton", "name": "棉花", "seed": "cotton_seed", "produce": "cotton", "stage_days": [3, 3, 3], "seasons": ["autumn"], "regrow_days": 4, "art": {"shape": "bush", "leaf": "5f9a48", "fruit": "fbfaf2", "icon": "boll", "tall": true}},
+	{"id": "sesame", "name": "芝麻", "seed": "sesame_seed", "produce": "sesame", "stage_days": [2, 2, 3], "seasons": ["autumn"], "art": {"shape": "stalk", "leaf": "6aa84a", "fruit": "ead9a6", "icon": "pile", "top": "pods"}},
+	{"id": "potherb_mustard", "name": "雪里蕻", "seed": "potherb_mustard_seed", "produce": "potherb_mustard", "stage_days": [2, 2, 2], "seasons": ["winter"], "art": {"shape": "leafy", "leaf": "3f8f52", "fruit": "5fae62", "icon": "leafy"}, "hardy": true},
+	{"id": "fog_bell", "name": "雾铃草", "seed": "fog_bell_seed", "produce": "fog_bell", "stage_days": [1, 1, 1], "seasons": ["spring", "summer", "autumn", "winter"], "needs_fog": true, "art": {"shape": "herb", "leaf": "7fb0a0", "fruit": "cfe6f4", "icon": "bell"}, "hardy": true},
+	{"id": "rice", "name": "水稻", "seed": "rice_seed", "produce": "rice", "stage_days": [3, 3, 4], "seasons": ["summer"], "paddy": true, "art": {"shape": "grain", "leaf": "7fbf4a", "fruit": "e8c85a", "icon": "grain", "droop": true}},
+	{"id": "lotus_root", "name": "莲藕", "seed": "lotus_root_seed", "produce": "lotus_root", "stage_days": [3, 4, 5], "seasons": ["summer"], "paddy": true, "bonus_produce": "lotus_flower", "art": {"shape": "lotus", "leaf": "5fae5a", "fruit": "e0cfae", "icon": "lotus", "flower": "f4a9be"}},
+	{"id": "winter_wheat", "name": "冬小麦", "seed": "winter_wheat_seed", "produce": "winter_wheat", "stage_days": [4, 12, 20], "seasons": ["spring", "summer", "autumn", "winter"], "sow_seasons": ["autumn"], "rainfed": true, "hardy": true, "ripe_term": "mangzhong", "art": {"shape": "grain", "leaf": "8fbc4c", "fruit": "e2b24a", "icon": "grain"}},
+	{"id": "tea", "name": "茶树", "seed": "tea_seed", "produce": "tea_leaf", "stage_days": [4, 4, 4], "seasons": ["spring", "summer", "autumn", "winter"], "regrow_days": 4, "rainfed": true, "hardy": true, "term_bonus": {"qingming": 1, "guyu": 2, "lixia": 1}, "art": {"shape": "bush", "leaf": "3f8a4a", "fruit": "b7e07a", "icon": "tea"}},
+	{"id": "sunflower", "name": "向日葵", "seed": "sunflower_seed", "produce": "sunflower", "stage_days": [2, 3, 3], "seasons": ["summer"], "art": {"shape": "stalk", "leaf": "5fa84a", "fruit": "f4c62e", "icon": "bloom", "top": "sun", "center": "7a4a24"}},
+	{"id": "chrysanthemum", "name": "菊花", "seed": "chrysanthemum_seed", "produce": "chrysanthemum", "stage_days": [2, 2, 3], "seasons": ["autumn"], "art": {"shape": "bush", "leaf": "5a9a4a", "fruit": "f2c23a", "icon": "bloom", "center": "d88a1e", "fruit_shape": "bloom"}},
+	{"id": "osmanthus", "name": "桂花", "seed": "osmanthus_seed", "produce": "osmanthus", "stage_days": [3, 3, 3], "seasons": ["autumn"], "regrow_days": 4, "art": {"shape": "bush", "leaf": "3f7f45", "fruit": "f6b83a", "icon": "flower", "tall": true}},
+	{"id": "wintersweet", "name": "腊梅", "seed": "wintersweet_seed", "produce": "wintersweet", "stage_days": [2, 2, 3], "seasons": ["winter"], "hardy": true, "art": {"shape": "stalk", "leaf": "8a6a52", "fruit": "f4dc5a", "icon": "flower", "top": "flower"}},
+	{"id": "camellia", "name": "山茶", "seed": "camellia_seed", "produce": "camellia", "stage_days": [2, 3, 3], "seasons": ["winter"], "hardy": true, "art": {"shape": "bush", "leaf": "2f6f42", "fruit": "d8384a", "icon": "bloom", "center": "f4d23c", "fruit_shape": "bloom"}}
 ]

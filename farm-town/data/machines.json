@@ -1,0 +1,34 @@
+[
+	{"id": "pickle_vat", "name": "腌缸", "price": 600, "tile": [13, 5], "flag": "lamp_plaza",
+	 "desc": "两份菜腌两天，出一坛腌菜。石叔送到农场屋东边。",
+	 "recipes": [
+		{"inputs": ["bok_choy", "white_radish", "napa_cabbage", "potherb_mustard", "chili"], "count": 2, "output": "pickles", "days": 2}
+	 ]},
+	{"id": "millstone", "name": "石磨", "price": 900, "tile": [15, 5], "flag": "lamp_plaza",
+	 "desc": "稻谷磨成米，小麦磨成面，过一夜就好。",
+	 "recipes": [
+		{"inputs": ["rice"], "count": 1, "output": "white_rice", "days": 1},
+		{"inputs": ["winter_wheat"], "count": 1, "output": "flour", "days": 1}
+	 ]},
+	{"id": "oil_press", "name": "榨油机", "price": 1200, "tile": [17, 5], "flag": "lamp_plaza",
+	 "desc": "油菜、芝麻、大豆两份榨一壶菜油；雾铃草榨灯油。",
+	 "recipes": [
+		{"inputs": ["rapeseed", "sesame", "soybean"], "count": 2, "output": "cooking_oil", "days": 1},
+		{"inputs": ["fog_bell"], "count": 1, "output": "lamp_oil", "days": 1}
+	 ]},
+	{"id": "tea_roaster", "name": "茶焙", "price": 800, "tile": [19, 5], "flag": "lamp_plaza",
+	 "desc": "两份鲜茶叶焙一夜，出一包干茶。",
+	 "recipes": [
+		{"inputs": ["tea_leaf"], "count": 2, "output": "dried_tea", "days": 1}
+	 ]},
+	{"id": "silk_reel", "name": "缫丝机", "price": 1500, "tile": [21, 5], "flag": "lamp_river",
+	 "desc": "三个蚕茧缫一夜，出一绞生丝。",
+	 "recipes": [
+		{"inputs": ["cocoon"], "count": 3, "output": "silk", "days": 1}
+	 ]},
+	{"id": "cheese_rack", "name": "奶酪架", "price": 1000, "tile": [23, 5], "flag": "lamp_pasture",
+	 "desc": "一份羊奶或牛奶晾两天，出一块奶酪。",
+	 "recipes": [
+		{"inputs": ["goat_milk", "milk"], "count": 1, "output": "cheese", "days": 2}
+	 ]}
+]

@@ -1,0 +1,32 @@
+{
+	"name": "dog",
+	"body": "quadruped",
+	"scale": 1.0,
+	"quad": {
+		"body": [
+			0.2,
+			0.33,
+			0.18
+		],
+		"leg": 0.2,
+		"neck": 0.12,
+		"neck_up": 0.22,
+		"head": [
+			0.17,
+			0.18,
+			0.16
+		],
+		"snout": 0.13,
+		"ears": "flop",
+		"tail": "up"
+	},
+	"parts": {
+		"body": "hair_tan",
+		"head": "hair_tan",
+		"leg": "hair_tan",
+		"ear": "hair_brown",
+		"tail": "hair_tan",
+		"snout": "cream",
+		"hoof": "cream"
+	}
+}

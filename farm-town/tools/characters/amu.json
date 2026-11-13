@@ -1,0 +1,29 @@
+{
+	"name": "amu",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": "straw",
+	"hair": "short",
+	"outfit": "overalls",
+	"bulk": 1.2,
+	"parts": {
+		"shirt": "orange",
+		"blue": "leather",
+		"hair": "hair_tan",
+		"band": "green",
+		"boot": "leather",
+		"skin": "skin_tan"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "calm",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "smile",
+		"jaw": "square",
+		"crop": true
+	}
+}

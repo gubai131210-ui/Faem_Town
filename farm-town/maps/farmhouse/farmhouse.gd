@@ -1,19 +1,32 @@
 extends GameMap
-## 农舍室内：床（睡觉）、桌子、出门的门垫。
+## 农舍室内：床（睡觉）、摆着两副碗筷的桌子、灶台（做菜）、柜子（上面的收音机报天气），门垫出门。
 
 const W := 12
 const H := 9
 const WALL_ROWS := 2
-const BED_TILES: Array[Vector2i] = [Vector2i(1, 2), Vector2i(1, 3)]
-const TABLE_TILES: Array[Vector2i] = [Vector2i(7, 4), Vector2i(8, 4)]
 const EXIT_TILES: Array[Vector2i] = [Vector2i(5, 8), Vector2i(6, 8)]
 const INTRO_DIALOGUE := "res://dialogue/intro.dialogue"
 const COMMON_DIALOGUE := "res://dialogue/common.dialogue"
+## 家具：[素材名, 锚点所在的像素位置, 占的格子(左上角), 占地宽, 占地深]
+const FURNITURE: Array = [
+	["bed", Vector2(32, 80), Vector2i(1, 2), 2, 3],
+	["cabinet", Vector2(64, 48), Vector2i(3, 2), 2, 1],
+	["stove", Vector2(176, 48), Vector2i(10, 2), 2, 1],
+	["table", Vector2(128, 80), Vector2i(7, 4), 2, 1],
+	["stool", Vector2(104, 76), Vector2i(6, 4), 1, 1],
+	["stool", Vector2(152, 76), Vector2i(9, 4), 1, 1],
+	["jar_jade", Vector2(184, 108), Vector2i(11, 6), 1, 1],
+	["jar_clay", Vector2(170, 124), Vector2i(10, 7), 1, 1],
+]
 
 var _solid: Dictionary[Vector2i, bool] = {}
-var _windows: Array[Sprite2D] = []
-var _window_day: Texture2D
-var _window_night: Texture2D
+var _bed_tiles: Array[Vector2i] = []
+var _table_tiles: Array[Vector2i] = []
+var _cabinet_tiles: Array[Vector2i] = []
+var _stove_tiles: Array[Vector2i] = []
+var _room: Sprite2D
+var _room_day: Texture2D
+var _room_night: Texture2D
 var _is_night := false
 
 
@@ -21,42 +34,44 @@ func _ready() -> void:
 	map_id = &"farmhouse"
 	indoor = true
 
-	var room := Px.new_img(W * TS, H * TS)
-	Px.blit(room, PixelArt.wall(W * TS, WALL_ROWS * TS), 0, 0)
-	Px.blit(room, PixelArt.floor_wood(W * TS, (H - WALL_ROWS) * TS), 0, WALL_ROWS * TS)
-	Px.rect(room, 0, WALL_ROWS * TS, W * TS, 2, Color(0.35, 0.22, 0.14, 0.55))
-	Px.blit(room, PixelArt.rug(56, 34), 60, 76)
-	Px.blit(room, PixelArt.doormat(), 86, 134)
-	var ground := Sprite2D.new()
-	ground.centered = false
-	ground.texture = Px.tex(room)
-	ground.z_index = -10
-	add_child(ground)
-
-	_window_day = Px.tex(PixelArt.window(false))
-	_window_night = Px.tex(PixelArt.window(true))
-	for x: int in [52, 122]:
-		var w := Sprite2D.new()
-		w.centered = false
-		w.position = Vector2(x, 7)
-		w.z_index = -9
-		add_child(w)
-		_windows.append(w)
+	_room_day = PropArt.texture("room_day")
+	_room_night = PropArt.texture("room_night")
+	_room = PropArt.sprite("room_day", Vector2(0, H * TS))
+	_room.z_index = -10
+	add_child(_room)
 	_update_windows(true)
 
 	entities = Node2D.new()
 	entities.y_sort_enabled = true
 	add_child(entities)
-	_prop(PixelArt.bed(), Vector2(27, 66), Vector2(-12, -35))
-	_prop(PixelArt.table(), Vector2(128, 82), Vector2(-14, -21))
-	for t in BED_TILES:
-		_solid[t] = true
-	for t in TABLE_TILES:
-		_solid[t] = true
+	for entry: Array in FURNITURE:
+		var prop: String = entry[0]
+		var pos: Vector2 = entry[1]
+		var origin: Vector2i = entry[2]
+		var wide: int = entry[3]
+		var deep: int = entry[4]
+		entities.add_child(PropArt.sprite(prop, pos))
+		for dy in deep:
+			for dx in wide:
+				var t := origin + Vector2i(dx, dy)
+				_solid[t] = true
+				if prop == "bed":
+					_bed_tiles.append(t)
+				elif prop == "table":
+					_table_tiles.append(t)
+				elif prop == "cabinet":
+					_cabinet_tiles.append(t)
+				elif prop == "stove":
+					_stove_tiles.append(t)
 
 
 func _process(_delta: float) -> void:
 	_update_windows(false)
+
+
+func _exit_tree() -> void:
+	# 出了屋就听不到收音机了
+	Audio.stop_radio()
 
 
 func size_px() -> Vector2i:
@@ -65,7 +80,7 @@ func size_px() -> Vector2i:
 
 func spawn_position(spawn: StringName) -> Vector2:
 	if spawn == &"bed":
-		return tile_center(Vector2i(2, 3))
+		return tile_center(Vector2i(3, 3))
 	return tile_center(Vector2i(5, 7)) + Vector2(8, 0)
 
 
@@ -82,18 +97,24 @@ func blocked(p: Vector2) -> bool:
 
 
 func query_use(_item: ItemDef, tile: Vector2i, _facing: Facing) -> StringName:
-	if BED_TILES.has(tile) or TABLE_TILES.has(tile):
+	if _bed_tiles.has(tile) or _table_tiles.has(tile) or _cabinet_tiles.has(tile) or _stove_tiles.has(tile):
 		return &"interact"
 	return &""
 
 
-func perform(action: StringName, _item: ItemDef, tile: Vector2i) -> void:
+func perform(action: StringName, _item: ItemDef, tile: Vector2i, _quiet: bool = false) -> void:
 	if action != &"interact":
 		return
-	if BED_TILES.has(tile):
+	if _bed_tiles.has(tile):
 		EventBus.dialogue_requested.emit(COMMON_DIALOGUE, "bed")
-	elif TABLE_TILES.has(tile):
+	elif _table_tiles.has(tile):
 		EventBus.dialogue_requested.emit(INTRO_DIALOGUE, "table")
+	elif _stove_tiles.has(tile):
+		EventBus.cook_requested.emit()
+	elif _cabinet_tiles.has(tile):
+		# 柜子上的收音机报明天的天气，一边出字一边播报
+		Audio.play_radio(Weather.report_clips())
+		EventBus.dialogue_requested.emit(COMMON_DIALOGUE, "radio")
 
 
 func trigger_at(tile: Vector2i) -> Dictionary:
@@ -102,19 +123,9 @@ func trigger_at(tile: Vector2i) -> Dictionary:
 	return {}
 
 
-func _prop(img: Image, pos: Vector2, offset: Vector2) -> void:
-	var s := Sprite2D.new()
-	s.texture = Px.tex(img)
-	s.centered = false
-	s.offset = offset
-	s.position = pos
-	entities.add_child(s)
-
-
 func _update_windows(force: bool) -> void:
 	var night := GameClock.minutes >= 1140.0
 	if night == _is_night and not force:
 		return
 	_is_night = night
-	for w in _windows:
-		w.texture = _window_night if night else _window_day
+	_room.texture = _room_night if night else _room_day

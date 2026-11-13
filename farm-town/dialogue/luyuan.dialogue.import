@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://dkaakvcj801xn"
+path="res://.godot/imported/luyuan.dialogue-dc6abeca1ebe5b08953bdcf5a3f8db49.tres"
+
+[deps]
+
+source_file="res://dialogue/luyuan.dialogue"
+dest_files=["res://.godot/imported/luyuan.dialogue-dc6abeca1ebe5b08953bdcf5a3f8db49.tres"]
+
+[params]
+
+defaults=true

@@ -1,0 +1,164 @@
+~ first
+老秦: 看什么看。
+老秦: 新来的？我姓秦，守北边那口井的。
+老秦: 丑话说在前头：那口井你别靠近。谁都别靠近。
+老秦: 没有为什么！ [#sad]
+=> END
+
+~ work
+=> daily
+
+~ daily
+if Residents.lamp_news("laoqin", "well")
+	=> well_lamp_news
+if Residents.lamp_lit("pasture") and not Residents.lamp_lit("well")
+	=> well_matter
+if Residents.owes_thanks("laoqin")
+	老秦: 上回那{{Residents.gift_name("laoqin")}}……咳。还行。别以为我就欠你的了。
+	do Residents.thanked("laoqin")
+if Residents.lamp_lit("well")
+	=> at_the_well
+if Residents.topic("laoqin", 6) == 0
+	老秦: 我来打酒，打完就走。别跟着我。
+elif Residents.topic("laoqin", 6) == 1
+	老秦: 井口的锁我每天查三遍。
+	老秦: 你问这个干什么？！
+elif Residents.topic("laoqin", 6) == 2
+	老秦: 那天……
+	老秦: 哪天？我说什么了？没说什么！ [#sad]
+elif Residents.topic("laoqin", 6) == 3
+	老秦: 云娘的酒掺水。我说了八百遍了，她不认。
+	老秦: ……明天还得来打。
+elif Residents.topic("laoqin", 6) == 4
+	老秦: 你种地的？种地好。在地上头干活，好。
+else
+	if Residents.knows("laoqin", 60)
+		老秦: 你这人倒不讨厌。
+		老秦: 我夜里老听见井底下有人敲。敲三下，停一停。……你别往外说。 [#sad]
+	else
+		老秦: 看我干什么。我脸上有字？
+=> END
+
+~ well_matter
+if Residents.has_flag("got_well_key")
+	if Residents.has_flag("laoqin_key_nag")
+		=> old_talk
+	老秦: 灯在北边路口，就是我天天走过的那一盏。灯座上刻着要什么。
+	老秦: 凑不齐就别点。我守了三十年，不差你这几天。
+	do Residents.mark("laoqin_key_nag")
+	=> END
+if Residents.knows("laoqin", 40)
+	=> well_key
+if Residents.has_flag("well_warned") and not Residents.has_flag("laoqin_warned")
+	老秦: 今天往北边雾里走的，是不是你？！
+	老秦: 那边是井。我说过，谁都别靠近。
+	老秦: ……你这人我还看不透。看透了再说。
+	do Residents.mark("laoqin_warned")
+	=> END
+=> old_talk
+
+~ well_key
+老秦: 你。站着。
+老秦: 北边路口那盏灯，你是不是想点。别装，西边那盏就是你点的。
+老秦: 那口井我守了三十年。为什么守，我说不上来。就知道不能让人下去。 [#sad]
+老秦: 可你这人……地种得踏实，说话也不绕。我看了你这些日子。
+if Residents.can_hold("well_key")
+	老秦: 拿着。井口的钥匙。灯座上刻着要它，那行字我早认得，就是不肯给。
+	do Residents.hand("well_key")
+	老秦: 灯要是亮了，我就搬回井口住。你下去，我在上头守着。
+	老秦: 下去的人，得有人等他上来。这个我记得。只有这个我记得。 [#sad]
+else
+	老秦: 有样东西要给你。你身上放不下了，腾个地方再来。
+=> END
+
+~ well_lamp_news
+老秦: ……亮了。
+老秦: 雾一退，井口的木架子还在，跟我记得的一模一样。我居然记得。
+老秦: 我搬回井口那间小屋了。你要下去就下去，洞口的镐子拿上。
+老秦: 逢五层有一盏井灯，点上，升降机就认得路。打不过就往上跑，不丢人。
+老秦: 真倒在下头，我背你上来。就这一条，我说到做到。
+=> END
+
+~ at_the_well
+if Residents.at("laoqin", "teahouse")
+	=> old_talk
+if Residents.topic("laoqin_well", 5) == 0
+	老秦: 下去之前把灯油看一眼。底下黑起来，是真黑。
+elif Residents.topic("laoqin_well", 5) == 1
+	老秦: 升降机的绳子我每天摸一遍。哪股松了，我比它自己先知道。
+elif Residents.topic("laoqin_well", 5) == 2
+	老秦: 夜里还是有人敲。敲三下，停一停。
+	老秦: 灯亮了以后，我敢听了。 [#sad]
+elif Residents.topic("laoqin_well", 5) == 3
+	老秦: 挖到矿石拿去给石头。那小子嘴笨，手不笨，好料到他手里糟蹋不了。
+else
+	if Residents.knows("laoqin", 60)
+		老秦: 那天早上我数过人。数到二十八。
+		老秦: 上来的时候我没数。……我不敢数。 [#sad]
+	else
+		老秦: 看我干什么。井在那边。
+=> END
+
+~ old_talk
+if Residents.topic("laoqin", 6) == 0
+	老秦: 我来打酒，打完就走。别跟着我。
+elif Residents.topic("laoqin", 6) == 1
+	老秦: 井口的锁我每天查三遍。
+	老秦: 你问这个干什么？！
+elif Residents.topic("laoqin", 6) == 2
+	老秦: 那天……
+	老秦: 哪天？我说什么了？没说什么！ [#sad]
+elif Residents.topic("laoqin", 6) == 3
+	老秦: 云娘的酒掺水。我说了八百遍了，她不认。
+	老秦: ……明天还得来打。
+elif Residents.topic("laoqin", 6) == 4
+	老秦: 你种地的？种地好。在地上头干活，好。
+else
+	老秦: 看我干什么。我脸上有字？
+=> END
+
+~ again
+if Residents.lamp_news("laoqin", "well")
+	=> well_lamp_news
+if Residents.lamp_lit("pasture") and not Residents.lamp_lit("well") and not Residents.has_flag("got_well_key") and Residents.knows("laoqin", 40)
+	=> well_key
+if Residents.nth("laoqin") == 2
+	% 老秦: 又是你。
+	% 老秦: 还没完了？
+else
+	% 老秦: 没空！
+	% 老秦: 走走走。
+=> END
+
+~ gift_love
+老秦: 哼，拿这个来讨好我？
+老秦: ……放下吧。算你有眼光。 [#happy]
+=> END
+
+~ gift_like
+% 老秦: 还行。放下吧。
+% 老秦: 哼。……谢了。
+=> END
+
+~ gift_ok
+老秦: 嗯。
+=> END
+
+~ gift_dislike
+老秦: 拿走拿走！ [#sad]
+老秦: ……算了，搁那儿。
+=> END
+
+~ memory_1
+老秦: 你从哪儿弄来的这个！
+老秦: ……挂矿灯的。每个下井的人一只，编号刻在里头。
+老秦: 那天早上我数过。二十八只。
+老秦: 上来的时候，我手里还攥着我那只。 [#sad]
+老秦: 别问了。今天就说到这儿。
+=> END
+
+~ ending_news
+老秦: 二十七个。我一个一个都叫得出来了。 [#sad]
+老秦: 那天为什么就我一个人上来，我也想起来了。往后慢慢跟你说。
+老秦: 井我还守着。这回知道是替谁守的。
+=> END

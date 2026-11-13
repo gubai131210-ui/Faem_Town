@@ -1,0 +1,233 @@
+~ first
+阿牧: 啊，你、你好。
+阿牧: 我叫阿牧，在西边养牛养鸡。我不太会说话……跟牛说得多些。
+阿牧: 你要是想养点什么，以后可以来找我。现在牧道让雾封着，牲口过不来。
+阿牧: 那个……欢迎你来。真的。 [#happy]
+=> END
+
+~ work
+=> daily
+
+~ sell
+阿牧: 那个……你是不是想养点什么？
+- 小鸡小鸭 [if Animals.sells_kind("chicken") /]
+	=> sell_coop
+- 羊和牛 [if Animals.sells_kind("goat") /]
+	=> sell_barn
+- 一匾蚕（{{Animals.animal_price("silkworm")}} 文） [if Animals.sells_kind("silkworm") /]
+	if Animals.buy("silkworm")
+		阿牧: 蚕种是我娘留下的老种。我、我给你送到蚕房去，是{{Animals.last_name}}。 [#happy]
+		阿牧: 天天要喂桑叶，断一天它就不长。连着喂四天，结一批茧。
+	else
+		=> sell_poor
+- 一箱蜜蜂（{{Animals.animal_price("bee")}} 文） [if Animals.sells_kind("bee") /]
+	if Animals.buy("bee")
+		阿牧: 蜂箱我给你搬过去，放在{{Animals.last_name}}。 [#happy]
+		阿牧: 蜂不用喂。蜂场边上种着什么花，它们就酿什么蜜。冬天没花，就让它们歇着。
+	else
+		=> sell_poor
+- 我想送一只回来 [if Animals.has_nth("coop", 0) or Animals.has_nth("barn", 0) /]
+	=> take_back
+- 不买，就是聊聊
+	if Residents.nth("amu") >= 2
+		=> again_chat
+	=> daily_chat
+=> END
+
+~ sell_coop
+阿牧: 鸡好养，鸭爱水。你要哪个？
+- 鸡（{{Animals.animal_price("chicken")}} 文）
+	if Animals.buy("chicken")
+		阿牧: 它叫{{Animals.last_name}}。我、我已经跟它说过你了，它自己认得路，这会儿该到你家鸡舍了。 [#happy]
+		阿牧: 每天喂一回，有空摸摸它。它高兴了，蛋就好。
+	else
+		=> sell_poor
+- 鸭（{{Animals.animal_price("duck")}} 文）
+	if Animals.buy("duck")
+		阿牧: 它叫{{Animals.last_name}}。鸭子爱水，下雨天它比你高兴。 [#happy]
+		阿牧: 喂法跟鸡一样。它偶尔掉根毛，别扔，能卖钱。
+	else
+		=> sell_poor
+- 再想想
+	阿牧: 好。不急的。
+=> END
+
+~ sell_barn
+阿牧: 大牲口要住畜棚。你、你想要哪个？
+- 山羊（{{Animals.animal_price("goat")}} 文）
+	if Animals.buy("goat")
+		阿牧: 它叫{{Animals.last_name}}。脾气有点倔，你别跟它顶，它顶不过你就不理你了。 [#happy]
+		阿牧: 喂饱了，第二天去畜棚里拿奶。
+	else
+		=> sell_poor
+- 绵羊（{{Animals.animal_price("sheep")}} 文）
+	if Animals.buy("sheep")
+		阿牧: 它叫{{Animals.last_name}}。胆子小，你走慢一点。 [#happy]
+		阿牧: 毛长得慢，连着喂三天才剪得下一团。
+	else
+		=> sell_poor
+- 水牛（{{Animals.animal_price("buffalo")}} 文） [if Residents.memory("amu") >= 1 /]
+	if Animals.buy("buffalo")
+		阿牧: 它叫{{Animals.last_name}}，是花花的崽。我、我本来舍不得……给你我放心。 [#happy]
+		阿牧: 喂过摸过以后，你再拍拍它，它就跟你走。牵着它拿锄头，一下能开一整行地。
+		阿牧: 别让它干太多。它不说，可它会累。
+	else
+		=> sell_poor
+- 再想想
+	阿牧: 好。不急的。
+=> END
+
+~ sell_poor
+阿牧: 钱……好像不够。没事的，我给你留着。
+=> END
+
+~ take_back
+阿牧: 送回来？……行。我、我照原价的一半算给你。是哪一只？
+- {{Animals.nth_label("coop", 0)}} [if Animals.has_nth("coop", 0) /]
+	do Animals.sell_nth("coop", 0)
+	=> took_back
+- {{Animals.nth_label("coop", 1)}} [if Animals.has_nth("coop", 1) /]
+	do Animals.sell_nth("coop", 1)
+	=> took_back
+- {{Animals.nth_label("coop", 2)}} [if Animals.has_nth("coop", 2) /]
+	do Animals.sell_nth("coop", 2)
+	=> took_back
+- {{Animals.nth_label("coop", 3)}} [if Animals.has_nth("coop", 3) /]
+	do Animals.sell_nth("coop", 3)
+	=> took_back
+- {{Animals.nth_label("barn", 0)}} [if Animals.has_nth("barn", 0) /]
+	do Animals.sell_nth("barn", 0)
+	=> took_back
+- {{Animals.nth_label("barn", 1)}} [if Animals.has_nth("barn", 1) /]
+	do Animals.sell_nth("barn", 1)
+	=> took_back
+- {{Animals.nth_label("barn", 2)}} [if Animals.has_nth("barn", 2) /]
+	do Animals.sell_nth("barn", 2)
+	=> took_back
+- {{Animals.nth_label("barn", 3)}} [if Animals.has_nth("barn", 3) /]
+	do Animals.sell_nth("barn", 3)
+	=> took_back
+- 算了，都留着
+	阿牧: 嗯。它们也想留着。 [#happy]
+=> END
+
+~ took_back
+阿牧: {{Animals.last_name}}我领回去了。它在我那儿也好好的，你、你别惦记。
+=> END
+
+~ daily
+if GameState.has_flag("lamp_pasture") and not Residents.has_flag("amu_pasture")
+	阿牧: 雾、雾退了！你看见没有，坡上的草全露出来了。 [#happy]
+	阿牧: 花花今早自己走上去的，在老牧道口站了一会儿，回头看我。它是叫我跟上。
+	阿牧: 你有空上来看看，从镇子西头那条路一直走。大雪那几天别来，路封着。
+	阿牧: 大牲口和蜂，现在我也能分给你了。先找青竹盖畜棚、搭蜂场。
+	do Residents.mark("amu_pasture")
+	=> END
+if GameState.has_flag("relic_cowbell") and not GameState.has_flag("lamp_pasture") and not Residents.has_flag("amu_bell")
+	阿牧: 这、这是花花的铃！你在哪儿……雾里？你走进去了？
+	阿牧: 我不敢进。牛敢。它们每回都往那儿走，走到老牧道口就站住，像在等谁开门。
+	阿牧: 道口有盏石灯，就在镇子西头的路边上。我爷爷说，从前赶牛上坡，先要给灯添东西。
+	阿牧: 铃你拿着，灯座上刻着要它。灯要是肯亮……花花它们就不用站在雾里等了。
+	do Residents.mark("amu_bell")
+	=> END
+if GameState.has_flag("lamp_river") and Animals.total() >= 2 and Animals.happiest() >= 70 and not Residents.has_flag("bell_hint")
+	阿牧: 那个……我能不能跟你说件事。你把它们养得好，我、我才敢说。
+	阿牧: 花花昨晚又往西边的雾里走了。今早自己回来的，脖子上的铃没了。
+	阿牧: 那只铃是我爷爷挂上去的。它在雾里头还响，我站在路口听得见，就是不敢进去找。 [#sad]
+	阿牧: 你胆子比我大。镇子西头那条路，雾最浓的地方……你要是路过，帮我听听。
+	do Residents.mark("bell_hint")
+	=> END
+if Animals.any_for_sale()
+	=> sell
+if GameState.has_flag("lamp_river") and Animals.building_state("coop") != 0 and not Residents.has_flag("amu_chicks")
+	阿牧: 那个……河那边的雾散了以后，小路通了一截。小鸡小鸭我能带过来了。
+	阿牧: 可你得先有地方养。找青竹盖一间鸡舍，盖好了来找我。
+	do Residents.mark("amu_chicks")
+	=> END
+=> daily_chat
+
+~ daily_chat
+if Residents.owes_thanks("amu")
+	阿牧: 上、上回的{{Residents.gift_name("amu")}}，谢谢你。我分了花花一半。它也说谢谢。 [#happy]
+	do Residents.thanked("amu")
+elif Residents.away("amu") >= 4
+	阿牧: 啊，是你。好几天没碰上了。我还跟花花说起你来着。
+if Residents.at("amu", "teahouse")
+	% 阿牧: 我给云娘送奶。她每回都要留我喝茶，我、我不知道怎么推。
+	% 阿牧: 云娘说要拿我的奶做一道菜，叫什么“玉露”……我没记住。
+elif Residents.topic("amu", 6) == 0
+	阿牧: 我来送奶的。送完就回，牛等着呢。
+elif Residents.topic("amu", 6) == 1
+	阿牧: 今早花花不肯吃草，我跟它讲了半天道理。
+	阿牧: ……花花是头牛。我是不是没说过。 [#happy]
+elif Residents.topic("amu", 6) == 2
+	阿牧: 我有时候会吹一声口哨。也不知道在叫谁。
+	阿牧: 吹完就站着等。没有东西跑过来。 [#sad]
+elif Residents.topic("amu", 6) == 3
+	if Residents.season_is("winter")
+		阿牧: 天冷，牛棚里我多铺了一层草。它们比我怕冷。
+	elif Residents.season_is("summer")
+		阿牧: 天热，牛都躲在树荫底下不动。我也想躲。
+	else
+		阿牧: 这时节草好，牛吃得欢。它们一高兴，奶就多。
+elif Residents.topic("amu", 6) == 4
+	阿牧: 你、你地里要是有吃不完的玉米秆，能不能留给我？牛爱吃。
+	- 行啊
+		阿牧: 真的？太好了。我拿奶跟你换。 [#happy]
+	- 我想想
+		阿牧: 哦……好。不急的。
+else
+	if Residents.knows("amu", 60)
+		阿牧: 我的牛老往北坡的雾里走。我拉都拉不住。
+		阿牧: 它们像是认得那条路。比我认得。
+	else
+		阿牧: 跟人说话我老紧张。跟你……好一点。
+=> END
+
+~ again
+if Animals.any_for_sale()
+	=> sell
+=> again_chat
+
+~ again_chat
+if Residents.nth("amu") == 2
+	% 阿牧: 呃……还有事吗？
+	% 阿牧: 啊，又、又见面了。
+else
+	% 阿牧: 我得回去了，牛该饮水了。
+	% 阿牧: 我话都说完了……真的。
+=> END
+
+~ gift_love
+阿牧: 这是给我的？真的？ [#happy]
+阿牧: 花花也爱吃这个！……我是说，我也爱吃。谢谢你！ [#happy]
+=> END
+
+~ gift_like
+% 阿牧: 谢谢，你人真好。 [#happy]
+% 阿牧: 啊，这个我喜欢的。谢谢。
+=> END
+
+~ gift_ok
+% 阿牧: 哦，谢谢。
+% 阿牧: 给我的？那、那我收下了。
+=> END
+
+~ gift_dislike
+阿牧: 这个……牛闻了都躲。 [#sad]
+阿牧: 不过还是谢谢你。
+=> END
+
+~ memory_1
+阿牧: 哨子？这是……我吹给你听。
+阿牧: （哨子响了，人几乎听不见。）
+阿牧: 以前一吹它，就有一条狗从雾里跑出来。黄的，耳朵缺一块。
+阿牧: 它叫……叫什么来着。我天天喊的。 [#sad]
+阿牧: 它要是还在，听见这声就回来了。
+=> END
+
+~ ending_news
+阿牧: 那条狗叫什么，我想起来了。……先不告诉你，我得上坡喊两声。
+阿牧: 想起来的东西太多，我跟牛说了一宿。它们听得比人耐心。
+阿牧: 老牧道上走丢的不光是牲口。往后我一样一样找回来。
+=> END

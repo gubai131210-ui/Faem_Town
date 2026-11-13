@@ -1,5 +1,6 @@
 {
 	"name": "farmer",
 	"hat": true,
+	"blend": true,
 	"parts": {}
 }

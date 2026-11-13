@@ -1,0 +1,165 @@
+~ first
+姜婆婆: 哎哟，这是谁家的孩子？瞧着面善。
+姜婆婆: 我姓姜，药铺是我开的。头疼脑热的就来找婆婆，不要你钱。
+姜婆婆: 你住东头那间老屋？那屋子空了好些年了……以前是谁住来着。
+姜婆婆: 唉，人老了，记不住事。你吃了没有？婆婆锅里总多做着一份。
+=> END
+
+~ work
+=> daily
+
+~ daily
+if Residents.has_flag("relic_family_photo") and not Residents.has_flag("got_ferry_stub")
+	=> the_photo
+if Residents.fog_lifted()
+	=> home
+if Residents.lamp_news("jiang", "east")
+	=> east_lamp_news
+if Residents.owes_thanks("jiang")
+	姜婆婆: 上回你拿来的{{Residents.gift_name("jiang")}}，婆婆舍不得一下吃完，还留着一半呢。 [#happy]
+	do Residents.thanked("jiang")
+elif Residents.away("jiang") >= 4
+	姜婆婆: 你这孩子，好几天不露面，婆婆还当你病了。瘦了没有？让我看看。
+if Residents.weather_is("rain") or Residents.weather_is("storm") or Residents.weather_is("snow")
+	% 姜婆婆: 这种天还往外跑，鞋湿了没有？回去拿热水泡泡脚，听见没。
+	% 姜婆婆: 一变天，我这膝盖比小满报得还准。
+	% 姜婆婆: 快站进来。淋了雨要喝姜汤的，别嫌辣。
+elif Residents.is_evening()
+	% 姜婆婆: 天晚了，快回去吧。夜里雾重，别在外头逗留。
+	% 姜婆婆: 晚饭吃了没有？没吃可不行，空着肚子睡要做噩梦的。
+elif Residents.at("jiang", "bench")
+	% 姜婆婆: 来，挨着婆婆坐会儿。晒晒太阳，骨头里的寒气就出来了。
+	% 姜婆婆: 我每天这个钟点都要来这儿坐坐。像是在等谁……又想不起等谁。
+	% 姜婆婆: 你看那盏灯，灰都落了多厚。以前逢年过节……唉，以前怎么着来着。 [#sad]
+elif Residents.topic("jiang", 8) == 0
+	姜婆婆: 今早我又摆了两副碗筷。
+	姜婆婆: 摆完才想起来，家里就我一个人。你说我这是摆给谁的。 [#sad]
+elif Residents.topic("jiang", 8) == 1
+	姜婆婆: 你下地戴帽子没有？日头看着不大，晒久了头要晕的。
+elif Residents.topic("jiang", 8) == 2
+	姜婆婆: 我前些日子好像寄过一封信……
+	姜婆婆: 寄给谁了呢。兴许是做梦。人老了，梦跟真事搅在一块儿。
+elif Residents.topic("jiang", 8) == 3
+	姜婆婆: 小满那丫头天天在外头疯跑，鞋底都磨穿了。你见着她，叫她来我这儿拿双新的。
+elif Residents.topic("jiang", 8) == 4
+	if Residents.season_is("spring")
+		姜婆婆: 春天的荠菜最嫩，包饺子香。你地边上要是长了，可别当草拔了。
+	elif Residents.season_is("summer")
+		姜婆婆: 天热，我熬了绿豆汤，又多出一碗来。你喝不喝？
+	elif Residents.season_is("autumn")
+		姜婆婆: 秋天燥，嗓子干就来拿点枇杷叶，煮水喝。
+	else
+		姜婆婆: 冬天要进补。萝卜炖汤，比什么药都强。
+elif Residents.topic("jiang", 8) == 5
+	姜婆婆: 你笑起来的样子，像一个人。
+	姜婆婆: ……像谁呢。话到嘴边了。算了算了，想起来再告诉你。
+elif Residents.topic("jiang", 8) == 6
+	姜婆婆: 陆大夫是个好后生，就是老拿笔往胳膊上写字。我说给你缝个本子，他还不要。
+else
+	if Residents.knows("jiang", 60)
+		姜婆婆: 你来了，婆婆心里就踏实。也说不上为什么。 [#happy]
+		姜婆婆: 明天还来啊。
+	else
+		姜婆婆: 多穿点。春捂秋冻，老话不会错的。
+=> END
+
+~ the_photo
+姜婆婆: 你兜里露出来的是什么？相片？给婆婆看看。
+姜婆婆: ……这是我嘛。那会儿头发还是黑的。 [#happy]
+姜婆婆: 这是阿芸。我闺女。
+姜婆婆: 她怀里这个…… [#sad]
+姜婆婆: 囡囡。是你。你周岁那天照的，抓着我的秤杆不撒手，照相的等了半个钟头。
+姜婆婆: 你爹那天早上下的井。名单上有他。
+姜婆婆: 出事以后阿芸说这地方待不得了，抱着你从东滩坐船走的。我在灯塔底下站到船看不见。 [#sad]
+姜婆婆: 后来镇上的人把她忘了，把你也忘了。我也忘了。我只记得要写信，一封一封地写，不晓得写给谁。
+姜婆婆: 有天早上醒过来，脑子清楚得像水洗过。我就写了最后一封，把老屋的钥匙装进去。
+姜婆婆: “趁我还记得，回来吧。”
+姜婆婆: 你回来了。 [#happy]
+if Residents.can_hold("ferry_stub")
+	姜婆婆: 这个你拿着。那天的船票，阿芸买了两张连着的，一张是给我的。我没上船。
+	do Residents.hand("ferry_stub")
+	姜婆婆: 东滩在河的下游，顺着河岸往东走到头。路口也有一盏灯，灭了三十年了。
+	姜婆婆: 你去点上。让那边的人……让那边……
+	姜婆婆: ……
+	姜婆婆: 哎哟，这是谁家的孩子，在这儿站多久了？瞧着面善。
+	姜婆婆: 吃了没有？婆婆锅里多做着一份。 [#happy]
+else
+	姜婆婆: 婆婆有样东西要给你。你身上放不下了，腾个地方，快点回来。趁我还记得。
+=> END
+
+~ east_lamp_news
+姜婆婆: 昨晚上我梦见灯塔了。
+姜婆婆: 有条船往外开，船上有人朝我招手，怀里抱着个孩子。我想喊，喊不出名字。 [#sad]
+姜婆婆: 醒了一看，桌上又是两副碗筷。
+姜婆婆: 这回我没收。你坐下，陪婆婆吃一口。 [#happy]
+=> END
+
+~ again
+if Residents.has_flag("relic_family_photo") and not Residents.has_flag("got_ferry_stub")
+	=> the_photo
+if Residents.nth("jiang") == 2
+	% 姜婆婆: 咦，咱们刚才是不是说过话了？瞧我这记性。
+	% 姜婆婆: 怎么又回来了，落下东西了？
+else
+	% 姜婆婆: 去忙吧，孩子。饿了就来。
+	% 姜婆婆: 好好好，婆婆不唠叨了。
+=> END
+
+~ gift_love
+姜婆婆: 哎哟，这孩子，还记着婆婆爱这个。 [#happy]
+姜婆婆: 以前也有个人老给我捎这个……是谁来着。
+姜婆婆: 来来，别急着走，婆婆给你倒碗茶。
+=> END
+
+~ gift_like
+% 姜婆婆: 好，好，有心了。 [#happy]
+% 姜婆婆: 这个好。婆婆收着，晚上就用上。 [#happy]
+=> END
+
+~ gift_ok
+% 姜婆婆: 留着自己吃嘛，还给婆婆送。
+% 姜婆婆: 你这孩子，挣点东西不容易，别老往我这儿拿。
+=> END
+
+~ gift_dislike
+姜婆婆: 这个……婆婆的牙口吃不动喽。 [#sad]
+姜婆婆: 心意收下了。东西你拿回去，啊。
+=> END
+
+~ quest_jiang_radish
+姜婆婆: 哎哟，萝卜来了。这么水灵。 [#happy]
+姜婆婆: 今晚炖汤，两副碗筷……哦，对了，钱。婆婆给你钱。
+姜婆婆: 还有这个。翻柜子找出来的，一截旧灯芯，婆婆也不知道留它做什么。
+姜婆婆: 你年轻，眼睛好，兴许用得上。
+=> END
+
+~ memory_1
+姜婆婆: 这信封……
+姜婆婆: 这是我的字。我写的。寄到城里去的……我写过很多封。
+姜婆婆: 我坐在灯底下写，写完就放在门口那只信箱里。邮差三天来一趟。
+姜婆婆: 写给谁呢。 [#sad]
+姜婆婆: 不急。婆婆慢慢想。你来了，婆婆就有工夫慢慢想了。 [#happy]
+=> END
+
+~ ending_news
+姜婆婆: 囡囡。
+姜婆婆: 婆婆这回不会忘了。早上起来头一件事，就是把你的名字念一遍。 [#happy]
+姜婆婆: 信是我寄的。趁那天早上还记得……唉，不说了。 [#sad]
+姜婆婆: 多摆的那副碗筷，一直是给你摆的。坐下，吃饭。
+=> END
+
+~ home
+if Residents.owes_thanks("jiang")
+	姜婆婆: 上回你拿来的{{Residents.gift_name("jiang")}}，婆婆留着一半呢。你娘小时候也爱往家里拿东西。 [#happy]
+	do Residents.thanked("jiang")
+if Residents.topic("jiang_home", 4) == 0
+	姜婆婆: 囡囡，吃了没有？锅里那一份现在知道是给谁留的了。 [#happy]
+elif Residents.topic("jiang_home", 4) == 1
+	姜婆婆: 你娘走的那天，我在灯塔底下站到船看不见。
+	姜婆婆: 现在灯塔亮了。她要是回来，老远就看得见。 [#sad]
+elif Residents.topic("jiang_home", 4) == 2
+	姜婆婆: 你抓周抓的是秤杆。婆婆那时候就说，这孩子将来是要回来的。
+	姜婆婆: ……说没说过，记不清了。就当说过。 [#happy]
+else
+	姜婆婆: 东头那间老屋，是你外公盖的。你住着，屋子就不空了。
+=> END

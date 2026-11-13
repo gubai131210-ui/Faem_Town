@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://boglkjrqcaeks"
+path="res://.godot/imported/qingzhu.dialogue-c467bbdef3444805f4c90f5b4fada02c.tres"
+
+[deps]
+
+source_file="res://dialogue/qingzhu.dialogue"
+dest_files=["res://.godot/imported/qingzhu.dialogue-c467bbdef3444805f4c90f5b4fada02c.tres"]
+
+[params]
+
+defaults=true

@@ -1,0 +1,28 @@
+{
+	"name": "jiang",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "bun",
+	"outfit": "robe",
+	"scale": 0.94,
+	"stoop": 9,
+	"parts": {
+		"shirt": "purple",
+		"band": "cream",
+		"hair": "hair_gray",
+		"boot": "charcoal",
+		"skin": "skin_pale"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thin",
+		"fringe": "part",
+		"mouth": "smile",
+		"jaw": "soft"
+	}
+}

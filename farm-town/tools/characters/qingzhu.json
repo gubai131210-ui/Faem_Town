@@ -1,0 +1,25 @@
+{
+	"name": "qingzhu",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": "headband",
+	"hair": "ponytail",
+	"outfit": "overalls",
+	"parts": {
+		"shirt": "cream",
+		"blue": "leather",
+		"hair": "hair_brown",
+		"band": "teal",
+		"boot": "charcoal"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "calm",
+		"brow": "thin",
+		"fringe": "part",
+		"mouth": "neutral"
+	}
+}

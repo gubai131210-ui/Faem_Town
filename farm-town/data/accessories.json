@@ -1,0 +1,21 @@
+[
+	{"id": "silver_guard", "name": "银护腕", "effect": "armor", "value": 0.15, "price": 500,
+	 "materials": [{"item": "silver_ore", "count": 5}],
+	 "desc": "戴着的时候挨打少掉一成半的生命。"},
+	{"id": "leech_tooth", "name": "蛭牙坠", "effect": "lifesteal", "value": 2, "price": 400,
+	 "materials": [{"item": "iron_ore", "count": 4}, {"item": "quartz", "count": 2}],
+	 "desc": "戴着的时候每打倒一只忘形回 2 点生命。"},
+	{"id": "oilcloth_wraps", "name": "油布绑腿", "effect": "wade", "value": 1, "price": 300,
+	 "materials": [{"item": "iron_ore", "count": 6}],
+	 "desc": "戴着的时候蹚水不会走慢。"},
+	{"id": "soft_soles", "name": "千层底", "effect": "roll_grace", "value": 0.15, "price": 600,
+	 "materials": [{"item": "silver_ore", "count": 3}, {"item": "quartz", "count": 3}],
+	 "desc": "戴着的时候翻滚完多一小会儿打不着。"},
+	{"id": "lan_wick", "name": "岚晶灯芯", "effect": "oil_saver", "value": 0.4, "price": 800,
+	 "materials": [{"item": "lan_crystal", "count": 2}, {"item": "silver_ore", "count": 2}],
+	 "desc": "戴着的时候灯油烧得慢四成。"},
+	{"id": "mask_shard", "name": "半张面具", "effect": "power", "value": 0.2, "price": 0,
+	 "desc": "无名戏班留下的。戴着的时候武器多打两成。"},
+	{"id": "lan_tassel", "name": "岚的灯穗", "effect": "glow", "value": 0.25, "price": 0,
+	 "desc": "井底那盏灯上解下来的穗子。戴着的时候手里的灯照得远两成半。"}
+]

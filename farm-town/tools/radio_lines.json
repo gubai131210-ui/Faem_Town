@@ -1,0 +1,16 @@
+{
+ "voice": "zh-CN-XiaoxiaoNeural",
+ "rate": "-5%",
+ "today": "今天，{term}。",
+ "tomorrow": "明天，",
+ "weather": {
+  "sunny": "晴天。",
+  "cloudy": "多云。",
+  "rain": "有雨。",
+  "storm": "有雷雨。",
+  "fog": "有雾。",
+  "wind": "有大风。",
+  "snow": "有雪。",
+  "frost": "有霜。"
+ }
+}

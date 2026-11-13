@@ -1,0 +1,55 @@
+[
+	{"id": "shallow", "name": "浅坑", "from": 1, "to": 10, "rock": 0.36, "stone": "stone", "stone_weight": 70,
+	 "ores": [
+		{"item": "copper_ore", "weight": 18, "color": "d8843c"},
+		{"item": "coal", "weight": 12, "color": "26262c"}
+	 ],
+	 "monster_count": [1, 4],
+	 "monsters": [
+		{"id": "dust", "weight": 50, "from": 1},
+		{"id": "stone_crab", "weight": 25, "from": 2},
+		{"id": "bat", "weight": 25, "from": 3}
+	 ],
+	 "boss": "mine_cart"},
+	{"id": "waterlogged", "name": "水渍层", "from": 11, "to": 20, "rock": 0.3, "stone": "stone", "stone_weight": 66,
+	 "ores": [
+		{"item": "iron_ore", "weight": 20, "color": "3f4f78"},
+		{"item": "quartz", "weight": 10, "color": "c9a8f0"},
+		{"item": "coal", "weight": 4, "color": "26262c"}
+	 ],
+	 "water": 0.22, "pool": 0.6,
+	 "monster_count": [2, 5],
+	 "monsters": [
+		{"id": "moss_frog", "weight": 40, "from": 11},
+		{"id": "leech_swarm", "weight": 30, "from": 12},
+		{"id": "leaky_umbrella", "weight": 30, "from": 14}
+	 ],
+	 "boss": "well_catfish"},
+	{"id": "forgotten", "name": "遗落层", "from": 21, "to": 30, "rock": 0.26, "stone": "stone", "stone_weight": 70,
+	 "ores": [
+		{"item": "silver_ore", "weight": 18, "color": "e6edf5"},
+		{"item": "iron_ore", "weight": 8, "color": "3f4f78"}
+	 ],
+	 "props": 0.07, "relic_bonus": 1.5,
+	 "monster_count": [3, 5],
+	 "monsters": [
+		{"id": "empty_shoes", "weight": 35, "from": 21},
+		{"id": "walking_clock", "weight": 30, "from": 22},
+		{"id": "faceless_paper", "weight": 35, "from": 24}
+	 ],
+	 "boss": "nameless_troupe"},
+	{"id": "lightless", "name": "无光层", "from": 31, "to": 40, "rock": 0.3, "stone": "stone", "stone_weight": 70,
+	 "ores": [
+		{"item": "gold_ore", "weight": 14, "color": "e8c040"},
+		{"item": "lan_crystal", "weight": 6, "color": "7fe0d8"},
+		{"item": "silver_ore", "weight": 6, "color": "e6edf5"}
+	 ],
+	 "dark": true,
+	 "monster_count": [3, 5],
+	 "monsters": [
+		{"id": "light_moth", "weight": 35, "from": 31},
+		{"id": "shadow", "weight": 30, "from": 32},
+		{"id": "nameless", "weight": 35, "from": 33}
+	 ],
+	 "boss": "lan_shade"}
+]

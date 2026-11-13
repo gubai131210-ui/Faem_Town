@@ -1,0 +1,28 @@
+{
+	"name": "bai",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "short",
+	"outfit": "robe",
+	"stoop": 3,
+	"parts": {
+		"shirt": "indigo",
+		"band": "ochre",
+		"hair": "hair_gray",
+		"boot": "charcoal"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "flat",
+		"jaw": "square",
+		"crop": true,
+		"moustache": true
+	}
+}

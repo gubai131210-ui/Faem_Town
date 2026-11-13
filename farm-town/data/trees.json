@@ -1,0 +1,6 @@
+[
+	{"id": "loquat", "name": "枇杷树", "sapling": "loquat_sapling", "grow_days": 24, "evergreen": true, "yields": [{"season": "spring", "item": "loquat", "color": "f2b23e"}], "art": {"leaf": "3f8f4a"}},
+	{"id": "peach", "name": "桃树", "sapling": "peach_sapling", "grow_days": 24, "evergreen": false, "yields": [{"season": "spring", "item": "peach_blossom", "color": "f4a9be", "flower": true}, {"season": "summer", "item": "peach", "color": "f08a7a"}], "art": {"leaf": "6fb44a"}},
+	{"id": "persimmon", "name": "柿树", "sapling": "persimmon_sapling", "grow_days": 24, "evergreen": false, "yields": [{"season": "autumn", "item": "persimmon", "color": "ee6a22"}], "art": {"leaf": "5fa84a"}},
+	{"id": "mandarin", "name": "橘树", "sapling": "mandarin_sapling", "grow_days": 24, "evergreen": true, "yields": [{"season": "winter", "item": "mandarin", "color": "f59a1e"}], "art": {"leaf": "2f7f45"}}
+]

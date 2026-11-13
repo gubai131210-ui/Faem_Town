@@ -1,0 +1,29 @@
+{
+	"name": "laozhou",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": "cone",
+	"hair": "short",
+	"outfit": "tunic",
+	"beard": true,
+	"stoop": 4,
+	"parts": {
+		"shirt": "leather",
+		"blue": "charcoal",
+		"hair": "hair_gray",
+		"boot": "charcoal",
+		"skin": "skin_tan"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "flat",
+		"jaw": "square",
+		"crop": true
+	}
+}

@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://bfaijh6pb878"
+path="res://.godot/imported/amu.dialogue-eea4259417ff01166710afe6149f4423.tres"
+
+[deps]
+
+source_file="res://dialogue/amu.dialogue"
+dest_files=["res://.godot/imported/amu.dialogue-eea4259417ff01166710afe6149f4423.tres"]
+
+[params]
+
+defaults=true

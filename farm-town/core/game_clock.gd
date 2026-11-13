@@ -1,6 +1,6 @@
 extends Node
 ## 时间和日期。一天从 6:00 到次日 2:00；一季 24 天，一年四季。
-## 节气在 M1 加入。
+## 每季 6 个节气，每个节气 4 天，定义在 data/solar_terms.json。
 
 ## 分钟数发生了可见的变化（每 10 分钟一次）
 signal time_changed
@@ -13,6 +13,7 @@ const DAY_START := 360.0
 const DAY_END := 1560.0
 const DAYS_PER_SEASON := 24
 const SEASONS_PER_YEAR := 4
+const DAYS_PER_TERM := 4
 const SEASON_NAMES: Array[String] = ["春", "夏", "秋", "冬"]
 ## 现实一秒对应的游戏分钟数；一天约 14 分钟
 const MINUTES_PER_SECOND := 1.4
@@ -20,6 +21,7 @@ const MINUTES_PER_SECOND := 1.4
 ## 每日结算的固定顺序，数字小的先执行
 const ORDER_WEATHER := 10
 const ORDER_CROPS := 20
+const ORDER_FORAGE := 25
 const ORDER_ANIMALS := 30
 const ORDER_MACHINES := 40
 const ORDER_NPCS := 50
@@ -70,6 +72,29 @@ func year() -> int:
 
 func day_of_season() -> int:
 	return (day - 1) % DAYS_PER_SEASON + 1
+
+
+## 第 d 天是一年里的第几个节气，0 是立春。
+static func term_index_of(d: int) -> int:
+	return posmod(d - 1, DAYS_PER_SEASON * SEASONS_PER_YEAR) / DAYS_PER_TERM
+
+
+func term_index() -> int:
+	return term_index_of(day)
+
+
+func term() -> TermDef:
+	return Database.term(term_index())
+
+
+func term_id() -> StringName:
+	var def := term()
+	return def.id if def != null else &""
+
+
+func term_name() -> String:
+	var def := term()
+	return def.name if def != null else ""
 
 
 func date_text() -> String:

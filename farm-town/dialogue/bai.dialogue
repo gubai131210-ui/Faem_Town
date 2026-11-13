@@ -1,0 +1,147 @@
+~ first
+柏先生: 你就是东头老屋的新主人吧。我姓柏，镇上的杂事归我管。
+柏先生: 一路过来辛苦了。这里日子慢，人也健忘，住久了你会习惯的。
+柏先生: 有一件事，请你记着：起雾的时候，别往镇子外头走太远。
+柏先生: ……不为什么。老规矩罢了。
+=> END
+
+~ work
+=> daily
+
+~ daily
+if Residents.has_flag("met_lan") and not Residents.has_flag("got_prayer_tablet")
+	=> the_prayer
+if Residents.lamp_news("bai", "shrine")
+	=> shrine_lamp_news
+if Residents.owes_thanks("bai")
+	柏先生: 上回的{{Residents.gift_name("bai")}}，多谢。我一个人，许久没收过这样的东西了。
+	do Residents.thanked("bai")
+elif Residents.away("bai") >= 5
+	柏先生: 有些日子没见你到镇上来。地里忙？
+if Residents.weather_is("fog")
+	% 柏先生: 今天雾大。待在看得见屋檐的地方。
+	% 柏先生: 这样的天，我总要多数一遍人头。……习惯了。
+elif Residents.at("bai", "lamp")
+	% 柏先生: 这盏灯，我每天这个时候都来看一眼。看一眼而已。
+	% 柏先生: 你问它为什么不亮？灯油早干了。……是我没叫人添。 [#sad]
+elif Residents.weather_is("rain") or Residents.weather_is("storm") or Residents.weather_is("snow")
+	% 柏先生: 这种天气，卷宗容易受潮。你的屋顶不漏吧？漏的话去找青竹。
+	% 柏先生: 雨天镇上清静。清静好。
+elif Residents.at("bai", "plaza")
+	% 柏先生: 午后我出来走一圈。坐久了，腿不听使唤。
+	% 柏先生: 你看这石板，缝里都长草了。从前逢集的日子……罢了。
+elif Residents.topic("bai", 6) == 0
+	柏先生: 镇公所的卷宗我每天理一遍。
+	柏先生: 有些纸，理着理着就少了。也好，少了省心。
+elif Residents.topic("bai", 6) == 1
+	柏先生: 你的地种得怎么样？镇上很久没有新庄稼了。
+	柏先生: 收成好的话，让阿禾知道。她一高兴，全镇都跟着高兴。
+elif Residents.topic("bai", 6) == 2
+	柏先生: 有人问我，这镇子以前什么样。
+	柏先生: 我说，就是现在这样。
+elif Residents.topic("bai", 6) == 3
+	柏先生: 北边、南边、西边的路都让雾封了。不是我封的。
+	柏先生: 我只是……没叫人去开。 [#sad]
+elif Residents.topic("bai", 6) == 4
+	柏先生: 小满那孩子总来问东问西。我答不上的，就说忘了。
+	柏先生: 她不信。孩子眼睛毒。
+else
+	if Residents.knows("bai", 60)
+		柏先生: 你来了以后，镇上的人话多了些。这是好事。大概是好事。
+		柏先生: 有些事，等我想好了怎么说，再同你讲。
+	else
+		柏先生: 住得还惯吗？缺什么就说，镇上能办的我来办。
+=> END
+
+~ the_prayer
+if not Residents.knows("bai", 40)
+	if Residents.has_flag("bai_deer_asked")
+		柏先生: 那件事，等我想好了怎么说。不是今天。
+		=> END
+	柏先生: 你说什么？一头白鹿？
+	柏先生: ……雾里看什么都像。山上没有鹿，三十年没有了。 [#sad]
+	柏先生: 我同你还没熟到能说这个的份上。改日吧。
+	do Residents.mark("bai_deer_asked")
+	=> END
+if Residents.has_flag("bai_confessed")
+	if Residents.can_hold("prayer_tablet")
+		柏先生: 拿着。别还给我。
+		do Residents.hand("prayer_tablet")
+	else
+		柏先生: 你手上腾个地方。这块牌子，我不想再带回屋里去了。
+	=> END
+柏先生: 你看见它了。
+柏先生: 我就知道，灯一盏一盏亮过去，早晚有人走到它跟前。只是没想到它还肯见人。
+柏先生: 三十年前，井里透水。二十七个人。我是镇长，名单是我念的，一家一家念过去。
+柏先生: 念到一半，我念不下去了。全镇的人站在井口哭，哭了三天，没有一个人回去生火做饭。
+柏先生: 第三天夜里我上了山。祠里有块空牌子，我写了一句话挂上去。
+柏先生: “让大家别这么疼。” [#sad]
+柏先生: 第二天起了雾。雾散的时候，没有人哭了。也没有人记得为什么站在井口。
+柏先生: 我以为它只拿那一天。后来是名字，后来是路，后来是半个镇子。
+柏先生: 只有我没忘。求的人是我，它大概觉得我得记着。……我也觉得。 [#sad]
+do Residents.mark("bai_confessed")
+if Residents.can_hold("prayer_tablet")
+	柏先生: 这块牌子，雾起的那天早上掉在我门口，绳子是断的。我收了三十年。
+	柏先生: 山路口那盏灯要它。你拿去。点不点，你比我有资格定。
+	do Residents.hand("prayer_tablet")
+else
+	柏先生: 有样东西该给你。你手上腾个地方，再来找我。
+=> END
+
+~ shrine_lamp_news
+柏先生: 山上的灯亮了。我在镇公所的窗口看见的。
+柏先生: 三十年了，我头一回不用一个人记着那条路在哪儿。
+柏先生: 它……它还好吗？算了，不必告诉我。我没脸问。 [#sad]
+=> END
+
+~ again
+if Residents.has_flag("bai_confessed") and not Residents.has_flag("got_prayer_tablet")
+	=> the_prayer
+if Residents.nth("bai") == 2
+	% 柏先生: 还有别的事吗？
+	% 柏先生: 嗯？方才不是说过了。年轻人记性倒不如我。
+else
+	% 柏先生: 我手头还有卷宗。改日再叙。
+	% 柏先生: 去吧。
+=> END
+
+~ gift_love
+柏先生: 这……很久没人送我这个了。你怎么知道的？ [#happy]
+柏先生: 多谢。我会好好收着。
+=> END
+
+~ gift_like
+% 柏先生: 有心了，多谢。
+% 柏先生: 难为你想着。我收下了。
+=> END
+
+~ gift_ok
+% 柏先生: 客气了。放这儿吧。
+% 柏先生: 不必破费。……既然拿来了，多谢。
+=> END
+
+~ gift_dislike
+柏先生: ……这东西，我见不得。 [#sad]
+柏先生: 不怪你。心意我领了。
+=> END
+
+~ quest_bai_bokchoy
+柏先生: 青菜四棵，按市价。镇公所不欠人东西。
+柏先生: 收据……算了，不用收据。多谢。
+=> END
+
+~ memory_1
+柏先生: 这枚章。
+柏先生: 字都磨平了。能磨成这样，要盖多少次。
+柏先生: 出事前一天，我在镇公所坐了一整天，一张接一张地盖。盖的什么文书，我……
+柏先生: 我忘了。 [#sad]
+柏先生: 你看我做什么。我说忘了就是忘了。
+=> END
+
+~ ending_news
+柏先生: 名单我又念了一遍。这回是当着大家的面。 [#sad]
+柏先生: 没有人骂我。我倒宁愿有人骂两句。
+if Residents.ending_is("name")
+	柏先生: 它的名字就是镇子的名字。我当了三十年镇长，竟没想过去问一声。
+柏先生: 镇公所的门以后不锁了。谁想来问那天的事，我都在。
+=> END

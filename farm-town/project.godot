@@ -25,7 +25,17 @@ GameState="*res://core/game_state.gd"
 SceneRouter="*res://core/scene_router.gd"
 Audio="*res://core/audio.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+Weather="*res://core/weather.gd"
 Farming="*res://features/farming/farming.gd"
+Shipping="*res://features/economy/shipping.gd"
+Foraging="*res://features/foraging/foraging.gd"
+Fishing="*res://features/fishing/fishing.gd"
+Animals="*res://features/animals/animals.gd"
+Crafting="*res://features/crafting/crafting.gd"
+Mine="*res://features/mine/mine.gd"
+Lamps="*res://features/lamps/lamps.gd"
+Quests="*res://features/npc/quests.gd"
+Residents="*res://features/npc/residents.gd"
 
 [display]
 
@@ -91,6 +101,18 @@ music={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":77,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
+roll={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194325,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":75,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":88,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+residents={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":82,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 slot1={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":49,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
@@ -134,7 +156,7 @@ slot8={
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://tests/fixtures/smoke.dialogue", "res://dialogue/common.dialogue", "res://dialogue/intro.dialogue")
+locale/translations_pot_files=PackedStringArray("res://tests/fixtures/smoke.dialogue", "res://dialogue/common.dialogue", "res://dialogue/intro.dialogue", "res://dialogue/ahe.dialogue", "res://dialogue/jiang.dialogue", "res://dialogue/shishu.dialogue", "res://dialogue/xiaoman.dialogue", "res://dialogue/amu.dialogue", "res://dialogue/bai.dialogue", "res://dialogue/egret.dialogue", "res://dialogue/laoqin.dialogue", "res://dialogue/laozhou.dialogue", "res://dialogue/luyuan.dialogue", "res://dialogue/qingzhu.dialogue", "res://dialogue/yunniang.dialogue", "res://dialogue/lan.dialogue", "res://dialogue/ending.dialogue", "res://dialogue/festival.dialogue")
 
 [physics]
 

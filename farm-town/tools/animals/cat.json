@@ -1,0 +1,32 @@
+{
+	"name": "cat",
+	"body": "quadruped",
+	"scale": 0.92,
+	"quad": {
+		"body": [
+			0.18,
+			0.3,
+			0.16
+		],
+		"leg": 0.15,
+		"neck": 0.08,
+		"neck_up": 0.18,
+		"head": [
+			0.18,
+			0.16,
+			0.16
+		],
+		"snout": 0.05,
+		"ears": "point",
+		"tail": "up"
+	},
+	"parts": {
+		"body": "orange",
+		"head": "orange",
+		"leg": "orange",
+		"ear": "orange",
+		"tail": "orange",
+		"snout": "cream",
+		"hoof": "cream"
+	}
+}

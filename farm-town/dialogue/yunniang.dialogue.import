@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://0rsknuc8gfkv"
+path="res://.godot/imported/yunniang.dialogue-792949af3a4cba94e1e0b387e73a2194.tres"
+
+[deps]
+
+source_file="res://dialogue/yunniang.dialogue"
+dest_files=["res://.godot/imported/yunniang.dialogue-792949af3a4cba94e1e0b387e73a2194.tres"]
+
+[params]
+
+defaults=true

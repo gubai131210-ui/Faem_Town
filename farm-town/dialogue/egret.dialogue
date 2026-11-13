@@ -1,0 +1,126 @@
+~ first
+白鹭: 嘘——别动，就站在那儿。光正好。
+白鹭: ……好了，画完了。谢谢你呀，路过的人。 [#happy]
+白鹭: 我是白鹭，到处走，到处画。
+白鹭: 我画的地方都不存在，你别当真。一座灯塔，一片滩，一口很深的井。
+白鹭: 奇怪的是，镇上的人看了都说眼熟。
+=> END
+
+~ work
+=> daily
+
+~ daily
+if Residents.lamp_news("egret", "east")
+	=> east_lamp_news
+if Residents.owes_thanks("egret")
+	白鹭: 你上次给的{{Residents.gift_name("egret")}}，我画下来了。画完才舍得动它。 [#happy]
+	do Residents.thanked("egret")
+elif Residents.away("egret") >= 4
+	白鹭: 咦，是你。几天不见，你影子都长了一点。……我瞎说的。
+if Residents.weather_is("fog")
+	白鹭: 雾天最好画。什么都看不清，就什么都能画。
+elif Residents.at("egret", "teahouse")
+	% 白鹭: 天黑了就画不了了。我在茶馆借住，云娘从不问我住到哪天。
+	% 白鹭: 我在等颜料干。等的时候最适合发呆。
+elif Residents.at("egret", "beach")
+	if Residents.topic("egret_beach", 4) == 0
+		白鹭: 这座灯塔我画过十几遍，一遍都没见过它。今天头一回对着真的画。
+		白鹭: 你猜怎么着，一笔都不用改。 [#sad]
+	elif Residents.topic("egret_beach", 4) == 1
+		白鹭: 海的颜色一个钟头变三回。我调色都赶不上它。 [#happy]
+	elif Residents.topic("egret_beach", 4) == 2
+		白鹭: 退潮的时候沙里有蛤蜊，海螺要去礁石那头找。
+		白鹭: ……我怎么知道的？我也想问。
+	else
+		白鹭: 灯塔顶上的灯是黑的。我画里它一直亮着。
+		白鹭: 是我画错了，还是它该亮？
+elif Residents.at("egret", "studio")
+	if Residents.topic("egret_studio", 3) == 0
+		白鹭: 这间屋子空着，门没锁，我就搬进来了。
+		白鹭: 墙上有小孩拿炭条画的画，画得很高兴。我没舍得擦。
+	elif Residents.topic("egret_studio", 3) == 1
+		白鹭: 窗台上有一道一道的刻痕，是给孩子量个子的。最高那道到我腰这儿。
+		白鹭: 我站过去比了比。……我比它干什么。 [#sad]
+	else
+		白鹭: 我在屋里找到一盒干了的颜料。牌子跟我用的一样。
+		白鹭: 这个牌子早就不出了，我一直以为只有我还留着。
+elif Residents.at("egret", "sketch")
+	if Residents.topic("egret_sketch", 3) == 0
+		白鹭: 别挡光……开玩笑的，你站那儿挺好，我把你也画进去。 [#happy]
+	elif Residents.topic("egret_sketch", 3) == 1
+		白鹭: 那盏石灯我画了七遍，每一遍它都是亮的。手自己画的，不怪我。
+	else
+		白鹭: 我今天画了一条往南的路，路的尽头有水。这镇子南边有水吗？
+		- 好像有条河
+			白鹭: 真的？那我没画错。……可我没去过呀。
+		- 不知道
+			白鹭: 我也不知道。画出来就是那样。
+elif Residents.topic("egret", 4) == 0
+	白鹭: 我是外地人。应该是吧。
+	白鹭: 不然我怎么会不认得回家的路。
+elif Residents.topic("egret", 4) == 1
+	白鹭: 你种的东西是什么颜色的？
+	白鹭: 我是说，不是“绿的”那种回答。早上和傍晚不一样的，你留心看看。
+elif Residents.topic("egret", 4) == 2
+	白鹭: 小满拿着我的画满镇子找那条街，找了一整天。
+	白鹭: 我跟她说那是假的。她说：“那你怎么画得出门牌？” [#sad]
+else
+	if Residents.knows("egret", 60)
+		白鹭: 我告诉你一件怪事。这镇上有扇门，我闭着眼睛都能画出它的木纹。
+		白鹭: 我没敲过它。不敢敲。
+	else
+		白鹭: 你走路的样子挺好画的。别紧张，我夸你呢。 [#happy]
+=> END
+
+~ east_lamp_news
+白鹭: 东边的雾散了，你知道吗？我今天一早就去了。
+白鹭: 一片滩，一座灯塔，滩上一间小屋。
+白鹭: 跟我画的一模一样。连屋檐缺的那片瓦都一样。 [#sad]
+白鹭: 我说过我画的地方都不存在，你别当真。
+白鹭: ……现在该谁别当真了。
+=> END
+
+~ again
+if Residents.lamp_news("egret", "east")
+	=> east_lamp_news
+if Residents.nth("egret") == 2
+	% 白鹭: 别吵，颜料要干了。……好啦，你说。
+	% 白鹭: 又来看我画画？ [#happy]
+else
+	% 白鹭: 明天再来，明天光不一样。
+	% 白鹭: 嘘。
+=> END
+
+~ gift_love
+白鹭: 啊，这个颜色！ [#happy]
+白鹭: 我要把它画下来，画在一个不存在的地方。谢谢你。
+=> END
+
+~ gift_like
+% 白鹭: 真好看，谢谢。 [#happy]
+% 白鹭: 这个我喜欢。先摆着看两天。
+=> END
+
+~ gift_ok
+% 白鹭: 谢啦。
+% 白鹭: 给我的？好呀。
+=> END
+
+~ gift_dislike
+白鹭: 唔，灰扑扑的。 [#sad]
+白鹭: 我留着当静物吧。
+=> END
+
+~ memory_1
+白鹭: 这画稿……是我画的。小时候画的。
+白鹭: 这个手印也是我的，比现在小好多。 [#happy]
+白鹭: 这条街我走过。拐角有一棵歪脖子槐树，树底下有个卖糖的。
+白鹭: 我说过我是外地来的，对吧？
+白鹭: ……那我是在哪儿走过这条街的呢。 [#sad]
+=> END
+
+~ ending_news
+白鹭: 我画的那些街，原来都是我走过的。我不是路过这儿的人。
+白鹭: 怪不得画的时候手比脑子快。
+白鹭: 灯塔的灯亮了，你去看了吗？这回我照着真的画。 [#happy]
+=> END

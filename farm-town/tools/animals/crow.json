@@ -1,0 +1,30 @@
+{
+	"name": "crow",
+	"body": "bird",
+	"scale": 0.85,
+	"bird": {
+		"comb": false,
+		"wattle": false,
+		"bill": "cone",
+		"tail": 0.05,
+		"neck": 0.3,
+		"neck_up": 0.22,
+		"body": [
+			0.2,
+			0.32,
+			0.19
+		],
+		"leg": 0.14
+	},
+	"parts": {
+		"body": "hair_black",
+		"wing": "charcoal",
+		"head": "hair_black",
+		"beak": "charcoal",
+		"leg": "charcoal",
+		"eye": [
+			"x",
+			"x"
+		]
+	}
+}

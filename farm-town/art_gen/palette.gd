@@ -12,8 +12,10 @@ static func colors() -> Dictionary:
 	if _colors.is_empty():
 		var raw: Dictionary = JsonFile.read_dict(PATH)
 		for key: String in raw:
-			var hex: String = raw[key]
-			_colors[key] = Color.html(hex)
+			# "ramps" 是 Blender 物件用的三段明暗色，不属于字符画
+			if raw[key] is String:
+				var hex: String = raw[key]
+				_colors[key] = Color.html(hex)
 	return _colors
 
 

@@ -1,0 +1,8 @@
+[
+	{"id": "old_sickle", "name": "旧镰刀", "kind": "sickle", "damage": 6, "price": 0, "desc": "割草的镰刀，也能防身。三下横扫，范围大；按住蓄力转一圈。"},
+	{"id": "short_sword", "name": "短剑", "kind": "dagger", "damage": 4, "price": 600, "desc": "石叔打的短剑。四下快刺，出手快；按住蓄力往前突进。"},
+	{"id": "stone_hammer", "name": "石锤", "kind": "hammer", "damage": 9, "price": 900, "desc": "沉，慢，两下重击。能砸开石蟹的壳；按住蓄力砸地，震开周围。"},
+	{"id": "rail_hammer", "name": "道钉锤", "kind": "hammer", "icon": "rail_hammer", "damage": 13, "price": 0, "desc": "从废矿车的残骸里捡出来的，当年钉铁轨用的锤。比石锤沉，也比石锤狠。"},
+	{"id": "fishbone_sickle", "name": "鱼骨镰", "kind": "sickle", "icon": "fishbone_sickle", "damage": 10, "price": 0, "desc": "井底老鲶留下的一根背刺，弯得像镰刀，刃口发青。"},
+	{"id": "opera_blade", "name": "戏刀", "kind": "dagger", "damage": 8, "price": 0, "desc": "戏班的道具刀，没开过刃的那种。不知道为什么现在能伤东西了。"}
+]

@@ -1,0 +1,34 @@
+{
+	"name": "sheep",
+	"body": "quadruped",
+	"scale": 0.95,
+	"quad": {
+		"body": [
+			0.27,
+			0.4,
+			0.26
+		],
+		"leg": 0.2,
+		"neck": 0.14,
+		"neck_up": 0.2,
+		"head": [
+			0.12,
+			0.16,
+			0.13
+		],
+		"snout": 0.1,
+		"wool": true,
+		"ears": "side",
+		"tail": "short"
+	},
+	"parts": {
+		"body": "cream",
+		"wing": "white",
+		"head": "skin_tan",
+		"leg": "skin_tan",
+		"ear": "skin_tan",
+		"tail": "cream",
+		"snout": "skin_tan",
+		"hoof": "leather"
+	}
+}

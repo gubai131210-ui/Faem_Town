@@ -1,0 +1,54 @@
+[
+	{"id": "plaza", "name": "广场灯", "map": "town", "relic": "old_wick",
+	 "offerings": [
+		{"item": "white_radish", "count": 4},
+		{"item": "rapeseed", "count": 3},
+		{"item": "shepherds_purse", "count": 3}
+	 ],
+	 "inscription": "灯座上刻着一行小字：白菔四、菜籽三、荠三，并旧芯一。",
+	 "lit_text": "灯亮了，雾退开了一小圈。"},
+	{"id": "river", "name": "河灯", "map": "nanxi", "relic": "river_lantern",
+	 "offerings": [
+		{"item": "crucian", "count": 3},
+		{"item": "stream_grouper", "count": 2},
+		{"item": "river_shrimp", "count": 4}
+	 ],
+	 "inscription": "灯座上刻着一行小字：鲫三、溪石斑二、河虾四，并水底的灯一盏。",
+	 "lit_text": "河灯亮了，雾顺着水退开。"},
+	{"id": "pasture", "name": "牧野灯", "map": "town", "relic": "cowbell",
+	 "offerings": [
+		{"item": "egg", "count": 4},
+		{"item": "duck_egg", "count": 2},
+		{"item": "corn", "count": 3},
+		{"item": "bayberry", "count": 3}
+	 ],
+	 "inscription": "灯座上刻着一行小字：鸡子四、鸭子二、苞谷三、杨梅三，并牛铃一只。",
+	 "lit_text": "牧野灯亮了，西边的雾往坡上退。"},
+	{"id": "well", "name": "井口灯", "map": "town", "relic": "well_key",
+	 "offerings": [
+		{"item": "sweet_potato", "count": 4},
+		{"item": "chestnut", "count": 3},
+		{"item": "hawthorn", "count": 3},
+		{"item": "perch", "count": 2}
+	 ],
+	 "inscription": "灯座上刻着一行小字：薯四、栗三、楂三、鲈二，并井钥一把。",
+	 "lit_text": "井口灯亮了，北边的雾贴着地往山里退。"},
+	{"id": "east", "name": "东滩灯", "map": "riverbank", "relic": "ferry_stub",
+	 "offerings": [
+		{"item": "potherb_mustard", "count": 4},
+		{"item": "wintersweet", "count": 3},
+		{"item": "silver_ore", "count": 3},
+		{"item": "carp", "count": 2}
+	 ],
+	 "inscription": "灯座上刻着一行小字：雪里蕻四、腊梅三、银矿三、鲤二，并船票半张。",
+	 "lit_text": "东滩灯亮了，下游的雾被风吹向海上。"},
+	{"id": "shrine", "name": "山祠灯", "map": "pasture", "relic": "prayer_tablet",
+	 "offerings": [
+		{"item": "tea_leaf", "count": 4},
+		{"item": "spring_bamboo_shoot", "count": 3},
+		{"item": "quartz", "count": 3},
+		{"item": "yellow_croaker", "count": 2}
+	 ],
+	 "inscription": "灯座上刻着一行小字：茶四、春笋三、石英三、黄鱼二，并木牌一块。",
+	 "lit_text": "山祠灯亮了，山路上的雾往山顶收。"}
+]

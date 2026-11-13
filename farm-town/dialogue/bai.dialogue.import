@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://cagtvd12gj0b1"
+path="res://.godot/imported/bai.dialogue-5a4328254b9f5a4f9241d5d6c40953fe.tres"
+
+[deps]
+
+source_file="res://dialogue/bai.dialogue"
+dest_files=["res://.godot/imported/bai.dialogue-5a4328254b9f5a4f9241d5d6c40953fe.tres"]
+
+[params]
+
+defaults=true

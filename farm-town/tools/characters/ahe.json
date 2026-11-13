@@ -1,0 +1,26 @@
+{
+	"name": "ahe",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "bun",
+	"outfit": "apron",
+	"parts": {
+		"shirt": "green",
+		"blue": "indigo",
+		"apron": "cream",
+		"hair": "hair_black",
+		"boot": "leather"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "big",
+		"brow": "thin",
+		"fringe": "part",
+		"blush": true,
+		"mouth": "smile"
+	}
+}

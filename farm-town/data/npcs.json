@@ -1,0 +1,190 @@
+[
+	{
+		"id": "jiang", "speed": 26, "name": "姜婆婆", "sheet": "jiang", "role": "药铺的婆婆", "enter": {"town": [8, 9]}, "loves": ["mint", "chrysanthemum", "shepherds_purse"], "likes": ["tea_leaf", "loquat", "hawthorn", "white_radish"], "dislikes": ["chili", "pine_cone"],
+		"schedule": [
+			{"from": "8:30", "map": "town", "tile": [9, 9], "facing": "down", "note": "door"},
+			{"from": "11:00", "map": "town", "tile": [18, 13], "facing": "down", "note": "bench"},
+			{"from": "13:00"},
+			{"from": "15:00", "map": "town", "tile": [9, 9], "facing": "down", "note": "door"},
+			{"from": "17:30"}
+		],
+		"rain_schedule": [
+			{"from": "9:00", "map": "town", "tile": [8, 9], "facing": "down", "note": "door"},
+			{"from": "16:00"}
+		]
+	},
+	{
+		"id": "xiaoman", "speed": 44, "name": "小满", "sheet": "xiaoman", "role": "镇上的孩子", "enter": {"town": [13, 9]}, "loves": ["strawberry", "bayberry", "watermelon"], "likes": ["peach", "mandarin", "chestnut", "sunflower"], "dislikes": ["potherb_mustard", "fern"],
+		"schedule": [
+			{"from": "7:00", "map": "town", "tile": [21, 16], "facing": "down", "note": "lamp"},
+			{"from": "10:00", "map": "town", "tile": [28, 9], "facing": "up", "note": "board"},
+			{"from": "12:30", "map": "town", "tile": [36, 19], "facing": "up", "note": "smithy"},
+			{"from": "15:00", "map": "town", "tile": [40, 19], "facing": "right", "note": "road"},
+			{"from": "17:00", "map": "town", "tile": [24, 14], "facing": "left", "note": "lamp"},
+			{"from": "19:00"}
+		],
+		"rain_schedule": [
+			{"from": "8:00", "map": "town", "tile": [36, 9], "facing": "down", "note": "eaves"},
+			{"from": "13:00", "map": "town", "tile": [10, 18], "facing": "down", "note": "eaves"},
+			{"from": "17:30"}
+		]
+	},
+	{
+		"id": "bai", "speed": 30, "name": "柏先生", "sheet": "bai", "role": "镇长", "enter": {"town": [22, 9]}, "loves": ["tea_leaf", "wintersweet", "lotus_root"], "likes": ["rice", "chrysanthemum", "persimmon"], "dislikes": ["fog_bell", "pine_cone"],
+		"schedule": [
+			{"from": "8:30", "map": "town", "tile": [22, 10], "facing": "down", "note": "hall"},
+			{"from": "12:00", "map": "town", "tile": [20, 13], "facing": "down", "note": "plaza"},
+			{"from": "14:00", "map": "town", "tile": [22, 10], "facing": "down", "note": "hall"},
+			{"from": "17:00", "map": "town", "tile": [25, 16], "facing": "left", "note": "lamp"},
+			{"from": "19:00"}
+		],
+		"rain_schedule": [
+			{"from": "9:00", "map": "town", "tile": [22, 10], "facing": "down", "note": "hall"},
+			{"from": "17:00"}
+		]
+	},
+	{
+		"id": "ahe", "speed": 38, "name": "阿禾", "sheet": "ahe", "role": "杂货铺掌柜", "service": "grocery", "enter": {"town": [8, 18]}, "loves": ["rapeseed", "sesame", "pumpkin"], "likes": ["soybean", "corn", "sunflower", "cotton"], "dislikes": ["fern", "wild_mushroom"],
+		"schedule": [
+			{"from": "7:30", "map": "town", "tile": [8, 18], "facing": "down", "work": true},
+			{"from": "18:00", "map": "town", "tile": [20, 17], "facing": "right", "note": "plaza"},
+			{"from": "20:00"}
+		],
+		"rain_schedule": [
+			{"from": "8:00", "map": "town", "tile": [8, 18], "facing": "down", "work": true},
+			{"from": "18:00"}
+		]
+	},
+	{
+		"id": "shishu", "name": "石叔", "sheet": "shishu", "role": "铁匠", "service": "smith", "enter": {"town": [37, 18]}, "loves": ["chili", "sweet_potato", "chestnut"], "likes": ["potato", "winter_wheat", "corn"], "dislikes": ["peach_blossom", "camellia", "lotus_flower"],
+		"schedule": [
+			{"from": "8:00", "map": "town", "tile": [37, 18], "facing": "down", "work": true},
+			{"from": "17:30", "map": "town", "tile": [27, 13], "facing": "down", "note": "bench"},
+			{"from": "19:30"}
+		],
+		"rain_schedule": [
+			{"from": "8:00", "map": "town", "tile": [37, 18], "facing": "down", "work": true},
+			{"from": "17:30"}
+		]
+	},
+	{
+		"id": "qingzhu", "name": "青竹", "sheet": "qingzhu", "role": "木匠", "enter": {"town": [0, 18]}, "loves": ["spring_bamboo_shoot", "winter_bamboo_shoot", "persimmon"], "likes": ["pine_cone", "tea_leaf", "tomato"], "dislikes": ["cotton"],
+		"schedule": [
+			{"from": "8:00", "map": "town", "tile": [26, 13], "facing": "down", "note": "bench"},
+			{"from": "11:00", "map": "town", "tile": [34, 19], "facing": "right", "note": "smithy"},
+			{"from": "13:30", "map": "town", "tile": [5, 10], "facing": "left", "note": "herb"},
+			{"from": "16:30"}
+		],
+		"rain_schedule": [
+			{"from": "8:00"}
+		]
+	},
+	{
+		"id": "yunniang", "name": "云娘", "sheet": "yunniang", "role": "茶馆老板娘", "enter": {"town": [37, 9]}, "loves": ["napa_cabbage", "lotus_root", "osmanthus"], "likes": ["tomato", "potato", "bok_choy", "wild_mushroom", "pea"], "dislikes": ["pine_cone"],
+		"schedule": [
+			{"from": "9:00", "map": "town", "tile": [37, 9], "facing": "down", "work": true},
+			{"from": "14:30", "map": "town", "tile": [9, 19], "facing": "up", "note": "grocery"},
+			{"from": "15:30", "map": "town", "tile": [37, 9], "facing": "down", "work": true},
+			{"from": "20:30"}
+		],
+		"rain_schedule": [
+			{"from": "9:00", "map": "town", "tile": [37, 9], "facing": "down", "work": true},
+			{"from": "20:00"}
+		]
+	},
+	{
+		"id": "laozhou", "speed": 30, "name": "老周", "sheet": "laozhou", "role": "渔夫", "enter": {"town": [22, 29], "nanxi": [19, 0]}, "loves": ["water_caltrop", "rice", "potherb_mustard"], "likes": ["sweet_potato", "soybean", "white_radish"], "dislikes": ["lotus_flower", "peach_blossom"],
+		"schedule": [
+			{"from": "6:30", "map": "town", "tile": [18, 18], "facing": "down", "note": "stall"},
+			{"from": "9:00", "map": "nanxi", "tile": [20, 16], "facing": "down", "note": "dock"},
+			{"from": "17:30", "map": "town", "tile": [17, 13], "facing": "down", "note": "bench"},
+			{"from": "19:30"}
+		],
+		"rain_schedule": [
+			{"from": "6:30", "map": "town", "tile": [18, 18], "facing": "down", "note": "stall"},
+			{"from": "8:30"}
+		]
+	},
+	{
+		"id": "amu", "name": "阿牧", "sheet": "amu", "role": "牧场主", "enter": {"town": [0, 18], "pasture": [43, 14]}, "loves": ["corn", "pumpkin", "soybean"], "likes": ["sweet_potato", "watermelon", "shepherds_purse"], "dislikes": ["chili", "mint"],
+		"early_until": "lamp_pasture",
+		"early_schedule": [
+			{"from": "8:30", "map": "town", "tile": [10, 19], "facing": "up", "note": "grocery"},
+			{"from": "11:30", "map": "town", "tile": [36, 10], "facing": "up", "note": "teahouse"},
+			{"from": "14:00", "map": "town", "tile": [10, 19], "facing": "up", "note": "grocery"},
+			{"from": "17:00"}
+		],
+		"early_rain_schedule": [
+			{"from": "9:00", "map": "town", "tile": [36, 10], "facing": "up", "note": "teahouse"},
+			{"from": "15:00"}
+		],
+		"schedule": [
+			{"from": "6:00", "map": "pasture", "tile": [14, 12], "facing": "down", "note": "barn"},
+			{"from": "10:00", "map": "town", "tile": [10, 19], "facing": "up", "note": "grocery"},
+			{"from": "11:30", "map": "town", "tile": [36, 10], "facing": "up", "note": "teahouse"},
+			{"from": "13:00", "map": "pasture", "tile": [18, 16], "facing": "down", "note": "paddock"},
+			{"from": "19:30"}
+		],
+		"rain_schedule": [
+			{"from": "6:00", "map": "pasture", "tile": [14, 12], "facing": "down", "note": "barn"},
+			{"from": "19:30"}
+		]
+	},
+	{
+		"id": "laoqin", "speed": 30, "name": "老秦", "sheet": "laoqin", "role": "守井人", "enter": {"town": [13, 0], "wellhead": [12, 19]}, "loves": ["winter_wheat", "hawthorn", "chili"], "likes": ["potato", "chestnut", "potherb_mustard"], "dislikes": ["camellia", "sunflower"],
+		"early_until": "lamp_well",
+		"early_schedule": [
+			{"from": "16:00", "map": "town", "tile": [34, 10], "facing": "up", "note": "teahouse"},
+			{"from": "18:30"}
+		],
+		"early_rain_schedule": [
+			{"from": "8:00"}
+		],
+		"schedule": [
+			{"from": "6:00", "map": "wellhead", "tile": [9, 9], "facing": "down", "note": "well"},
+			{"from": "16:00", "map": "town", "tile": [34, 10], "facing": "up", "note": "teahouse"},
+			{"from": "18:30", "map": "wellhead", "tile": [9, 9], "facing": "down", "note": "well"},
+			{"from": "21:00"}
+		],
+		"rain_schedule": [
+			{"from": "6:00", "map": "wellhead", "tile": [8, 9], "facing": "down", "note": "hut"},
+			{"from": "21:00"}
+		]
+	},
+	{
+		"id": "luyuan", "name": "陆远", "sheet": "luyuan", "role": "外来的大夫", "enter": {"town": [36, 9]}, "loves": ["fog_bell", "mint", "wild_mushroom"], "likes": ["tea_leaf", "fern", "loquat"], "dislikes": ["watermelon"],
+		"schedule": [
+			{"from": "8:00", "map": "town", "tile": [11, 10], "facing": "up", "note": "herb"},
+			{"from": "11:30", "map": "town", "tile": [16, 14], "facing": "right", "note": "plaza"},
+			{"from": "14:00", "map": "town", "tile": [11, 10], "facing": "up", "note": "herb"},
+			{"from": "18:00", "map": "town", "tile": [35, 10], "facing": "up", "note": "teahouse"},
+			{"from": "20:00"}
+		],
+		"rain_schedule": [
+			{"from": "9:00", "map": "town", "tile": [35, 10], "facing": "up", "note": "teahouse"},
+			{"from": "19:00"}
+		]
+	},
+	{
+		"id": "egret", "speed": 32, "name": "白鹭", "sheet": "egret", "role": "流浪画家", "enter": {"town": [38, 9], "dongtan": [0, 14]}, "loves": ["lotus_flower", "camellia", "peach_blossom"], "likes": ["sunflower", "osmanthus", "bayberry", "wintersweet", "conch"], "dislikes": ["potato"],
+		"early_until": "lamp_east",
+		"early_schedule": [
+			{"from": "9:30", "map": "town", "tile": [24, 17], "facing": "up", "note": "sketch"},
+			{"from": "13:00", "map": "town", "tile": [38, 10], "facing": "down", "note": "teahouse"},
+			{"from": "15:00", "map": "town", "tile": [22, 22], "facing": "down", "note": "sketch"},
+			{"from": "18:30", "map": "town", "tile": [39, 10], "facing": "down", "note": "teahouse"},
+			{"from": "21:00"}
+		],
+		"schedule": [
+			{"from": "9:00", "map": "dongtan", "tile": [27, 20], "facing": "right", "note": "beach"},
+			{"from": "13:00", "map": "town", "tile": [38, 10], "facing": "down", "note": "teahouse"},
+			{"from": "15:00", "map": "dongtan", "tile": [13, 11], "facing": "down", "note": "studio"},
+			{"from": "18:30", "map": "town", "tile": [39, 10], "facing": "down", "note": "teahouse"},
+			{"from": "21:00"}
+		],
+		"rain_schedule": [
+			{"from": "10:00", "map": "town", "tile": [38, 10], "facing": "down", "note": "teahouse"},
+			{"from": "20:00"}
+		]
+	}
+]

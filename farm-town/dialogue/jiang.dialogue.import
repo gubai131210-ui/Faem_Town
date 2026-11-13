@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://c8sb80ao8ga7w"
+path="res://.godot/imported/jiang.dialogue-a3bfcc4d79dcf146adfbc54ceddfa948.tres"
+
+[deps]
+
+source_file="res://dialogue/jiang.dialogue"
+dest_files=["res://.godot/imported/jiang.dialogue-a3bfcc4d79dcf146adfbc54ceddfa948.tres"]
+
+[params]
+
+defaults=true

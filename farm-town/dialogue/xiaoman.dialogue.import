@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://oanhg502ibi2"
+path="res://.godot/imported/xiaoman.dialogue-e2b06694f323d171c6978ad4bb0cf27b.tres"
+
+[deps]
+
+source_file="res://dialogue/xiaoman.dialogue"
+dest_files=["res://.godot/imported/xiaoman.dialogue-e2b06694f323d171c6978ad4bb0cf27b.tres"]
+
+[params]
+
+defaults=true

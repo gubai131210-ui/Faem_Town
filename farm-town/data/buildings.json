@@ -1,0 +1,6 @@
+[
+	{"id": "coop", "name": "鸡舍", "prop": "coop", "price": 1200, "days": 3, "width": 4, "depth": 4, "site": [34, 9], "door": 1, "capacity": 4, "yard": [30, 10, 38, 13], "swim": [30, 14, 37, 20], "desc": "木板墙草顶的矮屋，住得下四只鸡或鸭。盖在池塘北边，鸭子下水方便。三天盖好。"},
+	{"id": "silk_house", "name": "蚕房", "prop": "silk_house", "price": 1800, "days": 3, "width": 4, "depth": 4, "site": [8, 20], "door": 1, "capacity": 4, "yard": [6, 21, 9, 21], "flag": "lamp_river", "desc": "白墙瓦顶的小屋，摆得下四匾蚕。盖在老屋南边。三天盖好。"},
+	{"id": "barn", "name": "畜棚", "prop": "barn", "price": 3500, "days": 4, "width": 6, "depth": 4, "site": [20, 25], "door": 3, "capacity": 4, "yard": [15, 26, 26, 30], "flag": "lamp_pasture", "desc": "高大的木板棚，住得下四头羊或牛。盖在田地南边的空地上。四天盖好。"},
+	{"id": "apiary", "name": "蜂场", "prop": "apiary", "price": 800, "days": 1, "width": 3, "depth": 2, "site": [37, 26], "door": 1, "capacity": 3, "yard": [36, 27, 38, 27], "flag": "lamp_pasture", "desc": "一排架子，放得下三箱蜜蜂。盖在池塘南边，四周留着地给你种花。一天搭好。"}
+]

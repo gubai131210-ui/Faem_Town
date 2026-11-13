@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://bbs72kvvoxnrn"
+path="res://.godot/imported/shishu.dialogue-79ad3f80576493e33593917a985a10ae.tres"
+
+[deps]
+
+source_file="res://dialogue/shishu.dialogue"
+dest_files=["res://.godot/imported/shishu.dialogue-79ad3f80576493e33593917a985a10ae.tres"]
+
+[params]
+
+defaults=true

@@ -1,14 +1,25 @@
 class_name DialogueBalloon
 extends CanvasLayer
-## 对话框：逐字显示 Dialogue Manager 给出的台词，有选项时列出选项。
+## 对话框：逐字显示 Dialogue Manager 给出的台词，有选项时列出选项。说话的是居民时左边显示头像。
 
 signal finished
 
-const CHARS_PER_SECOND := 34.0
+const CHARS_PER_SECOND := 30.0
+## 说到这些标点时停一下，像人说话换气；句末停得久一点
+const PAUSE_SHORT := "，、；："
+const PAUSE_LONG := "。！？…—"
+const PAUSE_SHORT_TIME := 0.11
+const PAUSE_LONG_TIME := 0.2
+## 台词左边留的空：没有头像时、有头像时
+const TEXT_LEFT := 12.0
+const TEXT_LEFT_FACE := 82.0
+const TEXT_RIGHT := 288.0
 
 var _root: Control
 var _name_tag: NinePatchRect
 var _name: Label
+var _face_frame: NinePatchRect
+var _face: TextureRect
 var _text: Label
 var _more: Label
 var _choices: VBoxContainer
@@ -17,6 +28,7 @@ var _line: DialogueLine
 var _shown := 0.0
 var _waiting_choice := false
 var _blink := 0.0
+var _pause := 0.0
 
 
 func _ready() -> void:
@@ -52,6 +64,17 @@ func _ready() -> void:
 	_text.add_theme_constant_override(&"line_spacing", 3)
 	panel.add_child(_text)
 
+	_face_frame = UiKit.panel()
+	_face_frame.position = Vector2(4, -20)
+	_face_frame.size = Vector2(72, 72)
+	_face_frame.visible = false
+	panel.add_child(_face_frame)
+	_face = TextureRect.new()
+	_face.position = Vector2(4, 4)
+	_face.size = Vector2(64, 64)
+	_face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_face_frame.add_child(_face)
+
 	_more = UiKit.label("▼", 6, Color("c8483c"))
 	_more.position = Vector2(284, 43)
 	panel.add_child(_more)
@@ -76,8 +99,15 @@ func _process(delta: float) -> void:
 		return
 	var total := _text.get_total_character_count()
 	if _shown < total:
-		_shown = minf(_shown + delta * CHARS_PER_SECOND, total)
-		_text.visible_characters = int(_shown)
+		if _pause > 0.0:
+			_pause -= delta
+		else:
+			var before := int(_shown)
+			_shown = minf(_shown + delta * CHARS_PER_SECOND, total)
+			var now := int(_shown)
+			if now > before:
+				_pause = pause_after(_text.text, now - 1)
+			_text.visible_characters = now
 		if _shown >= total:
 			_on_line_fully_shown()
 	_blink += delta
@@ -134,11 +164,36 @@ func _show_next(key: String) -> void:
 	_line = line
 	_name.text = line.character
 	_name_tag.visible = line.character != ""
+	var who := Database.npc_by_name(line.character)
+	var mood := "happy" if line.has_tag("happy") else ("sad" if line.has_tag("sad") else "")
+	var face := UiKit.face(who.sheet, mood) if who != null else null
+	_face.texture = face
+	_face_frame.visible = face != null
+	var left := TEXT_LEFT_FACE if face != null else TEXT_LEFT
+	_text.position.x = left
+	_text.size.x = TEXT_RIGHT - left
+	_name_tag.position.x = left - 4.0
 	_text.text = line.text
 	_text.visible_characters = 0
 	_shown = 0.0
 	_blink = 0.0
+	_pause = 0.0
 	Audio.play("select", 0.1, -12.0)
+
+
+## 显示到 text 的第 index 个字以后要停多久。连着的标点（“……”“？！”）只在最后一个后面停。
+static func pause_after(text: String, index: int) -> float:
+	if index < 0 or index >= text.length() - 1:
+		return 0.0
+	var c := text[index]
+	var next := text[index + 1]
+	if PAUSE_LONG.contains(next) or PAUSE_SHORT.contains(next) or next == "”":
+		return 0.0
+	if PAUSE_LONG.contains(c):
+		return PAUSE_LONG_TIME
+	if PAUSE_SHORT.contains(c):
+		return PAUSE_SHORT_TIME
+	return 0.0
 
 
 func _on_line_fully_shown() -> void:

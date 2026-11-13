@@ -4,6 +4,8 @@ extends RefCounted
 ## 贴图里每个动画占 4 行（下、上、右、左），每列一帧。
 
 const DIR := "res://art/characters/"
+## 动物的序列帧（tools/animal.py 生成），格式一样
+const CREATURE_DIR := "res://art/creatures/"
 
 var texture: Texture2D
 var cell := 48
@@ -11,10 +13,10 @@ var foot_row := 40
 var _anims: Dictionary = {}
 
 
-static func load_sheet(sheet_name: String) -> CharacterSheet:
+static func load_sheet(sheet_name: String, dir: String = DIR) -> CharacterSheet:
 	var s := CharacterSheet.new()
-	s.texture = load(DIR + sheet_name + ".png") as Texture2D
-	var desc := JsonFile.read_dict(DIR + sheet_name + ".json")
+	s.texture = load(dir + sheet_name + ".png") as Texture2D
+	var desc := JsonFile.read_dict(dir + sheet_name + ".json")
 	if s.texture == null or desc.is_empty():
 		push_error("角色素材缺失：%s（先运行 tools/character.py）" % sheet_name)
 		return s
@@ -61,6 +63,24 @@ func step_frames(anim: StringName) -> Array:
 	var info: Dictionary = _anims.get(String(anim), {})
 	var frames: Array = info.get("step_frames", [])
 	return frames
+
+
+## 这一帧里鱼竿竿尖相对脚底的像素偏移（tools/character.py 渲染时算出来的）；没有竿的动作返回 ZERO。
+func tip(anim: StringName, facing: int, frame: int) -> Vector2:
+	var info: Dictionary = _anims.get(String(anim), {})
+	var tips: Array = info.get("tips", [])
+	if facing < 0 or facing >= tips.size():
+		return Vector2.ZERO
+	var row: Array = tips[facing]
+	if row.is_empty():
+		return Vector2.ZERO
+	var t: Array = row[posmod(frame, row.size())]
+	return Vector2(float(t[0]), float(t[1]))
+
+
+func has_tip(anim: StringName) -> bool:
+	var info: Dictionary = _anims.get(String(anim), {})
+	return info.has("tips")
 
 
 func region(anim: StringName, facing: int, frame: int) -> Rect2:

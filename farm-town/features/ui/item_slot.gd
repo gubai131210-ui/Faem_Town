@@ -3,6 +3,8 @@ extends Control
 ## 一个物品格：底框、图标、数量，可选的快捷键数字。物品栏和背包共用。
 
 signal clicked(index: int)
+## 鼠标移到了这一格上
+signal hovered(index: int)
 
 const SIZE := 22
 
@@ -11,6 +13,7 @@ var index := 0
 var _bg: TextureRect
 var _icon: TextureRect
 var _count: Label
+var _mark: TextureRect
 var _selected := false
 
 
@@ -18,6 +21,7 @@ func _init(slot_index: int = 0, key_hint: String = "") -> void:
 	index = slot_index
 	custom_minimum_size = Vector2(SIZE, SIZE)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_entered.connect(_on_mouse_entered)
 	_bg = TextureRect.new()
 	_bg.texture = UiKit.texture("slot")
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -27,6 +31,10 @@ func _init(slot_index: int = 0, key_hint: String = "") -> void:
 	_icon.pivot_offset = Vector2(8, 8)
 	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_icon)
+	_mark = TextureRect.new()
+	_mark.position = Vector2(2, 13)
+	_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_mark)
 	if key_hint != "":
 		var key := UiKit.label(key_hint, 5, UiKit.TEXT_LIGHT, true)
 		key.position = Vector2(3, 0)
@@ -45,7 +53,12 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func show_item(id: StringName, count: int) -> void:
+func _on_mouse_entered() -> void:
+	hovered.emit(index)
+
+
+func show_item(id: StringName, count: int, quality: int = 0) -> void:
+	_mark.texture = UiKit.quality_mark(quality) if id != &"" else null
 	var changed := count > 0 and _count.text != "" and str(count) != _count.text
 	_icon.texture = UiKit.item_icon(id) if id != &"" else null
 	_count.text = str(count) if count > 1 else ""

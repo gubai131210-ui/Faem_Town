@@ -1,0 +1,143 @@
+~ first
+青竹: 别动！你踩着我的线了。
+青竹: ……好了，量完了。抱歉啊，吓着你没有？ [#happy]
+青竹: 我是青竹，木匠。镇上的房子哪里漏、哪里歪，都归我修。
+青竹: 你那间老屋我去看过，梁是好梁。等你攒够了钱，我给你翻新。
+青竹: 现在不行，图纸还没画完。我的图纸永远画不完。
+=> END
+
+~ work
+=> daily
+
+~ build
+青竹: 对了，你家那块地我去量过。要不要盖点什么？
+- 鸡舍（{{Animals.price("coop")}} 文，{{Animals.build_days("coop")}} 天） [if Animals.can_offer("coop") /]
+	if Animals.order("coop")
+		青竹: 成！池塘北边那块平地正好。明天一早我就带家伙过去，你到时候别踩我的线。 [#happy]
+		青竹: 鸡鸭的事你得问阿牧，我只管房子不漏。
+	else
+		=> build_poor
+- 蚕房（{{Animals.price("silk_house")}} 文，{{Animals.build_days("silk_house")}} 天） [if Animals.can_offer("silk_house") /]
+	if Animals.order("silk_house")
+		青竹: 蚕房要朝南、要通风，我给你盖在老屋南边。 [#happy]
+		青竹: 蚕种问阿牧要，桑叶阿禾铺子里有。蚕这东西娇气，一天都不能断粮。
+	else
+		=> build_poor
+- 畜棚（{{Animals.price("barn")}} 文，{{Animals.build_days("barn")}} 天） [if Animals.can_offer("barn") /]
+	if Animals.order("barn")
+		青竹: 大活儿！田地南边那片空地我早看中了，梁要用整根的。 [#happy]
+		青竹: 四天。牛进去不许嫌矮。
+	else
+		=> build_poor
+- 蜂场（{{Animals.price("apiary")}} 文，{{Animals.build_days("apiary")}} 天） [if Animals.can_offer("apiary") /]
+	if Animals.order("apiary")
+		青竹: 一排架子的事，明天就好。搭在池塘南边，四周给你留着地种花。 [#happy]
+		青竹: 蜂箱我不碰，那个你找阿牧。我怕蜇。
+	else
+		=> build_poor
+- 先不盖，聊聊别的
+	if Residents.nth("qingzhu") >= 2
+		=> again_chat
+	=> daily_chat
+=> END
+
+~ build_poor
+青竹: ……你的钱袋子比我的图纸还空。攒够了再来，价钱不变。
+=> END
+
+~ daily
+if Animals.building_now() != ""
+	青竹: 你家的{{Animals.building_now()}}。梁已经上了，别催。
+	=> END
+if Animals.any_offer()
+	=> build
+=> daily_chat
+
+~ daily_chat
+if Residents.owes_thanks("qingzhu")
+	青竹: 哎，上回的{{Residents.gift_name("qingzhu")}}，谢了啊。我边干活边吃，木屑都掉进去了。 [#happy]
+	do Residents.thanked("qingzhu")
+elif Residents.away("qingzhu") >= 4
+	青竹: 好久不见。你屋顶没塌吧？塌了记得找我。
+if Residents.weather_is("fog")
+	青竹: 雾天木头发潮，刨不动。我干脆出来量量尺寸。
+elif Residents.at("qingzhu", "bench")
+	青竹: 这条长凳的腿短了半分。你坐着不觉得，我看着难受。
+	青竹: 我在想要不要修。……其实不用修，是我手痒。
+	- 那就修呗
+		青竹: 说得对！等我回去拿刨子。 [#happy]
+	- 别折腾了
+		青竹: 你跟柏先生说的一模一样。行吧。
+elif Residents.at("qingzhu", "smithy")
+	% 青竹: 我来找石叔拿钉子。他打的钉子最直——别告诉他是我说的。
+	% 青竹: 石叔让我等着。他说“等着”的时候，一般要等半个时辰。
+elif Residents.at("qingzhu", "herb")
+	% 青竹: 姜婆婆的窗框松了，我来看看。她非要留我吃饭，我说吃过了，她不信。
+	% 青竹: 这药铺的门槛是老手艺，一根钉子没用。现在没人这么做了。
+elif Residents.topic("qingzhu", 5) == 0
+	青竹: 镇西头有座断桥，你见过吗？被雾挡着，不好找。
+	青竹: 造它的人手艺很好。是谁造的来着……我明明该知道的。 [#sad]
+elif Residents.topic("qingzhu", 5) == 1
+	青竹: 我昨晚画了一张新图纸。画完一看，画的是一座桥。
+	青竹: 我没打算造桥啊。手自己画的。
+elif Residents.topic("qingzhu", 5) == 2
+	if Residents.season_is("winter")
+		青竹: 冬天木头收得紧，这时候做的榫头最牢。就是手冻僵了，线都弹不直。
+	else
+		青竹: 木头这东西有脾气。顺着纹路来，它听话；逆着来，它崩你一脸。
+elif Residents.topic("qingzhu", 5) == 3
+	青竹: 你那屋子的窗户朝东，早上亮堂。当初盖它的人是用了心的。
+else
+	if Residents.knows("qingzhu", 60)
+		青竹: 等雾散了，我想把那座桥修起来。也不知道为什么，就觉得该我来修。
+		青竹: 到时候你来搭把手？
+	else
+		青竹: 我一干活就不爱说话。你别介意，不是冲你。
+=> END
+
+~ again
+if Animals.building_now() == "" and Animals.any_offer()
+	=> build
+=> again_chat
+
+~ again_chat
+if Residents.nth("qingzhu") == 2
+	% 青竹: 嗯？哦，是你。我在算尺寸，说到哪儿了？
+	% 青竹: 还是那句话，先攒钱。 [#happy]
+else
+	% 青竹: 等会儿等会儿，我这数快算完了。
+	% 青竹: 再聊我今天就交不了工了。
+=> END
+
+~ gift_love
+青竹: 给我的？正好，我惦记这个好几天了！ [#happy]
+青竹: 回头你屋里缺个架子什么的，说一声。
+=> END
+
+~ gift_like
+% 青竹: 不错，谢了！ [#happy]
+% 青竹: 哟，这个好。干活的时候正好垫垫肚子。
+=> END
+
+~ gift_ok
+% 青竹: 哦，谢谢。先放工具箱上。
+% 青竹: 行，我收着。
+=> END
+
+~ gift_dislike
+青竹: 呃……这个我真用不上。 [#sad]
+青竹: 下回别破费了，啊。
+=> END
+
+~ memory_1
+青竹: 这张图纸——给我看看。
+青竹: 这笔迹我认得。这尺寸标法也只有一个人用。
+青竹: 是座桥。镇子外头有一座桥，就是它。我每天从上面走过去，从来没想过是谁造的。
+青竹: 原来是他。 [#sad]
+青竹: 图纸我可以收着吗？不，你拿着。我手里的东西留不住，总会不见。
+=> END
+
+~ ending_news
+青竹: 那座桥是我爹造的。图纸上的字是他的字。 [#sad]
+青竹: 桥还断着。料我算过了，开春就动工。 [#happy]
+=> END

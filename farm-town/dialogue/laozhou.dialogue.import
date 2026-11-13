@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://ciqqcy8amw5rh"
+path="res://.godot/imported/laozhou.dialogue-36c198df23f2537441aa84fae6016ab6.tres"
+
+[deps]
+
+source_file="res://dialogue/laozhou.dialogue"
+dest_files=["res://.godot/imported/laozhou.dialogue-36c198df23f2537441aa84fae6016ab6.tres"]
+
+[params]
+
+defaults=true

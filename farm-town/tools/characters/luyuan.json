@@ -1,0 +1,27 @@
+{
+	"name": "luyuan",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "short",
+	"outfit": "robe",
+	"bulk": 0.94,
+	"parts": {
+		"shirt": "white",
+		"band": "teal",
+		"hair": "hair_black",
+		"boot": "charcoal",
+		"skin": "skin_pale"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "calm",
+		"brow": "thin",
+		"fringe": "part",
+		"mouth": "neutral",
+		"crop": true
+	}
+}

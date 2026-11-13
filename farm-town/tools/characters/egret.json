@@ -1,0 +1,25 @@
+{
+	"name": "egret",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": "beret",
+	"hair": "long",
+	"outfit": "tunic",
+	"parts": {
+		"shirt": "teal",
+		"blue": "cream",
+		"hat": "red",
+		"hair": "hair_tan",
+		"boot": "leather"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "big",
+		"brow": "thin",
+		"fringe": "bangs",
+		"mouth": "smile"
+	}
+}

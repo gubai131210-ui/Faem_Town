@@ -1,0 +1,36 @@
+{
+	"name": "buffalo",
+	"body": "quadruped",
+	"scale": 1.3,
+	"cell": 48,
+	"foot_row": 40,
+	"quad": {
+		"body": [
+			0.3,
+			0.52,
+			0.29
+		],
+		"leg": 0.26,
+		"neck": 0.2,
+		"neck_up": 0.16,
+		"head": [
+			0.16,
+			0.24,
+			0.16
+		],
+		"snout": 0.14,
+		"horns": "buffalo",
+		"ears": "side",
+		"tail": "long"
+	},
+	"parts": {
+		"body": "charcoal",
+		"head": "charcoal",
+		"leg": "charcoal",
+		"ear": "charcoal",
+		"tail": "charcoal",
+		"snout": "gray",
+		"horn": "cream",
+		"hoof": "hair_black"
+	}
+}

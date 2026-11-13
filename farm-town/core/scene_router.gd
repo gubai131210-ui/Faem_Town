@@ -10,6 +10,14 @@ const GAME_SCENE := "res://game/game.tscn"
 const MAPS: Dictionary[StringName, String] = {
 	&"farm": "res://maps/farm/farm.tscn",
 	&"farmhouse": "res://maps/farmhouse/farmhouse.tscn",
+	&"town": "res://maps/town/town.tscn",
+	&"nanxi": "res://maps/nanxi/nanxi.tscn",
+	&"riverbank": "res://maps/riverbank/riverbank.tscn",
+	&"pasture": "res://maps/pasture/pasture.tscn",
+	&"dongtan": "res://maps/dongtan/dongtan.tscn",
+	&"shanci": "res://maps/shanci/shanci.tscn",
+	&"wellhead": "res://maps/wellhead/wellhead.tscn",
+	&"mine": "res://maps/mine/mine_map.tscn",
 }
 
 var busy := false

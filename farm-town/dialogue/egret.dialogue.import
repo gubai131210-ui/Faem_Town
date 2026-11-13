@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://dqqakqf6suu2"
+path="res://.godot/imported/egret.dialogue-9604ec664783c738ff0e7699b8214703.tres"
+
+[deps]
+
+source_file="res://dialogue/egret.dialogue"
+dest_files=["res://.godot/imported/egret.dialogue-9604ec664783c738ff0e7699b8214703.tres"]
+
+[params]
+
+defaults=true

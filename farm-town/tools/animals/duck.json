@@ -1,0 +1,7 @@
+{
+	"name": "duck",
+	"body": "bird",
+	"scale": 1.0,
+	"bird": {"comb": false, "wattle": false, "bill": "flat", "tail": 0.12, "neck": 0.36, "neck_up": 0.3, "head_scale": 0.95, "body": [0.23, 0.36, 0.2], "leg": 0.16},
+	"parts": {"body": "cream", "wing": ["X", "K"], "head": "green", "beak": "orange", "leg": "orange"}
+}

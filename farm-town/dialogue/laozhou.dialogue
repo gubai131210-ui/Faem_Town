@@ -1,0 +1,148 @@
+~ first
+老周: ……
+老周: 买鱼？
+老周: 我姓周，在南边码头打鱼。早上来镇上卖一会儿，卖完就回去。
+老周: 码头上……得有人等着。
+=> END
+
+~ work
+=> daily
+
+~ daily
+if Residents.lamp_lit("plaza") and not Residents.has_flag("got_rod")
+	老周: ……灯亮了。
+	老周: 你。会钓鱼吗？
+	if Residents.can_hold("rod")
+		老周: 船上多一根竿子。拿去。
+		do Residents.hand("rod")
+		老周: 对着水甩。浮漂一沉就按一下，然后慢慢收。
+		老周: 它要挣，你就松手。线比你想的脆。
+		老周: 钓着什么，别扔。
+	else
+		老周: 船上多一根竿子……你背包都满了，腾个地方再来。
+	=> END
+if Residents.owes_thanks("laozhou")
+	老周: 上回那个{{Residents.gift_name("laozhou")}}……吃了。挺好。
+	do Residents.thanked("laozhou")
+if Residents.lamp_news("laozhou", "river")
+	=> river_lamp_news
+if Residents.has_flag("relic_river_lantern") and not Residents.has_flag("lantern_found")
+	=> lantern_found
+if Residents.at("laozhou", "dock")
+	if Residents.has_flag("got_rod") and not Residents.has_flag("lantern_hint")
+		=> lantern_hint
+	if Residents.has_flag("got_rod")
+		% 老周: 这潭水深。鲫鱼贴底，别收太急。
+		% 老周: 下雾的日子，水里会钩上别的东西。别扔。
+		% 老周: 蟹笼放一晚就行。放久了虾自己会跑。
+		% 老周: ……你钓你的。我看我的水。
+	else
+		% 老周: 船是我的。码头不是。
+		% 老周: ……这儿风大。你回去吧。
+elif Residents.at("laozhou", "bench")
+	% 老周: ……今天也没等到。 [#sad]
+	% 老周: 坐一会儿就回码头。
+	% 老周: 天黑得早了。船不好靠岸。
+elif Residents.weather_is("rain") or Residents.weather_is("storm")
+	% 老周: 下雨鱼咬钩。卖完这几条就回去。
+	% 老周: 这雨不大。码头上比这大。
+elif Residents.topic("laozhou", 5) == 0
+	老周: 鱼卖完了。你来晚了。
+elif Residents.topic("laozhou", 5) == 1
+	老周: 码头不能没人。
+	老周: 万一有船回来呢。
+elif Residents.topic("laozhou", 5) == 2
+	老周: 等谁？
+	老周: ……等人。
+elif Residents.topic("laozhou", 5) == 3
+	老周: 今早的鲫鱼肥。河水涨了。
+else
+	if Residents.knows("laozhou", 60)
+		老周: 我船上有两副桨。
+		老周: 一副是我的。另一副……短一截。像是给半大孩子用的。 [#sad]
+	else
+		老周: 你种地的？……好。地不会走。
+=> END
+
+~ again
+if Residents.lamp_news("laozhou", "river")
+	=> river_lamp_news
+if Residents.has_flag("relic_river_lantern") and not Residents.has_flag("lantern_found")
+	=> lantern_found
+if Residents.at("laozhou", "dock") and Residents.has_flag("got_rod") and not Residents.has_flag("lantern_hint")
+	=> lantern_hint
+if Residents.nth("laozhou") == 2
+	老周: ……还有事？
+else
+	老周: ……
+=> END
+
+~ lantern_hint
+老周: ……你钓鱼的时候，往潭中间甩。
+老周: 那年清明放灯。有一盏没漂走，打着转沉下去了。就在码头两边的深水里。
+老周: 我捞了三十年，没捞着。你试试。竿子比网细。
+do Residents.mark("lantern_hint")
+=> END
+
+~ river_lamp_news
+老周: ……亮了。
+老周: 我没点过那盏灯。谁点的……也许是我。记不得。
+老周: 船你随便用。对着船按一下，我送你过河。河上的鱼不一样。
+老周: 这根竿子我用了三十年。给你。
+do Residents.upgrade("rod")
+老周: 我手里得空着。万一他回来，要拉他一把。
+=> END
+
+~ gift_love
+老周: ……
+老周: 这个，以前有人常给我带。
+老周: 谢了。 [#happy]
+=> END
+
+~ gift_like
+% 老周: 嗯。谢了。
+% 老周: 行。带回船上吃。
+=> END
+
+~ gift_ok
+老周: 嗯。
+=> END
+
+~ gift_dislike
+老周: ……放着吧。 [#sad]
+=> END
+
+~ quest_laozhou_pea
+老周: ……豌豆。
+老周: 嗯。钱。
+老周: 他爱吃这个。……谁？我没说谁。
+=> END
+
+~ memory_1
+老周: 这钩子是我磨的。
+老周: 红线是我缠的，怕扎手。给小孩用的。
+老周: 那孩子用它钓起过一条这么长的鱼，拎不动，拖着走，一路叫。
+老周: 叫的什么……叫“爹”吧。小孩都叫爹。 [#sad]
+老周: 我每天在码头等的，就是他吧。我也不知道。
+老周: ……你那根竿子太软。等着。
+老周: 船上这根是我自己削的。竿梢换过。拿去。
+do Residents.upgrade("rod")
+=> END
+
+~ lantern_found
+老周: ……
+老周: 给我看看。
+老周: 竹骨是我扎的。那个“周”字……不是我写的。笔画歪。 [#sad]
+老周: 是小孩写的。他写字，我扶着手。
+老周: ……那天晚上他放的灯。灯沉了，他哭。我说明年再放。
+老周: 没有明年。
+老周: 这灯你拿着。灯座缺的是它。你去点。我不去。
+老周: 我在这儿等。
+do Residents.mark("lantern_found")
+=> END
+
+~ ending_news
+老周: 我等的是我儿子。 [#sad]
+老周: 他不会从河上回来了。我知道了。
+老周: 码头我还去。不等谁了，就坐坐。
+=> END

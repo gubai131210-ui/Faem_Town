@@ -1,0 +1,27 @@
+{
+	"name": "xiaoman",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "pigtails",
+	"outfit": "tunic",
+	"scale": 0.8,
+	"parts": {
+		"shirt": "red",
+		"blue": "indigo",
+		"hair": "hair_black",
+		"band": "ochre",
+		"boot": "leather"
+	},
+	"face": {
+		"age": "child",
+		"eyes": "big",
+		"brow": "thin",
+		"fringe": "bangs",
+		"blush": true,
+		"mouth": "smile"
+	}
+}

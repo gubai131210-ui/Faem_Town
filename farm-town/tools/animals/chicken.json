@@ -1,0 +1,7 @@
+{
+	"name": "chicken",
+	"body": "bird",
+	"scale": 1.0,
+	"bird": {"comb": true, "wattle": true, "bill": "cone", "tail": 0.3, "neck": 0.3, "neck_up": 0.26},
+	"parts": {"body": "white", "wing": ["X", "K"], "head": "white", "beak": ["q", "Y"], "leg": ["q", "Y"], "comb": ["r", "R"]}
+}

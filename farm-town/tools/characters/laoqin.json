@@ -1,0 +1,29 @@
+{
+	"name": "laoqin",
+	"anims": [
+		"idle",
+		"walk",
+		"sit"
+	],
+	"hat": false,
+	"hair": "bald",
+	"outfit": "tunic",
+	"beard": true,
+	"bulk": 1.1,
+	"stoop": 5,
+	"parts": {
+		"shirt": "charcoal",
+		"blue": "gray",
+		"hair": "hair_gray",
+		"boot": "charcoal",
+		"skin": "skin_tan"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "flat",
+		"jaw": "square"
+	}
+}

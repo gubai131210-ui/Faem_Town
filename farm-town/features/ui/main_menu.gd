@@ -77,7 +77,7 @@ func _ready() -> void:
 	back.pressed.connect(_close_slots)
 	box.add_child(back)
 
-	var ver := UiKit.label("M0 · 基础框架", 6, UiKit.TEXT_LIGHT, true)
+	var ver := UiKit.label("M1 · 种田（进行中）", 6, UiKit.TEXT_LIGHT, true)
 	ver.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	ver.offset_left = 5.0
 	ver.offset_top = -14.0
