@@ -1,58 +1,661 @@
 [
-	{"id": "old_wick", "name": "旧灯芯", "shape": "wick", "found": "quest",
-	 "desc": "一截烧过一半的灯芯，捻一捻还有油味。广场灯缺的就是它。"},
-	{"id": "ledger_page", "name": "账本残页", "shape": "page", "npc": "ahe", "level": 1, "found": "quest",
-	 "desc": "从账本上撕下来的一页，字迹娟秀，不是阿禾的。"},
-	{"id": "old_sketch", "name": "旧画稿", "shape": "sketch", "npc": "egret", "level": 1, "found": "quest",
-	 "desc": "画着一条街的铅笔稿，纸角有个小孩的手印。"},
-	{"id": "faded_envelope", "name": "褪色的信封", "shape": "envelope", "npc": "jiang", "level": 1, "found": "fog",
-	 "desc": "没寄出去的信封，收信人那一栏被雾洇得只剩一个“城”字。"},
-	{"id": "brass_seal", "name": "磨平的印章", "shape": "seal", "npc": "bai", "level": 1, "found": "fog",
-	 "desc": "镇公所的铜章，字已经磨平了。盖了很多很多次。"},
-	{"id": "broken_chisel", "name": "断凿", "shape": "chisel", "npc": "shishu", "level": 1, "found": "fog",
-	 "desc": "断成两截的凿子，木柄上刻着一个“石”字，不是石叔的笔迹。"},
-	{"id": "bridge_sketch", "name": "桥的图纸", "shape": "blueprint", "npc": "qingzhu", "level": 1, "found": "fog",
-	 "desc": "一张桥的图纸，尺寸标得很细。镇上没有这座桥。"},
-	{"id": "song_sheet", "name": "半页歌谱", "shape": "sheet", "npc": "yunniang", "level": 1, "found": "fog",
-	 "desc": "工尺谱，只有上半段。后面的被撕掉了。"},
-	{"id": "fish_hook", "name": "磨亮的鱼钩", "shape": "hook", "npc": "laozhou", "level": 1, "found": "fog",
-	 "desc": "一枚磨得发亮的鱼钩，钩柄缠着红线，是给小孩用的尺寸。"},
-	{"id": "dog_whistle", "name": "狗哨", "shape": "whistle", "npc": "amu", "level": 1, "found": "fog",
-	 "desc": "竹子做的哨子，吹起来人几乎听不见。"},
-	{"id": "lamp_hook", "name": "矿灯挂钩", "shape": "lamphook", "npc": "laoqin", "level": 1, "found": "fog",
-	 "desc": "挂矿灯用的铁钩，内侧刻着一个编号：二十七。"},
-	{"id": "train_ticket", "name": "旧车票", "shape": "ticket", "npc": "luyuan", "level": 1, "found": "fog",
-	 "desc": "一张来青岚的车票。目的地那一栏是手写上去的。"},
-	{"id": "cowbell", "name": "花花的牛铃", "shape": "bell", "found": "quest",
-	 "desc": "一只铜牛铃，系绳断了。铃身上刻着“花”字，是阿牧爷爷的手艺。牧野灯缺的就是它。"},
-	{"id": "well_key", "name": "井口的钥匙", "shape": "key", "found": "quest",
-	 "desc": "一把长柄的铁钥匙，齿磨圆了，柄上缠着一圈发黑的布条。老秦在腰上挂了三十年。井口灯缺的就是它。"},
-	{"id": "miner_roster", "name": "下井的名单", "shape": "roster", "found": "story",
-	 "desc": "出事那天早上的下井名单，二十八行。二十七行的墨像被水洗过，只剩最底下一行认得出：秦。"},
-	{"id": "family_photo", "name": "全家福", "shape": "family", "found": "story",
-	 "desc": "药铺门口照的。一位婆婆，一个年轻女人，怀里抱着个抓着秤杆不放的孩子。背面写着：“囡囡周岁。”"},
-	{"id": "ferry_stub", "name": "半张船票", "shape": "ticket", "found": "quest",
-	 "desc": "东滩到城里的船票，撕剩的一半。票是两张连着买的，这一张没有用过。东滩灯缺的就是它。"},
-	{"id": "prayer_tablet", "name": "祈愿的木牌", "shape": "tablet", "found": "quest",
-	 "desc": "山祠檐下挂的那种木牌，红绳断了。上面的字被手指摩得只剩印子，凑近了还认得出：“让大家别这么疼。”山祠灯缺的就是它。"},
-	{"id": "river_lantern", "name": "河底的灯盏", "shape": "lantern", "found": "fishing",
-	 "desc": "一盏沉在水底的小纸灯，竹骨还在，纸早烂了。灯座上有个“周”字。河灯缺的就是它。"},
-	{"id": "frog_weight", "name": "石蛙镇纸", "shape": "frog", "found": "mine",
-	 "desc": "石头刻的一只蛙，压纸用的。背上长了一层青苔，肚子底下刻着半个学堂的名字。"},
-	{"id": "hemp_rope", "name": "一卷麻绳", "shape": "rope", "found": "mine",
-	 "desc": "井下拴东西用的麻绳，泡得发黑。上面打的是同一种结，一个接着一个。"},
-	{"id": "oil_umbrella", "name": "油纸伞", "shape": "umbrella", "found": "mine",
-	 "desc": "伞面破了两个洞。伞柄上系着一截红绳，像是怕和别人的拿混。"},
-	{"id": "cloth_shoes", "name": "一双布鞋", "shape": "shoes", "found": "mine",
-	 "desc": "千层底的小布鞋，鞋底几乎没磨过。是做给谁的，没来得及穿。"},
-	{"id": "stopped_clock", "name": "停了的座钟", "shape": "clock", "found": "mine",
-	 "desc": "指针停在三点一刻。上弦的钥匙还插在背后，拧不动了。"},
-	{"id": "paper_figure", "name": "纸人", "shape": "figure", "found": "mine",
-	 "desc": "戏班扎的纸人，脸上没画五官。背面写着一个“替”字。"},
-	{"id": "lamp_shade", "name": "旧灯罩", "shape": "lampshade", "found": "mine",
-	 "desc": "矿灯上的玻璃罩，熏黑了一半。里面粘着一点蛾子翅膀上的粉。"},
-	{"id": "old_photo", "name": "一张旧相片", "shape": "photo", "found": "mine",
-	 "desc": "一排人站在井口，对着镜头笑。脸都花了，只有影子还清楚。"},
-	{"id": "name_tag", "name": "矿工的名牌", "shape": "tag", "found": "mine",
-	 "desc": "下井的人挂在胸口的铜牌，上面本来刻着名字。现在摸上去是平的。"}
+	{
+		"id": "old_wick",
+		"name": "旧灯芯",
+		"shape": "wick",
+		"found": "quest",
+		"desc": "一截烧过一半的灯芯，捻一捻还有油味。广场灯缺的就是它。"
+	},
+	{
+		"id": "ledger_page",
+		"name": "账本残页",
+		"shape": "page",
+		"npc": "ahe",
+		"level": 1,
+		"found": "quest",
+		"desc": "从账本上撕下来的一页，字迹娟秀，不是阿禾的。"
+	},
+	{
+		"id": "old_sketch",
+		"name": "旧画稿",
+		"shape": "sketch",
+		"npc": "egret",
+		"level": 1,
+		"found": "quest",
+		"desc": "画着一条街的铅笔稿，纸角有个小孩的手印。"
+	},
+	{
+		"id": "faded_envelope",
+		"name": "褪色的信封",
+		"shape": "envelope",
+		"npc": "jiang",
+		"level": 1,
+		"found": "fog",
+		"desc": "没寄出去的信封，收信人那一栏被雾洇得只剩一个“城”字。"
+	},
+	{
+		"id": "brass_seal",
+		"name": "磨平的印章",
+		"shape": "seal",
+		"npc": "bai",
+		"level": 1,
+		"found": "fog",
+		"desc": "镇公所的铜章，字已经磨平了。盖了很多很多次。"
+	},
+	{
+		"id": "broken_chisel",
+		"name": "断凿",
+		"shape": "chisel",
+		"npc": "shishu",
+		"level": 1,
+		"found": "fog",
+		"desc": "断成两截的凿子，木柄上刻着一个“石”字，不是石叔的笔迹。"
+	},
+	{
+		"id": "bridge_sketch",
+		"name": "桥的图纸",
+		"shape": "blueprint",
+		"npc": "qingzhu",
+		"level": 1,
+		"found": "fog",
+		"desc": "一张桥的图纸，尺寸标得很细。镇上没有这座桥。"
+	},
+	{
+		"id": "song_sheet",
+		"name": "半页歌谱",
+		"shape": "sheet",
+		"npc": "yunniang",
+		"level": 1,
+		"found": "fog",
+		"desc": "工尺谱，只有上半段。后面的被撕掉了。"
+	},
+	{
+		"id": "fish_hook",
+		"name": "磨亮的鱼钩",
+		"shape": "hook",
+		"npc": "laozhou",
+		"level": 1,
+		"found": "fog",
+		"desc": "一枚磨得发亮的鱼钩，钩柄缠着红线，是给小孩用的尺寸。"
+	},
+	{
+		"id": "dog_whistle",
+		"name": "狗哨",
+		"shape": "whistle",
+		"npc": "amu",
+		"level": 1,
+		"found": "fog",
+		"desc": "竹子做的哨子，吹起来人几乎听不见。"
+	},
+	{
+		"id": "lamp_hook",
+		"name": "矿灯挂钩",
+		"shape": "lamphook",
+		"npc": "laoqin",
+		"level": 1,
+		"found": "fog",
+		"desc": "挂矿灯用的铁钩，内侧刻着一个编号：二十七。"
+	},
+	{
+		"id": "train_ticket",
+		"name": "旧车票",
+		"shape": "ticket",
+		"npc": "luyuan",
+		"level": 1,
+		"found": "fog",
+		"desc": "一张来青岚的车票。目的地那一栏是手写上去的。"
+	},
+	{
+		"id": "cowbell",
+		"name": "花花的牛铃",
+		"shape": "bell",
+		"found": "quest",
+		"desc": "一只铜牛铃，系绳断了。铃身上刻着“花”字，是阿牧爷爷的手艺。牧野灯缺的就是它。"
+	},
+	{
+		"id": "well_key",
+		"name": "井口的钥匙",
+		"shape": "key",
+		"found": "quest",
+		"desc": "一把长柄的铁钥匙，齿磨圆了，柄上缠着一圈发黑的布条。老秦在腰上挂了三十年。井口灯缺的就是它。"
+	},
+	{
+		"id": "miner_roster",
+		"name": "下井的名单",
+		"shape": "roster",
+		"found": "story",
+		"desc": "出事那天早上的下井名单，二十八行。二十七行的墨像被水洗过，只剩最底下一行认得出：秦。"
+	},
+	{
+		"id": "family_photo",
+		"name": "全家福",
+		"shape": "family",
+		"found": "story",
+		"desc": "药铺门口照的。一位婆婆，一个年轻女人，怀里抱着个抓着秤杆不放的孩子。背面写着：“囡囡周岁。”"
+	},
+	{
+		"id": "ferry_stub",
+		"name": "半张船票",
+		"shape": "ticket",
+		"found": "quest",
+		"desc": "东滩到城里的船票，撕剩的一半。票是两张连着买的，这一张没有用过。东滩灯缺的就是它。"
+	},
+	{
+		"id": "prayer_tablet",
+		"name": "祈愿的木牌",
+		"shape": "tablet",
+		"found": "quest",
+		"desc": "山祠檐下挂的那种木牌，红绳断了。上面的字被手指摩得只剩印子，凑近了还认得出：“让大家别这么疼。”山祠灯缺的就是它。"
+	},
+	{
+		"id": "river_lantern",
+		"name": "河底的灯盏",
+		"shape": "lantern",
+		"found": "fishing",
+		"desc": "一盏沉在水底的小纸灯，竹骨还在，纸早烂了。灯座上有个“周”字。河灯缺的就是它。"
+	},
+	{
+		"id": "frog_weight",
+		"name": "石蛙镇纸",
+		"shape": "frog",
+		"found": "mine",
+		"desc": "石头刻的一只蛙，压纸用的。背上长了一层青苔，肚子底下刻着半个学堂的名字。"
+	},
+	{
+		"id": "hemp_rope",
+		"name": "一卷麻绳",
+		"shape": "rope",
+		"found": "mine",
+		"desc": "井下拴东西用的麻绳，泡得发黑。上面打的是同一种结，一个接着一个。"
+	},
+	{
+		"id": "oil_umbrella",
+		"name": "油纸伞",
+		"shape": "umbrella",
+		"found": "mine",
+		"desc": "伞面破了两个洞。伞柄上系着一截红绳，像是怕和别人的拿混。"
+	},
+	{
+		"id": "cloth_shoes",
+		"name": "一双布鞋",
+		"shape": "shoes",
+		"found": "mine",
+		"desc": "千层底的小布鞋，鞋底几乎没磨过。是做给谁的，没来得及穿。"
+	},
+	{
+		"id": "stopped_clock",
+		"name": "停了的座钟",
+		"shape": "clock",
+		"found": "mine",
+		"desc": "指针停在三点一刻。上弦的钥匙还插在背后，拧不动了。"
+	},
+	{
+		"id": "paper_figure",
+		"name": "纸人",
+		"shape": "figure",
+		"found": "mine",
+		"desc": "戏班扎的纸人，脸上没画五官。背面写着一个“替”字。"
+	},
+	{
+		"id": "lamp_shade",
+		"name": "旧灯罩",
+		"shape": "lampshade",
+		"found": "mine",
+		"desc": "矿灯上的玻璃罩，熏黑了一半。里面粘着一点蛾子翅膀上的粉。"
+	},
+	{
+		"id": "old_photo",
+		"name": "一张旧相片",
+		"shape": "photo",
+		"found": "mine",
+		"desc": "一排人站在井口，对着镜头笑。脸都花了，只有影子还清楚。"
+	},
+	{
+		"id": "name_tag",
+		"name": "矿工的名牌",
+		"shape": "tag",
+		"found": "mine",
+		"desc": "下井的人挂在胸口的铜牌，上面本来刻着名字。现在摸上去是平的。"
+	},
+	{
+		"id": "ahe_cover",
+		"name": "账本封面",
+		"shape": "page",
+		"npc": "ahe",
+		"level": 2,
+		"found": "fog",
+		"desc": "封面右下角是母亲的签名，头一个字是“禾”。"
+	},
+	{
+		"id": "ahe_abacus",
+		"name": "旧算盘",
+		"shape": "seal",
+		"npc": "ahe",
+		"level": 3,
+		"found": "fog",
+		"desc": "母亲打过这把算盘，边打边哼铺子的名字。"
+	},
+	{
+		"id": "ahe_bell",
+		"name": "门上的铃",
+		"shape": "bell",
+		"npc": "ahe",
+		"level": 4,
+		"found": "fishing",
+		"desc": "进门的铃一响，镇上的人叫她母亲“禾嫂”。"
+	},
+	{
+		"id": "ahe_rubbing",
+		"name": "招牌拓片",
+		"shape": "sketch",
+		"npc": "ahe",
+		"level": 5,
+		"found": "fog",
+		"desc": "招牌上写的是“禾记”。母亲叫禾娘。"
+	},
+	{
+		"id": "egret_shoe",
+		"name": "一只小鞋",
+		"shape": "shoes",
+		"npc": "egret",
+		"level": 2,
+		"found": "fog",
+		"desc": "画里的街角有个水洼，她小时候从上面跳过去。"
+	},
+	{
+		"id": "egret_paper",
+		"name": "户籍残页",
+		"shape": "page",
+		"npc": "egret",
+		"level": 3,
+		"found": "fog",
+		"desc": "残页上写着她的名字，籍贯是青岚。"
+	},
+	{
+		"id": "egret_pier",
+		"name": "码头速写",
+		"shape": "sketch",
+		"npc": "egret",
+		"level": 4,
+		"found": "fishing",
+		"desc": "离开以前她画过东滩的码头，船头朝着海里。"
+	},
+	{
+		"id": "egret_map",
+		"name": "没画完的地图",
+		"shape": "blueprint",
+		"npc": "egret",
+		"level": 5,
+		"found": "fog",
+		"desc": "她的画就是镇上还没走通的路。"
+	},
+	{
+		"id": "qingzhu_mark",
+		"name": "梁上的刻字",
+		"shape": "tag",
+		"npc": "qingzhu",
+		"level": 2,
+		"found": "fog",
+		"desc": "桥梁底下刻着“竹父造”。"
+	},
+	{
+		"id": "qingzhu_nails",
+		"name": "一袋船钉",
+		"shape": "rope",
+		"npc": "qingzhu",
+		"level": 3,
+		"found": "fog",
+		"desc": "造桥用的钉还剩一把，她爹教过她怎么排。"
+	},
+	{
+		"id": "qingzhu_ink",
+		"name": "一根墨线",
+		"shape": "rope",
+		"npc": "qingzhu",
+		"level": 4,
+		"found": "fishing",
+		"desc": "墨线弹在桥面板上，是她父亲最后一次让她弹的。"
+	},
+	{
+		"id": "qingzhu_peg",
+		"name": "桥钉",
+		"shape": "key",
+		"npc": "qingzhu",
+		"level": 5,
+		"found": "fog",
+		"desc": "最后一颗钉归位，南溪上那座桥可以走人了。"
+	},
+	{
+		"id": "shishu_note",
+		"name": "淬火的纸条",
+		"shape": "page",
+		"npc": "shishu",
+		"level": 2,
+		"found": "fog",
+		"desc": "纸条上写着淬火要等刃口变色，不要看时钟。"
+	},
+	{
+		"id": "shishu_hammer",
+		"name": "师父的小锤",
+		"shape": "chisel",
+		"npc": "shishu",
+		"level": 3,
+		"found": "fog",
+		"desc": "最后一道工序用的是这把小锤，不靠大锤。"
+	},
+	{
+		"id": "shishu_coal",
+		"name": "焦炭单据",
+		"shape": "ticket",
+		"npc": "shishu",
+		"level": 4,
+		"found": "fishing",
+		"desc": "师父最后那个冬天烧的是这一车焦，火要比平时静。"
+	},
+	{
+		"id": "shishu_haft",
+		"name": "锤柄上的字",
+		"shape": "tag",
+		"npc": "shishu",
+		"level": 5,
+		"found": "fog",
+		"desc": "锤柄上刻着收口的顺序。他想起来了。"
+	},
+	{
+		"id": "amu_collar",
+		"name": "旧项圈",
+		"shape": "rope",
+		"npc": "amu",
+		"level": 2,
+		"found": "fog",
+		"desc": "项圈是那条狗的，牌子上的字磨掉了一半。"
+	},
+	{
+		"id": "amu_post",
+		"name": "牧道界桩",
+		"shape": "tablet",
+		"npc": "amu",
+		"level": 3,
+		"found": "fog",
+		"desc": "界桩标明老牧道从牧场西边绕出去。"
+	},
+	{
+		"id": "amu_can",
+		"name": "瘪了的奶桶",
+		"shape": "lantern",
+		"npc": "amu",
+		"level": 4,
+		"found": "fishing",
+		"desc": "每天早晨那条狗跟着奶桶跑到界桩再折返。"
+	},
+	{
+		"id": "amu_tag",
+		"name": "项圈上的牌",
+		"shape": "tag",
+		"npc": "amu",
+		"level": 5,
+		"found": "fog",
+		"desc": "牌子上是“大黄”。他把狗的名字想起来了。"
+	},
+	{
+		"id": "laozhou_reel",
+		"name": "小卷线轮",
+		"shape": "hook",
+		"npc": "laozhou",
+		"level": 2,
+		"found": "fog",
+		"desc": "线轮是他磨给那个孩子的，孩子用它钓过溪里的鱼。"
+	},
+	{
+		"id": "laozhou_spare",
+		"name": "备用的钩",
+		"shape": "hook",
+		"npc": "laozhou",
+		"level": 3,
+		"found": "fog",
+		"desc": "他给孩子备了两枚钩，一枚自己留着。"
+	},
+	{
+		"id": "laozhou_cap",
+		"name": "孩子的帽子",
+		"shape": "figure",
+		"npc": "laozhou",
+		"level": 4,
+		"found": "fishing",
+		"desc": "帽子是出海前一天落在码头上的。"
+	},
+	{
+		"id": "laozhou_name",
+		"name": "竿上的名字",
+		"shape": "tag",
+		"npc": "laozhou",
+		"level": 5,
+		"found": "fog",
+		"desc": "竿上刻着“阿海”。那是他儿子。"
+	},
+	{
+		"id": "yunniang_page",
+		"name": "歌谱第二页",
+		"shape": "sheet",
+		"npc": "yunniang",
+		"level": 2,
+		"found": "fog",
+		"desc": "第二页只有半句词，是一个人在厨房外唱完的。"
+	},
+	{
+		"id": "yunniang_stool",
+		"name": "厨房的凳子",
+		"shape": "tablet",
+		"npc": "yunniang",
+		"level": 3,
+		"found": "fog",
+		"desc": "凳子是给那个接唱的人留的，碗也多放了一副。"
+	},
+	{
+		"id": "yunniang_scrap",
+		"name": "词的碎片",
+		"shape": "page",
+		"npc": "yunniang",
+		"level": 4,
+		"found": "fishing",
+		"desc": "碎片上是下半句：灯还亮着就回家。"
+	},
+	{
+		"id": "yunniang_song",
+		"name": "唱完的歌",
+		"shape": "sheet",
+		"npc": "yunniang",
+		"level": 5,
+		"found": "fog",
+		"desc": "歌是唱给要下井的人的。她把它唱完了。"
+	},
+	{
+		"id": "bai_slip",
+		"name": "没盖完的文书",
+		"shape": "page",
+		"npc": "bai",
+		"level": 2,
+		"found": "fog",
+		"desc": "文书盖到一半。内容是农场东边那块地的许可。"
+	},
+	{
+		"id": "bai_log",
+		"name": "夜里的记录",
+		"shape": "page",
+		"npc": "bai",
+		"level": 3,
+		"found": "fog",
+		"desc": "记录写着第三天夜里他上了山。"
+	},
+	{
+		"id": "bai_copy",
+		"name": "名单的抄件",
+		"shape": "roster",
+		"npc": "bai",
+		"level": 4,
+		"found": "fishing",
+		"desc": "抄件是他在井口念过的那份名单。"
+	},
+	{
+		"id": "bai_permit",
+		"name": "扩建的许可",
+		"shape": "seal",
+		"npc": "bai",
+		"level": 5,
+		"found": "fog",
+		"desc": "许可盖全了。农场小溪东岸可以开垦。"
+	},
+	{
+		"id": "laoqin_left",
+		"name": "少掉的那只",
+		"shape": "lamphook",
+		"npc": "laoqin",
+		"level": 2,
+		"found": "fog",
+		"desc": "挂钩他数出二十七只在下，一只在自己手里。"
+	},
+	{
+		"id": "laoqin_coat",
+		"name": "湿外套",
+		"shape": "figure",
+		"npc": "laoqin",
+		"level": 3,
+		"found": "fog",
+		"desc": "外套是湿的。他在梯子上回头过一次。"
+	},
+	{
+		"id": "laoqin_warm",
+		"name": "还温着的灯",
+		"shape": "lampshade",
+		"npc": "laoqin",
+		"level": 4,
+		"found": "fishing",
+		"desc": "喊他的那盏灯到他手里还是温的。"
+	},
+	{
+		"id": "laoqin_why",
+		"name": "推他的那一下",
+		"shape": "photo",
+		"npc": "laoqin",
+		"level": 5,
+		"found": "fog",
+		"desc": "是岚把他推上梯子的。他因此少丢一点从井里带上来的东西。"
+	},
+	{
+		"id": "jiang_blank",
+		"name": "没有回音的信",
+		"shape": "envelope",
+		"npc": "jiang",
+		"level": 2,
+		"found": "fog",
+		"desc": "信寄出很多封，一封回音都没有。"
+	},
+	{
+		"id": "jiang_recipe",
+		"name": "药方残页",
+		"shape": "page",
+		"npc": "jiang",
+		"level": 3,
+		"found": "fog",
+		"desc": "残页是她给外孙煮过的药茶。灶上现在做得出来。"
+	},
+	{
+		"id": "jiang_word",
+		"name": "信上的称呼",
+		"shape": "page",
+		"npc": "jiang",
+		"level": 4,
+		"found": "fishing",
+		"desc": "信的抬头是“囡囡”。她是在叫自己的女儿。"
+	},
+	{
+		"id": "jiang_address",
+		"name": "农舍的地址",
+		"shape": "envelope",
+		"npc": "jiang",
+		"level": 5,
+		"found": "fog",
+		"desc": "地址是现在这座农舍。收信的人是阿芸。"
+	},
+	{
+		"id": "luyuan_arm",
+		"name": "手臂上的字",
+		"shape": "page",
+		"npc": "luyuan",
+		"level": 2,
+		"found": "fog",
+		"desc": "他在手臂上写过“不要问他们忘了什么”。"
+	},
+	{
+		"id": "luyuan_book",
+		"name": "诊所登记",
+		"shape": "roster",
+		"npc": "luyuan",
+		"level": 3,
+		"found": "fog",
+		"desc": "登记簿上有三十行，比井下的名单多两行。"
+	},
+	{
+		"id": "luyuan_vial",
+		"name": "雾的样本",
+		"shape": "lantern",
+		"npc": "luyuan",
+		"level": 4,
+		"found": "fishing",
+		"desc": "瓶子里是他采的雾。药方写在瓶贴反面。"
+	},
+	{
+		"id": "luyuan_why",
+		"name": "他为什么来",
+		"shape": "ticket",
+		"npc": "luyuan",
+		"level": 5,
+		"found": "fog",
+		"desc": "他来青岚，是因为父亲的名字在那份名单上。"
+	},
+	{
+		"id": "lan_antler",
+		"name": "断了一点的角",
+		"shape": "hook",
+		"npc": "lan",
+		"level": 1,
+		"found": "fog",
+		"desc": "角尖是她自己的。她还不知道自己是谁。"
+	},
+	{
+		"id": "lan_shard",
+		"name": "木牌的碎片",
+		"shape": "tablet",
+		"npc": "lan",
+		"level": 2,
+		"found": "fog",
+		"desc": "碎片是柏先生挂上去的那块牌子。"
+	},
+	{
+		"id": "lan_syllable",
+		"name": "一个音节",
+		"shape": "sheet",
+		"npc": "lan",
+		"level": 3,
+		"found": "fog",
+		"desc": "有人叫过她一个字。她只找回了那个音节。"
+	},
+	{
+		"id": "lan_echo",
+		"name": "井底的回声",
+		"shape": "lampshade",
+		"npc": "lan",
+		"level": 4,
+		"found": "fog",
+		"desc": "井底那一声是她自己留下的，叫人上去。"
+	},
+	{
+		"id": "lan_name",
+		"name": "她的名字",
+		"shape": "tag",
+		"npc": "lan",
+		"level": 5,
+		"found": "fog",
+		"desc": "她的名字是青岚。镇子是跟着她叫的。"
+	}
 ]

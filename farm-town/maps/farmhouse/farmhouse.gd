@@ -50,7 +50,10 @@ func _ready() -> void:
 		var origin: Vector2i = entry[2]
 		var wide: int = entry[3]
 		var deep: int = entry[4]
-		entities.add_child(PropArt.sprite(prop, pos))
+		var shown := prop
+		if prop == "bed" and Residents.memory_level(&"qingzhu") >= 3:
+			shown = "bed_wide"
+		entities.add_child(PropArt.sprite(shown, pos))
 		for dy in deep:
 			for dx in wide:
 				var t := origin + Vector2i(dx, dy)

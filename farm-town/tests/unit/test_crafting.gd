@@ -267,6 +267,8 @@ func test_yunniang_teaches_one_dish_a_day() -> void:
 		if not Crafting.learn("yunniang"):
 			break
 	for id: StringName in Database.recipes:
+		if Database.recipes[id].from == &"memory":
+			continue
 		assert_true(Crafting.knows(id), "最后都学会了：%s" % id)
 	assert_false(Crafting.has_lesson("yunniang"), "教完了")
 

@@ -429,7 +429,7 @@ func _refresh_book() -> void:
 		var when: Label = row.get_node("When")
 		when.text = m.when
 		var who: Label = row.get_node("Who")
-		who.text = "%s · %s" % [Database.npc(m.npc).name, m.title]
+		who.text = "%s · %s" % [_memory_who(m.npc), m.title]
 	if list.is_empty():
 		_book_title.text = ""
 		_book_when.text = ""
@@ -437,8 +437,14 @@ func _refresh_book() -> void:
 		return
 	var cur := list[_book_cursor]
 	_book_title.text = cur.title
-	_book_when.text = "%s · %s" % [cur.when, Database.npc(cur.npc).name]
+	_book_when.text = "%s · %s" % [cur.when, _memory_who(cur.npc)]
 	_book_text.text = cur.text
+
+
+func _memory_who(id: StringName) -> String:
+	if id == &"lan":
+		return "青岚" if Story.lan_level() >= 5 else "岚"
+	return Database.npc(id).name
 
 
 func _make_row(i: int) -> Control:

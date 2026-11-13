@@ -1,24 +1,542 @@
 [
-	{"npc": "ahe", "level": 1, "relic": "ledger_page", "title": "铺子的招牌", "when": "事故前几年", "order": -50,
-	 "text": "阿禾想起小时候铺子门口挂过一块招牌，字是母亲写的。招牌上写的什么，她还想不起来。"},
-	{"npc": "egret", "level": 1, "relic": "old_sketch", "title": "街角", "when": "事故前几年", "order": -40,
-	 "text": "白鹭想起画里的街她小时候走过。街是真的，只是现在找不到了。"},
-	{"npc": "qingzhu", "level": 1, "relic": "bridge_sketch", "title": "桥的图纸", "when": "事故前十年", "order": -100,
-	 "text": "青竹想起这张图纸的笔迹她见过。镇外有一座桥，图上画的就是它。"},
-	{"npc": "shishu", "level": 1, "relic": "broken_chisel", "title": "断凿", "when": "学徒的时候", "order": -80,
-	 "text": "石叔想起这把凿子是在师父那儿用断的。师父的脸他记得清楚，最后一道工序怎么也想不起来。"},
-	{"npc": "amu", "level": 1, "relic": "dog_whistle", "title": "一声哨", "when": "事故前", "order": -30,
-	 "text": "阿牧想起这只哨子吹响时，有一条狗会从雾里跑回来。狗叫什么，他还没想起。"},
-	{"npc": "laozhou", "level": 1, "relic": "fish_hook", "title": "鱼钩", "when": "事故那年春天", "order": -20,
-	 "text": "老周想起这枚鱼钩是他磨给一个孩子的。那孩子钓起过一条很大的鱼。"},
-	{"npc": "yunniang", "level": 1, "relic": "song_sheet", "title": "半首歌", "when": "事故前一夜", "order": -2,
-	 "text": "云娘想起这首歌她会唱。有人在厨房外面跟着哼，她转身的时候那个人已经不在了。"},
-	{"npc": "bai", "level": 1, "relic": "brass_seal", "title": "一枚印章", "when": "事故前一天", "order": -1,
-	 "text": "柏先生想起那天他在镇公所盖了一整天的章。盖的是什么文书，他说他忘了。"},
-	{"npc": "laoqin", "level": 1, "relic": "lamp_hook", "title": "二十八只挂钩", "when": "那一天", "order": 0,
-	 "text": "老秦想起每个下井的人都有一只这样的挂钩。那天早上他数过，二十八只。"},
-	{"npc": "jiang", "level": 1, "relic": "faded_envelope", "title": "一封封信", "when": "事故之后", "order": 20,
-	 "text": "姜婆婆想起她曾经一封一封地往城里写信。寄给谁，她还说不上来。"},
-	{"npc": "luyuan", "level": 1, "relic": "train_ticket", "title": "一张车票", "when": "三十年后", "order": 300,
-	 "text": "陆远想起他来青岚那天，车票上的目的地是他自己写上去的。为什么写，他还不知道。"}
+	{
+		"npc": "ahe",
+		"level": 1,
+		"relic": "ledger_page",
+		"title": "铺子的招牌",
+		"when": "事故前几年",
+		"order": -50,
+		"text": "阿禾想起小时候铺子门口挂过一块招牌，字是母亲写的。招牌上写的什么，她还想不起来。"
+	},
+	{
+		"npc": "egret",
+		"level": 1,
+		"relic": "old_sketch",
+		"title": "街角",
+		"when": "事故前几年",
+		"order": -40,
+		"text": "白鹭想起画里的街她小时候走过。街是真的，只是现在找不到了。"
+	},
+	{
+		"npc": "qingzhu",
+		"level": 1,
+		"relic": "bridge_sketch",
+		"title": "桥的图纸",
+		"when": "事故前十年",
+		"order": -100,
+		"text": "青竹想起这张图纸的笔迹她见过。镇外有一座桥，图上画的就是它。"
+	},
+	{
+		"npc": "shishu",
+		"level": 1,
+		"relic": "broken_chisel",
+		"title": "断凿",
+		"when": "学徒的时候",
+		"order": -80,
+		"text": "石叔想起这把凿子是在师父那儿用断的。师父的脸他记得清楚，最后一道工序怎么也想不起来。"
+	},
+	{
+		"npc": "amu",
+		"level": 1,
+		"relic": "dog_whistle",
+		"title": "一声哨",
+		"when": "事故前",
+		"order": -30,
+		"text": "阿牧想起这只哨子吹响时，有一条狗会从雾里跑回来。狗叫什么，他还没想起。"
+	},
+	{
+		"npc": "laozhou",
+		"level": 1,
+		"relic": "fish_hook",
+		"title": "鱼钩",
+		"when": "事故那年春天",
+		"order": -20,
+		"text": "老周想起这枚鱼钩是他磨给一个孩子的。那孩子钓起过一条很大的鱼。"
+	},
+	{
+		"npc": "yunniang",
+		"level": 1,
+		"relic": "song_sheet",
+		"title": "半首歌",
+		"when": "事故前一夜",
+		"order": -2,
+		"text": "云娘想起这首歌她会唱。有人在厨房外面跟着哼，她转身的时候那个人已经不在了。"
+	},
+	{
+		"npc": "bai",
+		"level": 1,
+		"relic": "brass_seal",
+		"title": "一枚印章",
+		"when": "事故前一天",
+		"order": -1,
+		"text": "柏先生想起那天他在镇公所盖了一整天的章。盖的是什么文书，他说他忘了。"
+	},
+	{
+		"npc": "laoqin",
+		"level": 1,
+		"relic": "lamp_hook",
+		"title": "二十八只挂钩",
+		"when": "那一天",
+		"order": 0,
+		"text": "老秦想起每个下井的人都有一只这样的挂钩。那天早上他数过，二十八只。"
+	},
+	{
+		"npc": "jiang",
+		"level": 1,
+		"relic": "faded_envelope",
+		"title": "一封封信",
+		"when": "事故之后",
+		"order": 20,
+		"text": "姜婆婆想起她曾经一封一封地往城里写信。寄给谁，她还说不上来。"
+	},
+	{
+		"npc": "luyuan",
+		"level": 1,
+		"relic": "train_ticket",
+		"title": "一张车票",
+		"when": "三十年后",
+		"order": 300,
+		"text": "陆远想起他来青岚那天，车票上的目的地是他自己写上去的。为什么写，他还不知道。"
+	},
+	{
+		"npc": "ahe",
+		"level": 2,
+		"relic": "ahe_cover",
+		"title": "封面上的字",
+		"when": "事故前几年",
+		"order": -48,
+		"text": "封面右下角是母亲的签名，头一个字是“禾”。"
+	},
+	{
+		"npc": "ahe",
+		"level": 3,
+		"relic": "ahe_abacus",
+		"title": "算盘的声音",
+		"when": "事故前几年",
+		"order": -46,
+		"text": "母亲打过这把算盘，边打边哼铺子的名字。"
+	},
+	{
+		"npc": "ahe",
+		"level": 4,
+		"relic": "ahe_bell",
+		"title": "铜铃",
+		"when": "事故前几年",
+		"order": -44,
+		"text": "进门的铃一响，镇上的人叫她母亲“禾嫂”。"
+	},
+	{
+		"npc": "ahe",
+		"level": 5,
+		"relic": "ahe_rubbing",
+		"title": "禾记",
+		"when": "事故前几年",
+		"order": -42,
+		"text": "招牌上写的是“禾记”。母亲叫禾娘。"
+	},
+	{
+		"npc": "egret",
+		"level": 2,
+		"relic": "egret_shoe",
+		"title": "水洼",
+		"when": "事故前几年",
+		"order": -38,
+		"text": "画里的街角有个水洼，她小时候从上面跳过去。"
+	},
+	{
+		"npc": "egret",
+		"level": 3,
+		"relic": "egret_paper",
+		"title": "本地人",
+		"when": "事故前几年",
+		"order": -36,
+		"text": "残页上写着她的名字，籍贯是青岚。"
+	},
+	{
+		"npc": "egret",
+		"level": 4,
+		"relic": "egret_pier",
+		"title": "离开以前",
+		"when": "事故前",
+		"order": -34,
+		"text": "离开以前她画过东滩的码头，船头朝着海里。"
+	},
+	{
+		"npc": "egret",
+		"level": 5,
+		"relic": "egret_map",
+		"title": "纸上的路",
+		"when": "事故前",
+		"order": -32,
+		"text": "她的画就是镇上还没走通的路。"
+	},
+	{
+		"npc": "qingzhu",
+		"level": 2,
+		"relic": "qingzhu_mark",
+		"title": "竹父造",
+		"when": "事故前十年",
+		"order": -96,
+		"text": "桥梁底下刻着“竹父造”。"
+	},
+	{
+		"npc": "qingzhu",
+		"level": 3,
+		"relic": "qingzhu_nails",
+		"title": "船钉",
+		"when": "事故前十年",
+		"order": -92,
+		"text": "造桥用的钉还剩一把，她爹教过她怎么排。"
+	},
+	{
+		"npc": "qingzhu",
+		"level": 4,
+		"relic": "qingzhu_ink",
+		"title": "墨线",
+		"when": "事故前十年",
+		"order": -88,
+		"text": "墨线弹在桥面板上，是她父亲最后一次让她弹的。"
+	},
+	{
+		"npc": "qingzhu",
+		"level": 5,
+		"relic": "qingzhu_peg",
+		"title": "把桥认回来",
+		"when": "事故前十年",
+		"order": -84,
+		"text": "最后一颗钉归位，南溪上那座桥可以走人了。"
+	},
+	{
+		"npc": "shishu",
+		"level": 2,
+		"relic": "shishu_note",
+		"title": "火候",
+		"when": "学徒的时候",
+		"order": -78,
+		"text": "纸条上写着淬火要等刃口变色，不要看时钟。"
+	},
+	{
+		"npc": "shishu",
+		"level": 3,
+		"relic": "shishu_hammer",
+		"title": "小锤",
+		"when": "学徒的时候",
+		"order": -76,
+		"text": "最后一道工序用的是这把小锤，不靠大锤。"
+	},
+	{
+		"npc": "shishu",
+		"level": 4,
+		"relic": "shishu_coal",
+		"title": "一车焦",
+		"when": "学徒的时候",
+		"order": -74,
+		"text": "师父最后那个冬天烧的是这一车焦，火要比平时静。"
+	},
+	{
+		"npc": "shishu",
+		"level": 5,
+		"relic": "shishu_haft",
+		"title": "收口",
+		"when": "学徒的时候",
+		"order": -72,
+		"text": "锤柄上刻着收口的顺序。他想起来了。"
+	},
+	{
+		"npc": "amu",
+		"level": 2,
+		"relic": "amu_collar",
+		"title": "项圈",
+		"when": "事故前",
+		"order": -28,
+		"text": "项圈是那条狗的，牌子上的字磨掉了一半。"
+	},
+	{
+		"npc": "amu",
+		"level": 3,
+		"relic": "amu_post",
+		"title": "老牧道",
+		"when": "事故前",
+		"order": -27,
+		"text": "界桩标明老牧道从牧场西边绕出去。"
+	},
+	{
+		"npc": "amu",
+		"level": 4,
+		"relic": "amu_can",
+		"title": "晨课",
+		"when": "事故前",
+		"order": -25,
+		"text": "每天早晨那条狗跟着奶桶跑到界桩再折返。"
+	},
+	{
+		"npc": "amu",
+		"level": 5,
+		"relic": "amu_tag",
+		"title": "大黄",
+		"when": "事故前",
+		"order": -24,
+		"text": "牌子上是“大黄”。他把狗的名字想起来了。"
+	},
+	{
+		"npc": "laozhou",
+		"level": 2,
+		"relic": "laozhou_reel",
+		"title": "小轮",
+		"when": "事故那年春天",
+		"order": -18,
+		"text": "线轮是他磨给那个孩子的，孩子用它钓过溪里的鱼。"
+	},
+	{
+		"npc": "laozhou",
+		"level": 3,
+		"relic": "laozhou_spare",
+		"title": "两枚钩",
+		"when": "事故那年春天",
+		"order": -17,
+		"text": "他给孩子备了两枚钩，一枚自己留着。"
+	},
+	{
+		"npc": "laozhou",
+		"level": 4,
+		"relic": "laozhou_cap",
+		"title": "帽子",
+		"when": "事故那年春天",
+		"order": -15,
+		"text": "帽子是出海前一天落在码头上的。"
+	},
+	{
+		"npc": "laozhou",
+		"level": 5,
+		"relic": "laozhou_name",
+		"title": "阿海",
+		"when": "事故那年春天",
+		"order": -14,
+		"text": "竿上刻着“阿海”。那是他儿子。"
+	},
+	{
+		"npc": "yunniang",
+		"level": 2,
+		"relic": "yunniang_page",
+		"title": "第二页",
+		"when": "事故前一夜",
+		"order": -7,
+		"text": "第二页只有半句词，是一个人在厨房外唱完的。"
+	},
+	{
+		"npc": "yunniang",
+		"level": 3,
+		"relic": "yunniang_stool",
+		"title": "多一副碗筷",
+		"when": "事故前一夜",
+		"order": -5,
+		"text": "凳子是给那个接唱的人留的，碗也多放了一副。"
+	},
+	{
+		"npc": "yunniang",
+		"level": 4,
+		"relic": "yunniang_scrap",
+		"title": "下半句",
+		"when": "事故前一夜",
+		"order": -4,
+		"text": "碎片上是下半句：灯还亮着就回家。"
+	},
+	{
+		"npc": "yunniang",
+		"level": 5,
+		"relic": "yunniang_song",
+		"title": "整首歌",
+		"when": "事故前一夜",
+		"order": -3,
+		"text": "歌是唱给要下井的人的。她把它唱完了。"
+	},
+	{
+		"npc": "bai",
+		"level": 2,
+		"relic": "bai_slip",
+		"title": "半枚章",
+		"when": "事故前一天",
+		"order": -11,
+		"text": "文书盖到一半。内容是农场东边那块地的许可。"
+	},
+	{
+		"npc": "bai",
+		"level": 3,
+		"relic": "bai_log",
+		"title": "第三天夜里",
+		"when": "事故后",
+		"order": -9,
+		"text": "记录写着第三天夜里他上了山。"
+	},
+	{
+		"npc": "bai",
+		"level": 4,
+		"relic": "bai_copy",
+		"title": "二十八",
+		"when": "那一天",
+		"order": 1,
+		"text": "抄件是他在井口念过的那份名单。"
+	},
+	{
+		"npc": "bai",
+		"level": 5,
+		"relic": "bai_permit",
+		"title": "东岸",
+		"when": "事故前一天",
+		"order": 6,
+		"text": "许可盖全了。农场小溪东岸可以开垦。"
+	},
+	{
+		"npc": "laoqin",
+		"level": 2,
+		"relic": "laoqin_left",
+		"title": "二十七",
+		"when": "那一天",
+		"order": 2,
+		"text": "挂钩他数出二十七只在下，一只在自己手里。"
+	},
+	{
+		"npc": "laoqin",
+		"level": 3,
+		"relic": "laoqin_coat",
+		"title": "回头",
+		"when": "那一天",
+		"order": 3,
+		"text": "外套是湿的。他在梯子上回头过一次。"
+	},
+	{
+		"npc": "laoqin",
+		"level": 4,
+		"relic": "laoqin_warm",
+		"title": "别停",
+		"when": "那一天",
+		"order": 4,
+		"text": "喊他的那盏灯到他手里还是温的。"
+	},
+	{
+		"npc": "laoqin",
+		"level": 5,
+		"relic": "laoqin_why",
+		"title": "为什么是他",
+		"when": "那一天",
+		"order": 5,
+		"text": "是岚把他推上梯子的。他因此少丢一点从井里带上来的东西。"
+	},
+	{
+		"npc": "jiang",
+		"level": 2,
+		"relic": "jiang_blank",
+		"title": "没有回音",
+		"when": "事故之后",
+		"order": 22,
+		"text": "信寄出很多封，一封回音都没有。"
+	},
+	{
+		"npc": "jiang",
+		"level": 3,
+		"relic": "jiang_recipe",
+		"title": "一碗药",
+		"when": "事故之后",
+		"order": 24,
+		"text": "残页是她给外孙煮过的药茶。灶上现在做得出来。"
+	},
+	{
+		"npc": "jiang",
+		"level": 4,
+		"relic": "jiang_word",
+		"title": "囡囡",
+		"when": "事故之后",
+		"order": 26,
+		"text": "信的抬头是“囡囡”。她是在叫自己的女儿。"
+	},
+	{
+		"npc": "jiang",
+		"level": 5,
+		"relic": "jiang_address",
+		"title": "寄到农舍",
+		"when": "事故之后",
+		"order": 28,
+		"text": "地址是现在这座农舍。收信的人是阿芸。"
+	},
+	{
+		"npc": "luyuan",
+		"level": 2,
+		"relic": "luyuan_arm",
+		"title": "不要问",
+		"when": "三十年后",
+		"order": 280,
+		"text": "他在手臂上写过“不要问他们忘了什么”。"
+	},
+	{
+		"npc": "luyuan",
+		"level": 3,
+		"relic": "luyuan_book",
+		"title": "三十个名字",
+		"when": "三十年后",
+		"order": 290,
+		"text": "登记簿上有三十行，比井下的名单多两行。"
+	},
+	{
+		"npc": "luyuan",
+		"level": 4,
+		"relic": "luyuan_vial",
+		"title": "一小瓶",
+		"when": "三十年后",
+		"order": 296,
+		"text": "瓶子里是他采的雾。药方写在瓶贴反面。"
+	},
+	{
+		"npc": "luyuan",
+		"level": 5,
+		"relic": "luyuan_why",
+		"title": "父亲的名字",
+		"when": "三十年后",
+		"order": 306,
+		"text": "他来青岚，是因为父亲的名字在那份名单上。"
+	},
+	{
+		"npc": "lan",
+		"level": 1,
+		"relic": "lan_antler",
+		"title": "角",
+		"when": "很久以前",
+		"order": -200,
+		"text": "角尖是她自己的。她还不知道自己是谁。"
+	},
+	{
+		"npc": "lan",
+		"level": 2,
+		"relic": "lan_shard",
+		"title": "木牌",
+		"when": "事故后",
+		"order": -160,
+		"text": "碎片是柏先生挂上去的那块牌子。"
+	},
+	{
+		"npc": "lan",
+		"level": 3,
+		"relic": "lan_syllable",
+		"title": "一个字",
+		"when": "事故后",
+		"order": 8,
+		"text": "有人叫过她一个字。她只找回了那个音节。"
+	},
+	{
+		"npc": "lan",
+		"level": 4,
+		"relic": "lan_echo",
+		"title": "回声",
+		"when": "那一天",
+		"order": 40,
+		"text": "井底那一声是她自己留下的，叫人上去。"
+	},
+	{
+		"npc": "lan",
+		"level": 5,
+		"relic": "lan_name",
+		"title": "青岚",
+		"when": "那一天",
+		"order": 50,
+		"text": "她的名字是青岚。镇子是跟着她叫的。"
+	}
 ]

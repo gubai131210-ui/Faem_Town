@@ -2278,6 +2278,66 @@ func _run() -> void:
 	await _wait(0.8)
 	await _shot("22m_new_year_morning")
 
+	# ---- 第五批：二到五级的忆，和忆满以后才打开的几处
+	var mem_game: Node = get_tree().current_scene
+	var mem_player: Player = mem_game.get(&"player")
+	var mem_balloon: DialogueBalloon = mem_game.get(&"balloon")
+	Residents.memory_levels[&"qingzhu"] = 5
+	mem_game.call(&"_load_map", &"nanxi", &"from_town")
+	await _wait(0.8)
+	var mem_map: Node = mem_game.get(&"map")
+	var bridge: Array = mem_map.call(&"_bridge_tiles")
+	var span: Vector2i = bridge[bridge.size() / 2]
+	_check(bool(mem_map.call(&"_walkable", span)), "青竹把西边的桥补上了，桥面能走")
+	mem_player.place(GameMap.tile_center(span), GameMap.Facing.DOWN)
+	await _wait(0.5)
+	await _shot("23a_nanxi_bridge")
+	mem_game.call(&"_load_map", &"farm", &"from_town")
+	await _wait(0.8)
+	mem_map = mem_game.get(&"map")
+	var east := Vector2i(-1, -1)
+	for bank_y in range(12, 22):
+		var bank_x: int = int(mem_map.call(&"_stream_x", bank_y)) + 2
+		var bank_tile := Vector2i(bank_x, bank_y)
+		var bank_at: int = mem_map.call(&"idx", bank_tile)
+		if int(mem_map.terrain[bank_at]) != GroundArt.WATER and int(mem_map.solid[bank_at]) == 0:
+			east = bank_tile
+			break
+	_check(east.x >= 0 and not bool(mem_map.call(&"_can_till", east)), "没有许可，溪东开不了")
+	Residents.memory_levels[&"bai"] = 5
+	_check(bool(mem_map.call(&"_can_till", east)), "柏先生的许可下来了，溪东能开垦")
+	mem_player.place(GameMap.tile_center(east), GameMap.Facing.LEFT)
+	await _wait(0.4)
+	await _shot("23b_farm_east_bank")
+	mem_game.call(&"_load_map", &"farmhouse", &"door")
+	await _wait(0.8)
+	mem_player.place(GameMap.tile_center(Vector2i(3, 5)), GameMap.Facing.UP)
+	await _wait(0.4)
+	await _shot("23c_wide_bed")
+	_make_room(1)
+	GameState.inventory.add(&"ahe_cover", 1)
+	for slot_i in GameState.inventory.size:
+		if GameState.inventory.id_at(slot_i) == &"ahe_cover":
+			GameState.selected_slot = slot_i
+			break
+	Residents.memory_levels[&"ahe"] = 1
+	Residents.familiarity[&"ahe"] = Residents.familiarity_cap(&"ahe")
+	Residents.talk(&"ahe", false)
+	await _wait(0.6)
+	_check(mem_balloon.is_open() and Residents.memory_level(&"ahe") == 2, "把封面还给阿禾，忆到了二级")
+	await _shot("23d_ahe_memory")
+	await _close_talk()
+	var seed_price := Database.item(&"bok_choy_seed").price
+	Residents.memory_levels[&"ahe"] = 4
+	_check(Shop.asking_price(Database.item(&"bok_choy_seed")) < seed_price, "阿禾的种子打了八折")
+	for npc_id: StringName in Database.npcs:
+		if Database.memory(npc_id, 1) != null:
+			Residents.memory_levels[npc_id] = 5
+	for lan_step in range(1, 6):
+		GameState.set_flag(StringName("memory_lan_%d" % lan_step))
+	_check(Story.lan_level() == 5 and Story.true_ready(), "居民和岚的忆都满了，归名的条件齐了")
+	_check(Story.ending() == Story.CLEAR, "这一局灯已经点过，走的仍是散雾")
+
 	for i in SaveSystem.SLOT_COUNT:
 		SaveSystem.delete(i)
 	if _failures.is_empty():

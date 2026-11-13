@@ -15,7 +15,7 @@ const DIALOGUE := "res://dialogue/ending.dialogue"
 const TRIAL_FLAG := &"boss_shade"
 ## 忆的满级
 const MEMORY_MAX := 5
-## 岚的忆满了（M6 第五批来立）
+## 岚的忆满了（第五段交还以后）
 const LAN_FLAG := &"memory_lan_5"
 
 
@@ -56,6 +56,16 @@ static func unfinished() -> Array[StringName]:
 		if has_memory.has(id) and Residents.memory_level(id) < MEMORY_MAX:
 			out.append(id)
 	return out
+
+
+## 岚的忆现在到第几级。必须一级级来，中间断了就停在断掉的前一级。
+static func lan_level() -> int:
+	var n := 0
+	for i in range(1, MEMORY_MAX + 1):
+		if not GameState.has_flag(StringName("memory_lan_%d" % i)):
+			break
+		n = i
+	return n
 
 
 ## 归名的条件：有忆的居民都满级，岚的忆也满级。

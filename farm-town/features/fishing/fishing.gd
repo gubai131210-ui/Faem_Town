@@ -74,6 +74,16 @@ func pick(water: StringName, roll: float) -> FishDef:
 
 
 ## 这次等多久咬钩；roll 是 0 到 1 的随机数。挂了鱼饵时间减半。
+## 老周的忆：第三级竿子来得快一档；第五级在海上再快一档。
+func effective_rod(water: StringName) -> int:
+	var n := GameState.tool_level(&"rod")
+	if Residents.memory_level(&"laozhou") >= 3:
+		n += 1
+	if water == &"sea" and Residents.memory_level(&"laozhou") >= 5:
+		n += 1
+	return n
+
+
 func bite_wait(rod_level: int, roll: float, baited: bool = false) -> float:
 	var top := maxf(WAIT_MIN + 0.5, WAIT_MAX - WAIT_PER_LEVEL * rod_level)
 	var t := lerpf(WAIT_MIN, top, roll)
@@ -109,7 +119,7 @@ func pick_relic(roll: float, excluded: Array[StringName] = []) -> StringName:
 	var pool: Array[StringName] = []
 	for id: StringName in Database.relics:
 		var r: RelicDef = Database.relics[id]
-		if r.found != &"fog" and r.found != &"fishing":
+		if (r.found != &"fog" and r.found != &"fishing") or not Residents.relic_available(r):
 			continue
 		if GameState.has_flag(StringName("relic_" + String(id))) or excluded.has(id):
 			continue

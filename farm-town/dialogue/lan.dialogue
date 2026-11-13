@@ -22,6 +22,10 @@ do Residents.mark("lan_talked")
 => END
 
 ~ daily
+if Residents.holding_lan_memory()
+	do Residents.give_lan()
+	岚: {{Residents.lan_line()}}
+	=> END
 if Residents.ending_is("keep") and not Residents.has_flag("lan_keep_told")
 	岚: 你没有点。
 	岚: 我不知道这算不算好。我只知道今天早上没有新的东西到我这儿来。
@@ -83,4 +87,30 @@ else
 % 青岚: 青岚。……我再念一遍。青岚。
 % 青岚: 你不忙的话就站一会儿。我不赶人。
 % 青岚: 那个小的今天又来过了。她问我鹿吃不吃桂花糕。
+=> END
+
+~ memory_1
+岚: 角尖是我自己的。我还不知道自己是谁。
+岚: 你拿来的时候，我摸到了。像摸到一件本来就长在身上的东西。
+=> END
+
+~ memory_2
+岚: 这块碎片是柏先生挂上去的那块牌子。
+岚: 他求过我一件事。牌子上写的是什么，我还是读不出。
+=> END
+
+~ memory_3
+岚: 有人叫过我一个字。
+岚: 我只找回了那个音节。整句话还在雾里。
+=> END
+
+~ memory_4
+岚: 井底那一声是我自己留下的。
+岚: 我叫人上去。灯别灭。别的我当时没说。
+=> END
+
+~ memory_5
+岚: 青岚。
+岚: 他们是这么叫我的。镇子是跟着我叫的。
+岚: 名字回来了。疼的那一天也回来了。两件一起拿着。
 => END

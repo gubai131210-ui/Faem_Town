@@ -1,14 +1,127 @@
 [
-	{"id": "radish_soup", "from": "start", "ingredients": {"white_radish": 2}},
-	{"id": "stir_greens", "from": "start", "ingredients": {"bok_choy": 2}},
-	{"id": "roast_sweet_potato", "from": "start", "ingredients": {"sweet_potato": 1}},
-	{"id": "fried_egg", "from": "start", "ingredients": {"egg": 1}},
-	{"id": "rice_bowl", "from": "start", "ingredients": {"white_rice": 1}},
-	{"id": "fish_soup", "from": "yunniang", "ingredients": {"crucian": 1, "white_radish": 1}},
-	{"id": "plain_noodles", "from": "yunniang", "ingredients": {"flour": 1, "bok_choy": 1}},
-	{"id": "tea_egg", "from": "yunniang", "ingredients": {"egg": 2, "dried_tea": 1}},
-	{"id": "egg_fried_rice", "from": "yunniang", "ingredients": {"white_rice": 1, "egg": 1, "cooking_oil": 1}},
-	{"id": "pumpkin_porridge", "from": "yunniang", "ingredients": {"pumpkin": 1, "white_rice": 1}},
-	{"id": "milk_cake", "from": "yunniang", "ingredients": {"cheese": 1, "flour": 1, "egg": 1}},
-	{"id": "osmanthus_cake", "from": "yunniang", "ingredients": {"osmanthus": 2, "white_rice": 1, "honey_wild": 1}}
+	{
+		"id": "radish_soup",
+		"from": "start",
+		"ingredients": {
+			"white_radish": 2
+		}
+	},
+	{
+		"id": "stir_greens",
+		"from": "start",
+		"ingredients": {
+			"bok_choy": 2
+		}
+	},
+	{
+		"id": "roast_sweet_potato",
+		"from": "start",
+		"ingredients": {
+			"sweet_potato": 1
+		}
+	},
+	{
+		"id": "fried_egg",
+		"from": "start",
+		"ingredients": {
+			"egg": 1
+		}
+	},
+	{
+		"id": "rice_bowl",
+		"from": "start",
+		"ingredients": {
+			"white_rice": 1
+		}
+	},
+	{
+		"id": "fish_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"crucian": 1,
+			"white_radish": 1
+		}
+	},
+	{
+		"id": "plain_noodles",
+		"from": "yunniang",
+		"ingredients": {
+			"flour": 1,
+			"bok_choy": 1
+		}
+	},
+	{
+		"id": "tea_egg",
+		"from": "yunniang",
+		"ingredients": {
+			"egg": 2,
+			"dried_tea": 1
+		}
+	},
+	{
+		"id": "egg_fried_rice",
+		"from": "yunniang",
+		"ingredients": {
+			"white_rice": 1,
+			"egg": 1,
+			"cooking_oil": 1
+		}
+	},
+	{
+		"id": "pumpkin_porridge",
+		"from": "yunniang",
+		"ingredients": {
+			"pumpkin": 1,
+			"white_rice": 1
+		}
+	},
+	{
+		"id": "milk_cake",
+		"from": "yunniang",
+		"ingredients": {
+			"cheese": 1,
+			"flour": 1,
+			"egg": 1
+		}
+	},
+	{
+		"id": "osmanthus_cake",
+		"from": "yunniang",
+		"ingredients": {
+			"osmanthus": 2,
+			"white_rice": 1,
+			"honey_wild": 1
+		}
+	},
+	{
+		"id": "herb_tea",
+		"from": "memory",
+		"teacher": "jiang",
+		"need": 3,
+		"ingredients": {
+			"fog_bell": 1,
+			"dried_tea": 1
+		}
+	},
+	{
+		"id": "fog_tonic",
+		"from": "memory",
+		"teacher": "luyuan",
+		"need": 4,
+		"ingredients": {
+			"fog_bell": 2,
+			"dried_tea": 1
+		}
+	},
+	{
+		"id": "farewell_noodles",
+		"from": "memory",
+		"teacher": "yunniang",
+		"need": 5,
+		"ingredients": {
+			"flour": 1,
+			"bok_choy": 1,
+			"egg": 1
+		}
+	}
 ]

@@ -422,6 +422,9 @@ static func food(id: StringName) -> Image:
 		&"plain_noodles": ["e0c080", "5fa848"],
 		&"egg_fried_rice": ["f2dc8a", "f0a040"],
 		&"pumpkin_porridge": ["f0a23c", "f8cc70"],
+		&"herb_tea": ["cfe6c8", "7fb0a0"],
+		&"fog_tonic": ["d5e6f2", "9ec4e0"],
+		&"farewell_noodles": ["e8d2a0", "f2b23e"],
 	}
 	if bowls.has(id):
 		var cols: Array = bowls[id]

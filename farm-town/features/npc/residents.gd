@@ -77,10 +77,63 @@ func memory_level(id: StringName) -> int:
 func recovered() -> Array[MemoryDef]:
 	var out: Array[MemoryDef] = []
 	for m in Database.memories:
-		if m.level <= memory_level(m.npc):
+		var got := Story.lan_level() >= m.level if m.npc == &"lan" else m.level <= memory_level(m.npc)
+		if got:
 			out.append(m)
 	out.sort_custom(func(a: MemoryDef, b: MemoryDef) -> bool: return a.order < b.order)
 	return out
+
+
+## 这件遗物现在出不出现：下一级的可以找，再后面的先不出，免得池子被高阶的淹没。
+func relic_available(r: RelicDef) -> bool:
+	if r == null or r.npc == &"" or r.level <= 0:
+		return true
+	if r.npc == &"lan":
+		return Story.lan_level() + 1 >= r.level
+	return memory_level(r.npc) + 1 >= r.level
+
+
+## 手里拿着的是不是岚的下一段忆。
+func holding_lan_memory() -> bool:
+	var item := GameState.selected_item()
+	if item == null or not Database.has_relic(item.id):
+		return false
+	var r := Database.relic(item.id)
+	return r.npc == &"lan" and r.level == Story.lan_level() + 1
+
+
+var _lan_line := ""
+
+
+## 把岚的下一段遗物还回去。对话里紧接着用 lan_line() 念这段忆。
+func give_lan() -> void:
+	var item := GameState.selected_item()
+	if not holding_lan_memory():
+		return
+	var r := Database.relic(item.id)
+	if GameState.inventory.remove_at(GameState.selected_slot, 1) != 1:
+		return
+	GameState.set_flag(StringName("memory_lan_%d" % r.level))
+	var m := Database.memory(&"lan", r.level)
+	_lan_line = m.text if m != null else ""
+	changed.emit()
+
+
+func lan_line() -> String:
+	return _lan_line
+
+
+## 白鹭的画：还没点亮的灯，和井底那一盏（没走过考验的时候）。
+func uncharted() -> String:
+	var names := PackedStringArray()
+	for id: StringName in Database.lamps:
+		if not Lamps.is_lit(id):
+			names.append(Database.lamp(id).name)
+	if not GameState.has_flag(Story.TRIAL_FLAG):
+		names.append("井底的灯")
+	if names.is_empty():
+		return "纸上的路都通了。"
+	return "还没画实的是" + "、".join(names) + "。"
 
 
 ## 这件东西是不是这位居民下一级忆要的遗物。

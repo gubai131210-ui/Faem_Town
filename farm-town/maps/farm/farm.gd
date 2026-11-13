@@ -881,7 +881,9 @@ func _use_machine(tile: Vector2i, item: ItemDef) -> bool:
 func _can_till(t: Vector2i) -> bool:
 	if not in_map(t) or occupied.has(t) or Farming.orchard.has(t) or Foraging.item_at(map_id, t) != &"" or Farming.has_scarecrow(t):
 		return false
-	# 房子前面那一排留作通道，不让开垦
+	# 房子前面那一排留作通道，不让开垦。小溪东岸要柏先生的许可（忆五级）
+	if t.x >= _stream_x(t.y) + 2 and Residents.memory_level(&"bai") < 5:
+		return false
 	return terrain[idx(t)] != WATER and solid[idx(t)] == 0 and t.y > 6
 
 

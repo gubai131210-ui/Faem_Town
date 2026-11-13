@@ -110,6 +110,10 @@ func knows(recipe_id: StringName) -> bool:
 	if not Database.recipes.has(recipe_id):
 		return false
 	var def: RecipeDef = Database.recipes[recipe_id]
+	if def.from == &"memory":
+		if def.teacher == &"lan":
+			return Story.lan_level() >= def.need_level
+		return Residents.memory_level(def.teacher) >= def.need_level
 	return def.from == &"start" or GameState.has_flag(def.known_flag())
 
 

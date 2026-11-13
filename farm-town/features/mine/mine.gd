@@ -370,8 +370,9 @@ func collect_owed() -> Array[StringName]:
 ## 在井里晕倒：这一趟得来的东西每样丢一半（单数的多丢一个），人回地面。返回丢了什么：物品 id -> 个数。
 func faint() -> Dictionary[StringName, int]:
 	var lost: Dictionary[StringName, int] = {}
+	var loss := 0.25 if Residents.memory_level(&"laoqin") >= 5 else FAINT_LOSS
 	for item: StringName in haul:
-		var n := mini(ceili(haul[item] * FAINT_LOSS), GameState.inventory.count_of(item))
+		var n := mini(ceili(haul[item] * loss), GameState.inventory.count_of(item))
 		if n > 0 and GameState.inventory.remove(item, n):
 			lost[item] = n
 	haul.clear()

@@ -23,11 +23,21 @@ const COUNTER_NAMES: Dictionary[StringName, String] = {GROCERY: "阿禾杂货铺
 
 ## 这个季节在卖的种子，按价格从低到高。
 static func stock(season: StringName) -> Array[ItemDef]:
+	var seasons: Array[StringName] = [season]
+	# 阿禾忆到五级：货架上多摆前后各一季的种子
+	if Residents.memory_level(&"ahe") >= 5:
+		var i := Database.SEASON_IDS.find(season)
+		if i >= 0:
+			seasons.append(Database.SEASON_IDS[(i + 3) % 4])
+			seasons.append(Database.SEASON_IDS[(i + 1) % 4])
 	var out: Array[ItemDef] = []
-	for id: StringName in Database.crops:
-		var crop: CropDef = Database.crops[id]
-		if crop.shop and crop.can_sow(season) and Database.has_item(crop.seed):
-			out.append(Database.item(crop.seed))
+	var seen: Dictionary[StringName, bool] = {}
+	for s: StringName in seasons:
+		for id: StringName in Database.crops:
+			var crop: CropDef = Database.crops[id]
+			if crop.shop and crop.can_sow(s) and Database.has_item(crop.seed) and not seen.has(crop.seed):
+				seen[crop.seed] = true
+				out.append(Database.item(crop.seed))
 	out.sort_custom(_by_price)
 	return out
 
@@ -112,7 +122,11 @@ static func _upgrades() -> Array[ShopEntry]:
 		e.name = "升级：%s%s" % [GameState.TIER_NAMES[level + 1], Database.item(tool).name]
 		e.price = UPGRADE_PRICES[level]
 		for m: Dictionary in UPGRADE_MATERIALS[level]:
-			e.materials.append(m)
+			var copy: Dictionary = m.duplicate()
+			# 石叔想起最后一道工序：每种矿少要一块（至少留一块）
+			if Residents.memory_level(&"shishu") >= 5 and int(copy["count"]) > 1:
+				copy["count"] = int(copy["count"]) - 1
+			e.materials.append(copy)
 		var gain := PICKAXE_NOTES[level] if tool == Mine.PICKAXE else "按住蓄力，一次作用 %d 格。" % ToolArea.COUNTS[level + 1]
 		e.desc = "要%s。%s" % [materials_text(e.materials), gain]
 		e.icon = "%s@%d" % [Database.item(tool).icon, level + 1]
@@ -199,7 +213,7 @@ static func affordable(item_id: StringName, want: int) -> int:
 	var def := Database.item(item_id)
 	var n := want
 	if def.price > 0:
-		n = mini(n, GameState.money / def.price)
+		n = mini(n, GameState.money / asking_price(def))
 	while n > 0 and not GameState.inventory.can_add(item_id, n):
 		n -= 1
 	return maxi(n, 0)
@@ -209,7 +223,7 @@ static func affordable(item_id: StringName, want: int) -> int:
 static func buy(item_id: StringName, count: int) -> bool:
 	if count <= 0 or affordable(item_id, count) < count:
 		return false
-	GameState.money -= Database.item(item_id).price * count
+	GameState.money -= asking_price(Database.item(item_id)) * count
 	GameState.inventory.add(item_id, count)
 	return true
 
@@ -256,10 +270,17 @@ static func _item_entry(def: ItemDef) -> ShopEntry:
 	var e := ShopEntry.new()
 	e.item_id = def.id
 	e.name = def.name
-	e.price = def.price
+	e.price = asking_price(def)
 	e.desc = def.desc
 	e.icon = def.icon
 	return e
+
+
+## 标价。阿禾忆到四级，种子打八折。
+static func asking_price(def: ItemDef) -> int:
+	if def != null and def.kind == &"seed" and Residents.memory_level(&"ahe") >= 4:
+		return maxi(1, int(round(float(def.price) * 0.8)))
+	return def.price if def != null else 0
 
 
 static func _by_price(a: ItemDef, b: ItemDef) -> bool:

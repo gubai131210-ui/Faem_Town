@@ -95,7 +95,7 @@ func trigger_at(tile: Vector2i) -> Dictionary:
 
 ## 溪里全是溪水；码头的木板不算水。
 func fishing_water(tile: Vector2i) -> StringName:
-	if not _is_water(tile) or DOCK_TILES.has(tile):
+	if not _is_water(tile) or DOCK_TILES.has(tile) or _bridge_tiles().has(tile):
 		return &""
 	return &"stream"
 
@@ -334,6 +334,17 @@ func _show_lamp_lit() -> void:
 
 # ---------------------------------------------------------------- 布局
 
+## 青竹父亲那座桥：西边水面窄的两列，整段跨过去。
+func _bridge_tiles() -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for x in [8, 9]:
+		var cy := _stream_y(x)
+		var half := _stream_half(x)
+		for y in range(cy - half, cy + half + 1):
+			out.append(Vector2i(x, y))
+	return out
+
+
 ## 溪在这一列的中心行：从西往东缓缓弯
 func _stream_y(x: int) -> int:
 	return 18 + int(roundf(sin(x * 0.23 + 0.6) * 1.6))
@@ -355,6 +366,10 @@ func _layout() -> void:
 	# 码头的木板架在水上，人能走
 	for t in DOCK_TILES:
 		solid[idx(t)] = 0
+	# 青竹忆到五级：西边窄水面铺上她父亲那座桥
+	if Residents.memory_level(&"qingzhu") >= 5:
+		for t in _bridge_tiles():
+			solid[idx(t)] = 0
 
 
 ## 采集物可以落在哪些格子：溪北岸能走到的空草地。shore 为真时只要紧挨着水的。
@@ -373,6 +388,10 @@ func _forage_tiles(shore: bool) -> Array[Vector2i]:
 
 
 func _place_objects() -> void:
+	if Residents.memory_level(&"qingzhu") >= 5:
+		var tiles := _bridge_tiles()
+		var mid: Vector2i = tiles[tiles.size() / 2]
+		_prop("bridge", tile_center(mid))
 	# 码头：木板、水里的桩、系着的船
 	for t in DOCK_TILES:
 		var m := 0

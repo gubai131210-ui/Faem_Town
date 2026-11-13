@@ -96,7 +96,11 @@ func building_now() -> String:
 
 
 func price(id: String) -> int:
-	return Database.building(StringName(id)).price
+	var p := Database.building(StringName(id)).price
+	# 青竹想起全套手法：建筑打八折
+	if Residents.memory_level(&"qingzhu") >= 3:
+		p = maxi(1, int(round(float(p) * 0.8)))
+	return p
 
 
 func build_days(id: String) -> int:
@@ -108,9 +112,9 @@ func order(id: String) -> bool:
 	if not can_offer(id):
 		return false
 	var def := Database.building(StringName(id))
-	if GameState.money < def.price:
+	if GameState.money < price(id):
 		return false
-	GameState.money -= def.price
+	GameState.money -= price(id)
 	buildings[def.id] = maxi(1, def.days)
 	changed.emit()
 	return true
@@ -152,7 +156,11 @@ func room(building: String) -> int:
 
 
 func animal_price(kind: String) -> int:
-	return Database.animal(StringName(kind)).price
+	var p := Database.animal(StringName(kind)).price
+	# 阿牧想起牧道：牲口打八折
+	if Residents.memory_level(&"amu") >= 3:
+		p = maxi(1, int(round(float(p) * 0.8)))
+	return p
 
 
 ## 买一只：要有地方住、付得起。成功后 last_name 是它的名字。
@@ -160,9 +168,9 @@ func buy(kind: String) -> bool:
 	if not sells_kind(kind):
 		return false
 	var def := Database.animal(StringName(kind))
-	if GameState.money < def.price:
+	if GameState.money < animal_price(kind):
 		return false
-	GameState.money -= def.price
+	GameState.money -= animal_price(kind)
 	last_name = _pick_name(def)
 	animals.append({"kind": def.id, "name": last_name, "mood": START_MOOD, "fed": false, "petted": false, "days": 0, "work": 0})
 	changed.emit()
@@ -207,7 +215,9 @@ func nth_label(building: String, n: int) -> String:
 
 
 func sell_price(index: int) -> int:
-	return int(def_of(index).price * SELL_BACK)
+	# 阿牧想起狗的名字：送回去按原价收
+	var rate := 1.0 if Residents.memory_level(&"amu") >= 5 else SELL_BACK
+	return int(def_of(index).price * rate)
 
 
 ## 把这栋建筑里第 n 只送回给阿牧，拿回一半的钱。

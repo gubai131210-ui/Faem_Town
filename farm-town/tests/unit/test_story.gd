@@ -18,7 +18,7 @@ func after_each() -> void:
 func test_story_tables_validate() -> void:
 	assert_eq(Database.validate().size(), 0, "\n".join(Database.validate()))
 	assert_gt(Database.relics.size(), 10)
-	assert_eq(Database.memories.size(), 11, "小满以外每位居民都有第一级忆")
+	assert_eq(Database.memories.size(), 60, "十一位居民各五级，岚也有五段")
 	assert_true(Database.quests.size() >= 8)
 	assert_true(Database.lamps.has(&"plaza"))
 
@@ -41,7 +41,8 @@ func test_memory_and_quest_dialogue_sections_exist() -> void:
 		var line: Variant = await DialogueManager.get_next_dialogue_line(res, m.dialogue_title())
 		assert_not_null(line, "%s 有 %s 段" % [m.npc, m.dialogue_title()])
 		if line != null:
-			assert_eq(str(line.character), Database.npc(m.npc).name)
+			var who := "岚" if m.npc == &"lan" else Database.npc(m.npc).name
+			assert_eq(str(line.character), who)
 	for id: StringName in Database.quests:
 		var q := Database.quest(id)
 		var res: Resource = load(Residents.dialogue_path(q.npc))

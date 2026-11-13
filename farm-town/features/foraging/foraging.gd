@@ -143,7 +143,7 @@ func pick_relic(roll: float) -> StringName:
 	var pool: Array[StringName] = []
 	for id: StringName in Database.relics:
 		var r: RelicDef = Database.relics[id]
-		if r.found != &"fog" or GameState.has_flag(StringName("relic_" + String(id))):
+		if r.found != &"fog" or not Residents.relic_available(r) or GameState.has_flag(StringName("relic_" + String(id))):
 			continue
 		var lying := false
 		for map_id: StringName in items:

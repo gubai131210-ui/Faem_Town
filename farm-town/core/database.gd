@@ -599,6 +599,10 @@ func _validate_crafting() -> PackedStringArray:
 			errors.append("菜谱 %s 做出来的不是食物" % id)
 		if not RecipeDef.SOURCES.has(rec.from):
 			errors.append("菜谱 %s 的来源无效：%s" % [id, rec.from])
+		if rec.from == &"memory" and rec.teacher != &"lan" and not npcs.has(rec.teacher):
+			errors.append("菜谱 %s 要跟着不存在的居民的忆：%s" % [id, rec.teacher])
+		if rec.from == &"memory" and (rec.need_level < 1 or rec.need_level > 5):
+			errors.append("菜谱 %s 要的忆等级无效" % id)
 		if rec.ingredients.is_empty():
 			errors.append("菜谱 %s 没有材料" % id)
 		for item_id: StringName in rec.ingredients:
@@ -684,7 +688,7 @@ func _validate_story() -> PackedStringArray:
 		if not RelicDef.SOURCES.has(r.found):
 			errors.append("遗物 %s 的来源无效：%s" % [id, r.found])
 		if r.npc != &"":
-			if not npcs.has(r.npc):
+			if r.npc != &"lan" and not npcs.has(r.npc):
 				errors.append("遗物 %s 属于不存在的居民：%s" % [id, r.npc])
 			if r.level < 1 or r.level > 5:
 				errors.append("遗物 %s 的忆等级必须在 1 到 5 之间" % id)
@@ -696,7 +700,7 @@ func _validate_story() -> PackedStringArray:
 		if seen.has(key):
 			errors.append("居民 %s 的第 %d 级忆写了两次" % [m.npc, m.level])
 		seen[key] = true
-		if not npcs.has(m.npc):
+		if m.npc != &"lan" and not npcs.has(m.npc):
 			errors.append("忆指向不存在的居民：%s" % m.npc)
 		if m.level < 1 or m.level > 5:
 			errors.append("居民 %s 的忆等级无效：%d" % [m.npc, m.level])
