@@ -538,5 +538,167 @@
 		"when": "那一天",
 		"order": 50,
 		"text": "她的名字是青岚。镇子是跟着她叫的。"
+	},
+	{
+		"npc": "shuoshu",
+		"level": 1,
+		"relic": "story_page",
+		"title": "话本上的一页",
+		"when": "雾起之前",
+		"order": -45,
+		"text": "说书人想起这页是他话本上的。讲到一半，雾从台下漫上来，椅子还在，人没了。"
+	},
+	{
+		"npc": "shuoshu",
+		"level": 2,
+		"relic": "story_sheet",
+		"title": "扇面上的字",
+		"when": "听客还在的时候",
+		"order": -43,
+		"text": "说书人想起扇面上写过四个字，是那段书的题目。字还在，他对不上山里的事。"
+	},
+	{
+		"npc": "shuoshu",
+		"level": 3,
+		"relic": "story_seal",
+		"title": "扉页上的印",
+		"when": "戏台还热闹的时候",
+		"order": -41,
+		"text": "说书人想起印盖在每一本话本的扉页上。他盖了几十年，印文他只认出一个字。"
+	},
+	{
+		"npc": "jiangyuan",
+		"level": 1,
+		"relic": "soy_recipe",
+		"title": "半张酱方",
+		"when": "铺子还开着",
+		"order": -35,
+		"text": "酱园掌柜想起这半张方子是柜上压着的。黄豆泡到第几天，他数到一半就断了。"
+	},
+	{
+		"npc": "jiangyuan",
+		"level": 2,
+		"relic": "jar_tag",
+		"title": "坛上的签",
+		"when": "封坛那天",
+		"order": -33,
+		"text": "酱园掌柜想起坛口贴过一张签，写的是哪一年的酱。年份他认得，味道想不起来。"
+	},
+	{
+		"npc": "jiangyuan",
+		"level": 3,
+		"relic": "shop_seal",
+		"title": "柜上的印",
+		"when": "还往外送酱的时候",
+		"order": -31,
+		"text": "酱园掌柜想起印是盖在卖出去的坛上的。铺子的名字就两个字，他念出来又摇头，说还差一声。"
+	},
+	{
+		"npc": "huolang",
+		"level": 1,
+		"relic": "pack_list",
+		"title": "一张货单",
+		"when": "还在路上",
+		"order": -23,
+		"text": "货郎想起这张单子上的东西他都背过。单子写到镇口就断了，镇里面有什么，他记不清。"
+	},
+	{
+		"npc": "huolang",
+		"level": 2,
+		"relic": "pack_bell",
+		"title": "一串铃",
+		"when": "进镇的那天",
+		"order": -22,
+		"text": "货郎想起铃一响，有人会出来看货。现在摇下去，路上没有人应。"
+	},
+	{
+		"npc": "huolang",
+		"level": 3,
+		"relic": "pack_rope",
+		"title": "包袱上的结",
+		"when": "包袱还满的时候",
+		"order": -21,
+		"text": "货郎想起包袱是在镇外的路口解开的。货还在，买货的人的脸，他一对不上。"
+	},
+	{
+		"npc": "chuanniang",
+		"level": 1,
+		"relic": "oar_cloth",
+		"title": "桨上的布",
+		"when": "还肯开船",
+		"order": -13,
+		"text": "船娘想起布条是缠在桨柄上的。船还在坞里，她想不起最后一趟送到了哪一岸。"
+	},
+	{
+		"npc": "chuanniang",
+		"level": 2,
+		"relic": "tide_tag",
+		"title": "三道刻痕",
+		"when": "潮水还听话",
+		"order": -12,
+		"text": "船娘想起船帮上刻过三道，涨到第几道就不开。海还在，刻痕在，她数不清那天涨到了哪一道。"
+	},
+	{
+		"npc": "chuanniang",
+		"level": 3,
+		"relic": "ferry_lantern",
+		"title": "渡口的灯",
+		"when": "渡口还有灯",
+		"order": -10,
+		"text": "船娘想起渡口原先挂一盏灯，对岸看见光才摇船过来。灯还在手里，对岸有没有人等，她说不出来。"
+	},
+	{
+		"npc": "miaozhu",
+		"level": 1,
+		"relic": "incense_stub",
+		"title": "半支香",
+		"when": "山门还开着",
+		"order": -66,
+		"text": "庙祝想起香是插在山门前的。插到一半，雾把烟拧散了。他不记得那天求的是什么。"
+	},
+	{
+		"npc": "miaozhu",
+		"level": 2,
+		"relic": "altar_tablet",
+		"title": "供桌上的牌",
+		"when": "香还点得着",
+		"order": -64,
+		"text": "庙祝想起牌子是供在桌前的。牌上的字被水冲过，他只记得木头的味道。"
+	},
+	{
+		"npc": "miaozhu",
+		"level": 3,
+		"relic": "rite_bell",
+		"title": "一声铃",
+		"when": "铃还响得全",
+		"order": -62,
+		"text": "庙祝想起铃响三下，山门才算开过。他摇了一下，只找回一声，后两声在雾里找不着。"
+	},
+	{
+		"npc": "shanliren",
+		"level": 1,
+		"relic": "trail_tag",
+		"title": "一块路标",
+		"when": "还认得路",
+		"order": -70,
+		"text": "山里人想起木片是他钉在岔路口的。钉的时候路还在。他站在山祠，说再往上的那一段，当时就不敢认。"
+	},
+	{
+		"npc": "shanliren",
+		"level": 2,
+		"relic": "herb_rope",
+		"title": "一包干药",
+		"when": "采药的那些年",
+		"order": -69,
+		"text": "山里人想起这包药是交给姜婆婆的。药名他数得出三味，第四味卡在嘴边。"
+	},
+	{
+		"npc": "shanliren",
+		"level": 3,
+		"relic": "trail_knife",
+		"title": "杖上的刻痕",
+		"when": "路还走得通的时候",
+		"order": -68,
+		"text": "山里人想起杖上每走通一条路就刻一道。七道都在，那时候他只走得通眼前这一段。"
 	}
 ]

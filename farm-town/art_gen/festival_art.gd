@@ -57,10 +57,49 @@ static func stall() -> Image:
 	return Px.outline(img)
 
 
-## 长桌，52×24，占三格宽。kind 是 "harvest"（评比台：南瓜、鱼、一篮蛋、三条绶带）或 "dumpling"（宴席：蒸笼和几盘饺子）。
+## 长桌，52×24，占三格宽。kind 是 "harvest"（评比台）或 "dumpling"（宴席）。
 static func table(kind: String) -> Image:
+	return _long_table(kind, true)
+
+
+## 同一张长桌，桌布上不画菜。饺子宴和除夕用来摆你带来的菜。
+static func cloth(kind: String) -> Image:
+	return _long_table(kind, false)
+
+
+## 菜摆在桌布上的中心点，相对这张 52×24 的图。两道大一些，多了就挤一挤。
+static func dish_places(count: int) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	if count <= 0:
+		return out
+	var scale := dish_scale(count)
+	var w := 32.0 * scale
+	var cols := mini(count, 4)
+	var rows := int(ceil(float(count) / float(cols)))
+	var gap := 1.0
+	var row_w := float(cols) * w + float(cols - 1) * gap
+	var x0 := (52.0 - row_w) / 2.0 + w / 2.0
+	var y_top := 10.0
+	var y_gap := w * 0.55
+	for i in count:
+		var c := i % cols
+		var r := int(i / cols)
+		var y := y_top if rows == 1 else y_top + (float(r) - float(rows - 1) * 0.5) * y_gap
+		out.append(Vector2(x0 + float(c) * (w + gap), y))
+	return out
+
+
+static func dish_scale(count: int) -> float:
+	if count <= 2:
+		return 1.0
+	if count <= 4:
+		return 0.5
+	return 0.38
+
+
+static func _long_table(kind: String, with_food: bool) -> Image:
 	var img := Px.new_img(52, 24)
-	var feast := kind == "dumpling"
+	var feast := kind == "dumpling" or kind == "newyear"
 	var cloth := Color.html("c8483c") if feast else Color.html(CLOTH)
 	var cloth_d := Color.html("96322c") if feast else Color.html(CLOTH_DARK)
 	# 桌腿、桌面、垂下来的桌布
@@ -71,6 +110,8 @@ static func table(kind: String) -> Image:
 	Px.rect(img, 2, 17, 48, 1, cloth_d)
 	for x in range(6, 50, 8):
 		Px.rect(img, x, 13, 1, 4, cloth_d)
+	if not with_food:
+		return Px.outline(img)
 	if feast:
 		# 两屉蒸笼冒着白气，中间几盘饺子
 		for sx: int in [5, 39]:

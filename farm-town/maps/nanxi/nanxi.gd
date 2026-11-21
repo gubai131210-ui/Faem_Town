@@ -1,9 +1,18 @@
-extends OutdoorMap
+﻿extends WildMap
 ## 南溪：镇子南边的一条溪。从镇上的南街走过来，路到溪边就断了，
 ## 岸边是老周的小码头和一盏没亮的河灯。溪里能钓，岸上长野菜。
 
-const W := 40
-const H := 30
+## 老地图是左上角 40×30；往东、往南扩到 72×48，老坐标一格不动（决策 150）。
+const OLD_W := 40
+const OLD_H := 30
+const W := 72
+const H := 48
+## 北岸东头的栈桥：从岸上伸进东边那个大潭
+const PIER_X := 60
+## 新长出的树
+const NEW_TREES: Array[String] = ["round0", "round1", "round2", "willow0", "round0", "willow1"]
+## 南岸新区的名字：过了青竹父亲那座桥才走得过去
+const SOUTH_BANK := Rect2i(0, 30, W, H - 30)
 ## 从镇上下来的路占的两列
 const ROAD_COLS: Array[int] = [19, 20]
 ## 路从北边进来，走到这一行就到了溪边的空地
@@ -45,11 +54,16 @@ var _festival_t := 0.0
 func _ready() -> void:
 	map_id = &"nanxi"
 	_rng.seed = 20261113
-	_setup_grid(W, H)
+	_scatter_cols = OLD_W
+	_scatter_rows = OLD_H
+	_setup_wild(W, H)
 	_layout()
+	_layout_new()
 	_build_ground()
 	_make_entities()
 	_place_objects()
+	_place_new()
+	_add_planks()
 	Foraging.settle(map_id, _forage_tiles(false), _forage_tiles(true))
 	Foraging.changed.connect(_sync_forage)
 	_sync_forage()
@@ -69,6 +83,7 @@ func _process(delta: float) -> void:
 
 
 func _exit_tree() -> void:
+	super._exit_tree()
 	if Foraging.changed.is_connected(_sync_forage):
 		Foraging.changed.disconnect(_sync_forage)
 	if Fishing.changed.is_connected(_sync_traps):
@@ -95,16 +110,18 @@ func trigger_at(tile: Vector2i) -> Dictionary:
 
 ## 溪里全是溪水；码头的木板不算水。
 func fishing_water(tile: Vector2i) -> StringName:
-	if not _is_water(tile) or DOCK_TILES.has(tile) or _bridge_tiles().has(tile):
+	if not _is_water(tile) or DOCK_TILES.has(tile) or planks.has(tile) or _bridge_tiles().has(tile):
 		return &""
 	return &"stream"
 
 
 func query_use(item: ItemDef, tile: Vector2i, _facing: Facing) -> StringName:
-	if npc_at(tile) != null or tile == LAMP_TILE or BOAT_TILES.has(tile) or _fireflies.has(tile):
+	if npc_at(tile) != null or tile == LAMP_TILE or BOAT_TILES.has(tile) or _fireflies.has(tile) or clue_at(tile) != "":
 		return &"interact"
 	if Foraging.item_at(map_id, tile) != &"":
 		return &"harvest"
+	if _bridge_tiles().has(tile) and PeopleLine.mark(&"qingzhu") != "":
+		return &"interact"
 	var trap := _trap_query(item, tile)
 	if trap != &"":
 		return trap
@@ -127,6 +144,10 @@ func perform(action: StringName, item: ItemDef, tile: Vector2i, _quiet: bool = f
 					EventBus.lamp_requested.emit(LAMP_ID)
 			elif BOAT_TILES.has(tile):
 				_use_boat()
+			elif _bridge_tiles().has(tile) and PeopleLine.mark(&"qingzhu") != "":
+				EventBus.banner_requested.emit(PeopleLine.mark(&"qingzhu"))
+			elif clue_at(tile) != "":
+				EventBus.banner_requested.emit(clue_at(tile))
 		&"harvest":
 			_pick_forage(tile)
 		&"place_trap":
@@ -328,6 +349,12 @@ func on_lamp_lit(lamp_id: StringName) -> void:
 	Fx.burst(self, top, Color(1.0, 0.6, 0.25, 0.8), 10, 24.0, 0.9, 12.0)
 
 
+func lamp_focus(lamp_id: StringName) -> Vector2:
+	if lamp_id == LAMP_ID and _lamp_sprite != null:
+		return _lamp_sprite.global_position
+	return Vector2.INF
+
+
 func _show_lamp_lit() -> void:
 	_add_night_light(_lamp_sprite.position + Vector2(0, -16), 2.0)
 
@@ -352,7 +379,13 @@ func _stream_y(x: int) -> int:
 
 ## 溪在这一列有多宽（半宽）：码头附近宽成一个潭
 func _stream_half(x: int) -> int:
-	return 2 if x >= 15 and x <= 25 else 1
+	if x >= 15 and x <= 25:
+		return 2
+	if x >= 58 and x <= 64:
+		return 4
+	if x >= 56 and x <= 66:
+		return 3
+	return 1
 
 
 func _layout() -> void:
@@ -375,8 +408,8 @@ func _layout() -> void:
 ## 采集物可以落在哪些格子：溪北岸能走到的空草地。shore 为真时只要紧挨着水的。
 func _forage_tiles(shore: bool) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
-	for y in range(3, H - 2):
-		for x in range(2, W - 2):
+	for y in range(3, OLD_H - 2):
+		for x in range(2, OLD_W - 2):
 			var t := Vector2i(x, y)
 			if not _is_free(t) or y > _stream_y(x) + _stream_half(x):
 				continue
@@ -444,3 +477,65 @@ func _place_objects() -> void:
 	_scatter_trees(18)
 	_scatter_bushes(22)
 	_scatter_tufts(300)
+	_release_ghosts()
+
+
+# ---------------------------------------------------------------- 往东、往南扩出来的部分
+
+func _ghost_tree(t: Vector2i) -> bool:
+	return _legacy_edge(t, OLD_W, OLD_H)
+
+
+## 新区的地形：北岸一条往东的土路通到栈桥；南岸从桥头往东南一条路。
+## 老地图那一块不动（路都从老边界以外开始铺），老格子上的树留着，连得上靠随机碰运气以外的口子：东、南两排边界树放开了。
+func _layout_new() -> void:
+	_trail([Vector2i(OLD_W, 12), Vector2i(PIER_X + 1, 12)], 2, DIRT)
+	_walk([Vector2i(PIER_X, 14), Vector2i(PIER_X, 19)], 2, DIRT, false)
+	_trail([Vector2i(8, OLD_H), Vector2i(12, 34), Vector2i(26, 37), Vector2i(40, 38)], 2, DIRT)
+	_trail([Vector2i(40, 38), Vector2i(50, 34), Vector2i(58, 31)], 2, DIRT)
+
+
+func _spot(t: Vector2i) -> bool:
+	return in_map(t) and _is_free(t) and not _is_water(t)
+
+
+func _place_new() -> void:
+	_new_edge_trees(OLD_W, OLD_H, NEW_TREES)
+	# 北岸东段
+	_building("boathouse", 46, 10, 5, 4, true)
+	_wall_clue(46, 10, 5, "岸上的船屋。门闩上缠着一圈渔线，没锁")
+	_wide_prop("drying_rack", Vector2i(52, 10), 2, "竹匾里晒着小鱼干，一条条头朝一个方向")
+	_wide_prop("wood_pile", Vector2i(42, 10), 2, "劈好的柴，码得比人还齐")
+	_wide_prop("bench", Vector2i(56, 13), 2, "长凳朝着潭面。坐的人不在，凳子还是温的")
+	_lamp_post(Vector2i(59, 11))
+	_lamp_post(Vector2i(62, 11))
+	for t: Vector2i in [Vector2i(44, 14), Vector2i(50, 14), Vector2i(54, 14), Vector2i(66, 14), Vector2i(68, 15)]:
+		if _spot(t):
+			_tree("willow%d" % (t.x % 2), t)
+	_small_prop("rock_0", Vector2i(63, 14), "潭边的石头，被水磨得滑溜溜的")
+	_small_prop("rock_1", Vector2i(48, 15))
+	# 栈桥尽头的告示
+	_clue(Vector2i(PIER_X, 19), "栈桥一直伸到潭心。水是绿的，看不见底")
+	_clue(Vector2i(PIER_X + 1, 19), "栈桥一直伸到潭心。水是绿的，看不见底")
+	# 南岸：桥那边的人家和旧亭
+	_building("pavilion", 22, 35, 3, 2, false)
+	_wall_clue(22, 35, 3, "亭子的栏杆上刻着一排高低不一的线")
+	_building("boathouse", 57, 30, 4, 3, true)
+	_wall_clue(57, 30, 4, "南岸的船屋，门板被水泡得发白")
+	_wide_prop("drying_rack", Vector2i(52, 36), 2, "竹匾空着。底下压着一张折了四折的网")
+	_wide_prop("wood_pile", Vector2i(44, 41), 2)
+	_building("well", 36, 43, 2, 2, false)
+	_wall_clue(36, 43, 2, "井口封着一块石板，石板上压着一只空碗")
+	for t: Vector2i in [Vector2i(11, 32), Vector2i(25, 39), Vector2i(41, 36)]:
+		if _spot(t):
+			_lamp_post(t)
+	_small_prop("rock_0", Vector2i(30, 41), "石头缝里长着一小丛没见过的蕨")
+	# 林子和草
+	_grove(Rect2i(40, 0, 32, 9), 22, NEW_TREES)
+	_grove(Rect2i(OLD_W, 14, 14, 3), 14, NEW_TREES)
+	_grove(Rect2i(67, 9, 5, 22), 22, NEW_TREES)
+	_grove(Rect2i(0, OLD_H, W, 5), 14, NEW_TREES)
+	_grove(Rect2i(0, 40, W, 8), 22, NEW_TREES)
+	_grove(Rect2i(62, 26, 10, 14), 18, NEW_TREES)
+	_sprinkle_grass(Rect2i(OLD_W, 0, W - OLD_W, 30), 31)
+	_sprinkle_grass(SOUTH_BANK, 32)

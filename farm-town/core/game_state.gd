@@ -97,6 +97,19 @@ func spend_energy(amount: int) -> bool:
 	return true
 
 
+## 用一次工具的体力。base 是这一档的基础消耗（镐子已按等级折过），charge 是蓄力档数。
+## 小寒天冷更费力（×1.5 向上取整）；吃饱了（hearty）和立春开垦各减半，至少 1。
+static func tool_cost(base: int, action: StringName, charge: int, term: StringName, hearty: bool) -> int:
+	var cost := base
+	if term == &"xiaohan":
+		cost = ceili(cost * 1.5)
+	if cost > 1 and hearty:
+		cost = maxi(1, cost / 2)
+	if action == &"hoe" and term == &"lichun":
+		cost = maxi(1, cost / 2)
+	return cost * (charge + 1)
+
+
 ## 挨了一下，扣 amount 点生命；掉到 0 发 knocked_out。已经是 0 时不再发。
 func hurt(amount: int) -> void:
 	if health <= 0 or amount <= 0:
@@ -129,13 +142,20 @@ func buff_text() -> String:
 ## 吃一份食物：回体力、带上增益，受了伤的话也回生命（回的体力的一半），返回要显示的一句话。
 ## 不饿（体力和生命都满了、这样东西也不带增益）返回空，什么都不发生。
 ## 不动背包。
-func eat(def: ItemDef) -> String:
+func eat(def: ItemDef, in_term: bool = false) -> String:
 	if def == null or def.kind != &"food":
 		return ""
 	if energy >= max_energy and health >= max_health and def.buff == &"":
 		return ""
-	# 小寒：热食效果翻倍
-	var gain := def.energy * (2 if def.hot and GameClock.term_id() == &"xiaohan" else 1)
+	# 小寒：热食体力翻倍。当令：体力和增益再翻倍。处暑：恢复加快。雨雪天热食的增益更长。
+	var term := GameClock.term_id()
+	var gain := def.energy
+	if def.hot and term == &"xiaohan":
+		gain *= 2
+	if in_term:
+		gain *= 2
+	if term == &"chushu":
+		gain = ceili(float(gain) * 1.5)
 	var before := energy
 	energy += gain
 	var text := "吃了%s，体力 +%d" % [def.name, energy - before]
@@ -146,10 +166,23 @@ func eat(def: ItemDef) -> String:
 	if def.buff != &"":
 		buff = def.buff
 		buff_day = GameClock.day
-		buff_end = GameClock.minutes + def.buff_minutes
+		var minutes := def.buff_minutes * (2 if in_term else 1)
+		if def.hot and (Weather.today == Weather.RAIN or Weather.today == Weather.STORM or Weather.today == Weather.SNOW):
+			minutes = ceili(float(minutes) * 1.5)
+		buff_end = GameClock.minutes + minutes
 		buff_changed.emit()
-		text += "，%s %d 小时" % [BUFF_NAMES.get(buff, ""), def.buff_minutes / 60]
+		text += "，%s %s" % [BUFF_NAMES.get(buff, ""), _hour_text(minutes)]
+	if in_term:
+		text += "，当令"
 	return text
+
+
+func _hour_text(minutes: int) -> String:
+	var hours := minutes / 60
+	var rest := minutes % 60
+	if rest == 0:
+		return "%d 小时" % hours
+	return "%d 小时 %d 分" % [hours, rest]
 
 
 func has_flag(flag: StringName) -> bool:
@@ -158,6 +191,10 @@ func has_flag(flag: StringName) -> bool:
 
 func set_flag(flag: StringName) -> void:
 	flags[flag] = true
+
+
+func clear_flag(flag: StringName) -> void:
+	flags.erase(flag)
 
 
 ## 存档摘要，显示在读档菜单里。
@@ -175,6 +212,7 @@ func save_data() -> Dictionary:
 		levels[String(id)] = tool_levels[id]
 	return {
 		"inventory": inventory.to_array(),
+		"fresh": inventory.fresh.duplicate(),
 		"money": money,
 		"energy": energy,
 		"max_energy": max_energy,
@@ -192,6 +230,8 @@ func save_data() -> Dictionary:
 func load_data(data: Dictionary) -> void:
 	var inv: Array = data.get("inventory", [])
 	inventory.from_array(inv)
+	var fresh: Dictionary = data.get("fresh", {})
+	inventory.restore_fresh(fresh)
 	max_energy = int(data.get("max_energy", 100))
 	money = int(data.get("money", 0))
 	energy = int(data.get("energy", max_energy))

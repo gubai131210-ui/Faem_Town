@@ -1,6 +1,6 @@
 extends Node
-## 音效和背景音乐全部用代码合成。唯一的音频文件是收音机播报的人声（audio/radio/），
-## 由 tools/radio_voice.py 用语音合成生成；收音机的失真和沙沙声在这里加。
+## 音效、背景音乐、收音机人声都由代码合成。收音机的词在 tools/radio_voice.py 里念成 wav，
+## 失真和沙沙声在这里加。
 
 const RATE := 22050
 const RADIO_DIR := "res://audio/radio/"
@@ -11,13 +11,19 @@ var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 var _music: AudioStreamPlayer
 var _music_task := -1
-var _music_stream: AudioStreamWAV
+## 十一首循环：春夏秋冬、井下、节日、夜晚，再加竹海、后山、雾岛、室内。合成完以前是空的。
+var _tracks: Dictionary = {}
+## 正在播的是哪一首；空表示还没选过
+var _cue := &""
 var music_on := true
 var _rng := RandomNumberGenerator.new()
 var _radio: AudioStreamPlayer
 var _radio_static: AudioStreamPlayer
 var _radio_queue: Array[AudioStream] = []
 var _radio_fade: Tween
+## 下雨或海浪，单独一个循环播放器
+var _ambience: AudioStreamPlayer
+var _ambience_name := ""
 ## 正在退出：不再放任何新的声音
 var muted := false
 
@@ -31,6 +37,9 @@ func _ready() -> void:
 	_music = AudioStreamPlayer.new()
 	_music.volume_db = -16.0
 	add_child(_music)
+	_ambience = AudioStreamPlayer.new()
+	_ambience.volume_db = -20.0
+	add_child(_ambience)
 	_streams["step"] = _wav(_noise_hit(0.06, 0.22, 70.0, 0.25))
 	_streams["hoe"] = _wav(_thud())
 	_streams["water"] = _wav(_splash())
@@ -50,6 +59,10 @@ func _ready() -> void:
 	_streams["spit"] = _wav(_mix(_sweep(380.0, 760.0, 0.07, 0.22), _noise_hit(0.07, 0.15, 50.0, 0.5)))
 	_streams["plunge"] = _wav(_mix(_splash(), _sweep(150.0, 60.0, 0.28, 0.35)))
 	_streams["sleep"] = _wav(_notes([72, 76, 79, 84], 0.16, 0.35))
+	# 下雨和海浪是循环的底噪，不进那八个一次性的播放器
+	_streams["rain"] = _wav(_loop_bed(1.8, 0.12, 0.4, 5.0), true)
+	_streams["waves"] = _wav(_waves(), true)
+	_streams["cicada"] = _wav(_cicada(), true)
 	_streams["radio_tune"] = _wav(_radio_tune())
 	# 钓鱼：甩竿是一声短促的风声接落水，咬钩两个高音，挣扎一下闷响，断线一声脆响
 	_streams["cast"] = _wav(_cast())
@@ -64,6 +77,12 @@ func _ready() -> void:
 	_streams["bark"] = _wav(_calls([[300.0, 210.0, 0.07], [320.0, 200.0, 0.09]], 0.34))
 	_streams["meow"] = _wav(_calls([[620.0, 780.0, 0.12], [780.0, 540.0, 0.22]], 0.22))
 	_streams["caw"] = _wav(_calls([[540.0, 430.0, 0.12], [520.0, 400.0, 0.15]], 0.3))
+	# 灶上：落刀一声脆的，下料一阵滋啦，添火时短短一声滋，撒调料两个轻音，起锅三个上行的音
+	_streams["chop"] = _wav(_mix(_noise_hit(0.05, 0.34, 90.0, 0.6), _sweep(240.0, 150.0, 0.05, 0.3)))
+	_streams["sizzle"] = _wav(_noise_hit(0.5, 0.2, 5.0, 0.85))
+	_streams["sear"] = _wav(_noise_hit(0.14, 0.1, 16.0, 0.9))
+	_streams["season"] = _wav(_notes([84, 91], 0.05, 0.3))
+	_streams["plate_up"] = _wav(_notes([72, 79, 84, 91], 0.08, 0.38))
 	_setup_radio()
 	_music_task = WorkerThreadPool.add_task(_gen_music)
 
@@ -72,9 +91,7 @@ func _process(_delta: float) -> void:
 	if _music_task >= 0 and WorkerThreadPool.is_task_completed(_music_task):
 		WorkerThreadPool.wait_for_task_completion(_music_task)
 		_music_task = -1
-		_music.stream = _music_stream
-		if music_on:
-			_music.play()
+	_apply_cue()
 
 
 func _exit_tree() -> void:
@@ -90,6 +107,8 @@ func silence() -> void:
 	for p in _players:
 		p.stop()
 	_music.stop()
+	_ambience.stop()
+	_ambience_name = ""
 	if _radio_fade != null:
 		_radio_fade.kill()
 	_radio_queue.clear()
@@ -106,6 +125,20 @@ func quit_game(code: int = 0) -> void:
 	await get_tree().create_timer(0.2, true, false, true).timeout
 	silence()
 	get_tree().quit(code)
+
+
+## 室外的底噪：下雨是 "rain"，海边是 "waves"，室内或晴天传空字符串。
+func ambience(n: String) -> void:
+	if muted or _ambience == null:
+		return
+	if n == _ambience_name:
+		return
+	_ambience_name = n
+	if n == "" or not _streams.has(n):
+		_ambience.stop()
+		return
+	_ambience.stream = _streams[n]
+	_ambience.play()
 
 
 func play(n: String, pitch_var := 0.08, vol_db := 0.0) -> void:
@@ -201,6 +234,51 @@ func toggle_music() -> void:
 		_music.stop()
 
 
+## 屋里这几张图用同一首。井下虽然也在室内，它有自己的一首，不走这条。
+const INDOOR_MAPS: Array[StringName] = [
+	&"farmhouse", &"teahouse", &"herbshop", &"smithy", &"hall", &"workshop",
+]
+
+
+## 现在该放哪一首。人在竹海、后山、雾岛或屋里，这首盖过节日、夜晚和季节。
+## 井下仍盖过一切。节日开着时盖过夜晚和季节。傍晚六点以后算夜晚（夏至冬至跟着天黑挪两小时）。
+func music_cue() -> StringName:
+	var here := GameState.map_id
+	if here == &"mine":
+		return &"mine"
+	if here == &"zhuhai":
+		return &"zhuhai"
+	if here == &"houshan":
+		return &"houshan"
+	if here == &"wudao":
+		return &"wudao"
+	if INDOOR_MAPS.has(here):
+		return &"indoor"
+	if Festivals.is_open():
+		return &"festival"
+	if GameClock.minutes >= 1080.0 + GameClock.dusk_shift() or GameClock.minutes < GameClock.DAY_START:
+		return &"night"
+	return GameClock.season_id()
+
+
+func track_count() -> int:
+	return _tracks.size()
+
+
+func _apply_cue() -> void:
+	if _tracks.is_empty() or muted:
+		return
+	var cue := music_cue()
+	if not _tracks.has(cue):
+		cue = &"spring"
+	if cue == _cue:
+		return
+	_cue = cue
+	_music.stream = _tracks[cue]
+	if music_on:
+		_music.play()
+
+
 func _wav(buf: PackedFloat32Array, loop := false) -> AudioStreamWAV:
 	var bytes := PackedByteArray()
 	bytes.resize(buf.size() * 2)
@@ -260,6 +338,56 @@ func _thud() -> PackedFloat32Array:
 		ph += f / RATE
 		s += (rng.randf_range(-1.0, 1.0) - s) * 0.35
 		buf[i] = sin(ph * TAU) * exp(-t * 22.0) * 0.7 + s * exp(-t * 45.0) * 0.6
+	return buf
+
+
+## 能首尾相接的底噪。pulse 是这一段里起伏几次，取整数才不会在循环点上跳。
+func _loop_bed(seconds: float, vol: float, lp: float, pulse: float) -> PackedFloat32Array:
+	var n := int(seconds * RATE)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 67
+	var s := 0.0
+	for i in n:
+		s += (rng.randf_range(-1.0, 1.0) - s) * lp
+		var env := 0.72 + 0.28 * sin(TAU * pulse * float(i) / float(n))
+		buf[i] = s * vol * env
+	# 尾巴收到开头那一格上，循环点不会跳一下
+	var blend := maxi(1, int(n * 0.08))
+	for i in blend:
+		var k := float(i + 1) / float(blend)
+		buf[n - blend + i] = lerpf(buf[n - blend + i], buf[0], k)
+	return buf
+
+
+## 夏天的蝉：一段里三声短促的高音，循环时接在静音上。
+func _cicada() -> PackedFloat32Array:
+	var n := int(1.8 * RATE)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	for burst in 3:
+		var start := int(n * (0.06 + float(burst) * 0.28))
+		var length := int(0.08 * RATE)
+		var ph := 0.0
+		for i in length:
+			var t := float(i) / float(length)
+			var f := lerpf(3400.0, 4800.0, t)
+			ph += f / RATE
+			buf[start + i] = sin(ph * TAU) * sin(PI * t) * 0.16
+	return buf
+
+
+## 两拍海浪，长度正好是整周期，循环时接得上。
+func _waves() -> PackedFloat32Array:
+	var bed := _loop_bed(2.4, 0.2, 0.18, 2.0)
+	var buf := PackedFloat32Array()
+	buf.resize(bed.size())
+	for i in bed.size():
+		var t := float(i) / float(bed.size())
+		var swell := pow(maxf(sin(TAU * t * 2.0), 0.0), 2.0)
+		var roll := sin(TAU * t * 2.0) * 0.12
+		buf[i] = (roll + bed[i]) * (0.35 + swell)
 	return buf
 
 
@@ -385,28 +513,73 @@ func _note(buf: PackedFloat32Array, start: float, midi: int, dur: float, vol: fl
 
 
 func _gen_music() -> void:
-	var eighth := 0.3
-	var melody := [
-		72, 0, 76, 79, 0, 76, 74, 72,
-		69, 0, 72, 76, 0, 72, 71, 69,
-		65, 0, 69, 72, 0, 77, 76, 72,
-		74, 0, 71, 74, 79, 0, 74, 0,
-		76, 0, 79, 84, 0, 79, 76, 79,
-		81, 0, 76, 72, 0, 76, 81, 0,
-		77, 76, 72, 69, 0, 72, 74, 0,
-		74, 0, 71, 67, 0, 71, 74, 0,
-	]
-	var chords := [[48, 60, 64, 67], [45, 57, 60, 64], [41, 57, 60, 65], [43, 55, 59, 62]]
+	# 春：原来那首，三角波旋律，稍快
+	_tracks[&"spring"] = _tune(0.3, [
+		72, 0, 76, 79, 0, 76, 74, 72, 69, 0, 72, 76, 0, 72, 71, 69,
+		65, 0, 69, 72, 0, 77, 76, 72, 74, 0, 71, 74, 79, 0, 74, 0,
+	], [[48, 60, 64, 67], [45, 57, 60, 64], [41, 57, 60, 65], [43, 55, 59, 62]], 0, 1, 0.2, 0.2)
+	# 夏：更高、更密
+	_tracks[&"summer"] = _tune(0.24, [
+		76, 79, 84, 79, 76, 74, 76, 72, 74, 77, 81, 77, 74, 72, 74, 69,
+		72, 76, 79, 84, 81, 79, 76, 74, 79, 76, 74, 72, 74, 76, 72, 0,
+	], [[52, 64, 67, 71], [50, 62, 65, 69], [48, 60, 64, 67], [45, 57, 60, 64]], 0, 1, 0.18, 0.16)
+	# 秋：低一些，小调
+	_tracks[&"autumn"] = _tune(0.36, [
+		64, 0, 67, 72, 0, 67, 64, 62, 60, 0, 64, 67, 0, 62, 60, 57,
+		59, 0, 62, 67, 0, 64, 62, 59, 60, 0, 57, 55, 0, 57, 60, 0,
+	], [[45, 52, 57, 60], [41, 48, 53, 57], [43, 50, 55, 58], [40, 47, 52, 55]], 0, 1, 0.16, 0.18)
+	# 冬：疏，慢，低
+	_tracks[&"winter"] = _tune(0.44, [
+		60, 0, 0, 64, 0, 0, 62, 0, 57, 0, 0, 60, 0, 0, 55, 0,
+		59, 0, 0, 62, 0, 0, 60, 0, 55, 0, 0, 52, 0, 0, 55, 0,
+	], [[40, 47, 52, 55], [38, 45, 50, 53], [36, 43, 48, 52], [41, 48, 53, 56]], 1, 1, 0.14, 0.16)
+	# 井下：更低的正弦，几乎没有跳进
+	_tracks[&"mine"] = _tune(0.42, [
+		48, 0, 51, 0, 48, 0, 46, 0, 43, 0, 46, 0, 48, 0, 0, 0,
+		46, 0, 43, 0, 41, 0, 43, 0, 46, 0, 48, 0, 46, 0, 43, 0,
+	], [[36, 43, 48, 51], [34, 41, 46, 50], [33, 40, 45, 48], [31, 38, 43, 46]], 1, 1, 0.12, 0.2)
+	# 节日：密、亮
+	_tracks[&"festival"] = _tune(0.22, [
+		76, 79, 84, 88, 84, 79, 81, 76, 77, 81, 84, 88, 84, 81, 77, 74,
+		79, 84, 88, 91, 88, 84, 81, 79, 76, 79, 84, 79, 76, 74, 72, 76,
+	], [[55, 67, 71, 74], [53, 65, 69, 72], [48, 60, 64, 67], [50, 62, 65, 69]], 0, 1, 0.2, 0.14)
+	# 夜晚：疏、轻、正弦
+	_tracks[&"night"] = _tune(0.4, [
+		67, 0, 0, 72, 0, 0, 69, 0, 64, 0, 0, 67, 0, 0, 62, 0,
+		65, 0, 0, 69, 0, 0, 67, 0, 64, 0, 0, 60, 0, 0, 62, 0,
+	], [[41, 48, 53, 56], [38, 45, 50, 53], [36, 43, 48, 52], [40, 47, 52, 55]], 1, 1, 0.1, 0.12)
+	# 竹海：高、疏，正弦，像风过竹节
+	_tracks[&"zhuhai"] = _tune(0.34, [
+		79, 0, 83, 0, 86, 83, 0, 79, 74, 0, 0, 79, 0, 83, 86, 0,
+		81, 0, 86, 0, 88, 86, 0, 81, 76, 0, 0, 74, 0, 79, 83, 0,
+	], [[62, 67, 74, 79], [57, 64, 69, 74], [55, 62, 67, 74], [59, 64, 71, 76]], 1, 1, 0.14, 0.08)
+	# 后山：低、慢，落下去
+	_tracks[&"houshan"] = _tune(0.48, [
+		52, 0, 55, 0, 48, 0, 50, 0, 45, 0, 48, 0, 43, 0, 0, 0,
+		47, 0, 50, 0, 43, 0, 45, 0, 40, 0, 43, 0, 38, 0, 0, 0,
+	], [[36, 43, 48, 52], [33, 40, 45, 48], [31, 38, 43, 47], [34, 41, 46, 50]], 0, 1, 0.16, 0.18)
+	# 雾岛：从低处往上爬，中间空一拍
+	_tracks[&"wudao"] = _tune(0.38, [
+		60, 0, 64, 0, 67, 0, 71, 0, 0, 72, 0, 0, 67, 0, 64, 0,
+		62, 0, 65, 0, 69, 0, 74, 0, 0, 69, 0, 0, 65, 0, 62, 0,
+	], [[40, 47, 52, 55], [38, 45, 50, 53], [36, 43, 48, 52], [41, 48, 53, 57]], 1, 1, 0.12, 0.1)
+	# 室内：短句，轻，不跟门外的季节走
+	_tracks[&"indoor"] = _tune(0.36, [
+		64, 67, 0, 71, 0, 67, 64, 0, 62, 65, 0, 69, 0, 65, 62, 0,
+		60, 64, 0, 67, 0, 64, 60, 0, 62, 65, 0, 69, 0, 65, 0, 60,
+	], [[48, 55, 60, 64], [45, 52, 57, 60], [43, 50, 55, 59], [41, 48, 53, 57]], 0, 1, 0.11, 0.09)
+
+
+func _tune(eighth: float, melody: Array, chords: Array, mel_kind: int, bass_kind: int, mel_vol: float, bass_vol: float) -> AudioStreamWAV:
 	var buf := PackedFloat32Array()
-	buf.resize(int(64 * eighth * RATE))
-	for i in 64:
-		var m: int = melody[i]
+	buf.resize(int(melody.size() * eighth * RATE))
+	for i in melody.size():
+		var m: int = int(melody[i])
 		if m > 0:
-			_note(buf, i * eighth, m, 0.7, 0.2, 0, 4.5)
-		var ch: Array = chords[(i / 8) % 4]
-		var arp: int = ch[1 + [0, 1, 2, 1][i % 4]]
-		_note(buf, i * eighth, arp, 0.4, 0.07, 1, 6.0)
+			_note(buf, i * eighth, m, eighth * 2.2, mel_vol, mel_kind, 4.5)
+		var ch: Array = chords[(i / 8) % chords.size()]
+		var arp: int = int(ch[1 + [0, 1, 2, 1][i % 4]])
+		_note(buf, i * eighth, arp, eighth * 1.3, bass_vol * 0.35, bass_kind, 6.0)
 		if i % 4 == 0:
-			var root: int = ch[0]
-			_note(buf, i * eighth, root, 1.1, 0.2, 1, 2.0)
-	_music_stream = _wav(buf, true)
+			_note(buf, i * eighth, int(ch[0]), eighth * 3.6, bass_vol, bass_kind, 2.0)
+	return _wav(buf, true)

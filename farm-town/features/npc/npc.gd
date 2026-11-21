@@ -18,6 +18,7 @@ const MIN_SPEED := 12.0
 const CORNER := 5.0
 ## 走到终点前，玩家离终点这么近就先等着，免得停下来把玩家卡在同一格里
 const WAIT_DISTANCE := 14.0
+const ScenicScript := preload("res://maps/scenic.gd")
 ## 玩家走到这么近，站着的居民会转过来看；走出 NOTICE_FAR 以后再转回去
 const NOTICE_NEAR := 26.0
 const NOTICE_FAR := 36.0
@@ -64,6 +65,8 @@ var _chat_with: Npc
 var _chat_left := 0.0
 var _bubble: Sprite2D
 var _bubble_t := 0.0
+var _cape: Sprite2D
+var _breath: Sprite2D
 
 
 func setup(npc_def: NpcDef, tile: Vector2i, new_facing: int) -> void:
@@ -89,6 +92,20 @@ func setup(npc_def: NpcDef, tile: Vector2i, new_facing: int) -> void:
 	_bubble.position = Vector2(9, -_sheet.foot_row + 6)
 	_bubble.visible = false
 	add_child(_bubble)
+	# 老周下雨披蓑衣：一层草披风盖在背上
+	_cape = Sprite2D.new()
+	_cape.texture = Px.tex(_cape_image())
+	_cape.position = Vector2(0, -24)
+	_cape.z_index = 1
+	_cape.visible = false
+	add_child(_cape)
+	_breath = Sprite2D.new()
+	_breath.texture = Px.tex(_breath_image())
+	_breath.position = Vector2(2, -42)
+	_breath.z_index = 2
+	_breath.visible = false
+	add_child(_breath)
+	Weather.changed.connect(_apply)
 	# 每个人呼吸的快慢和起点都不一样，一群人站着不会同时一起一伏
 	_idle_rate = randf_range(0.75, 1.1)
 	_anim_t = randf() * 4.0
@@ -150,6 +167,33 @@ func _bubble_image() -> Image:
 	return img
 
 
+## 蓑衣：上窄下宽的草披风，几道竖着的草茎。
+## 一小团白气，三颗点。
+static func _breath_image() -> Image:
+	var img := Px.new_img(5, 4)
+	var c := Color(0.93, 0.95, 0.97, 0.85)
+	Px.px(img, 1, 2, c)
+	Px.px(img, 2, 1, c)
+	Px.px(img, 3, 2, Color(0.93, 0.95, 0.97, 0.45))
+	return img
+
+
+func _cape_image() -> Image:
+	var img := Image.create(16, 12, false, Image.FORMAT_RGBA8)
+	var straw := Color("c9a24a")
+	var dark := Color("8a6a2f")
+	img.fill(Color(0, 0, 0, 0))
+	for y in range(12):
+		var half := mini(7, 4 + y / 2)
+		for x in range(8 - half, 8 + half):
+			var edge := x == 8 - half or x == 7 + half or y == 11
+			img.set_pixel(x, y, dark if edge else straw)
+	for x in [5, 8, 11]:
+		for y in range(2, 11):
+			img.set_pixel(x, y, dark)
+	return img
+
+
 func _walk(delta: float) -> void:
 	var target := GameMap.tile_center(_path[0]) + Vector2(0, 4)
 	var last := _path.size() == 1
@@ -175,7 +219,7 @@ func _walk(delta: float) -> void:
 			stuck.emit(self)
 		return
 	_stuck = 0.0
-	var want := def.speed
+	var want: float = ScenicScript.pace(def.speed, Weather.today)
 	if last:
 		want = clampf(def.speed * to.length() / SLOW_DISTANCE, MIN_SPEED, def.speed)
 	_speed = move_toward(_speed, want, ACCEL * delta)
@@ -191,11 +235,19 @@ func _walk(delta: float) -> void:
 		to = GameMap.tile_center(_path[0]) + Vector2(0, 4) - position
 	position += to.normalized() * minf(step, to.length())
 	_face_along(to, false)
-	_set_anim(&"walk")
-	var n := _sheet.frame_count(&"walk")
+	var walk_anim := _walk_anim()
+	_set_anim(walk_anim)
+	var n := _sheet.frame_count(walk_anim)
 	_anim_t += step / STRIDE * n
 	_frame = int(_anim_t) % n
 	_apply()
+
+
+## 下雨（含雷雨）在外面走就打伞；序列帧里没有打伞走就照常走。
+func _walk_anim() -> StringName:
+	if (Weather.today == Weather.RAIN or Weather.today == Weather.STORM) and _sheet.has_anim(&"umbrella_walk"):
+		return &"umbrella_walk"
+	return &"walk"
 
 
 func _finish() -> void:
@@ -270,7 +322,11 @@ func is_chatting() -> bool:
 	return _chat_with != null
 
 
-## 站着的动作：坐在长凳边就是坐着，否则慢慢地一起一伏。
+func chat_with() -> Npc:
+	return _chat_with
+
+
+## 站着的动作：坐在长凳边就是坐着，日程写了 pose 就播那个姿势，否则慢慢地一起一伏。
 func _stand(delta: float) -> void:
 	if is_sitting():
 		_set_anim(&"sit")
@@ -279,6 +335,13 @@ func _stand(delta: float) -> void:
 		_apply()
 		return
 	_sprite.position.y = -_sheet.foot_row
+	var pose := StringName(str(spot.get("pose", "")))
+	if _path.is_empty() and not _leaving and pose != &"" and _sheet.has_anim(pose):
+		_set_anim(pose)
+		_anim_t += delta * _sheet.fps(pose)
+		_frame = int(_anim_t) % _sheet.frame_count(pose)
+		_apply()
+		return
 	_set_anim(&"idle")
 	_anim_t += delta * _sheet.fps(&"idle") * _idle_rate
 	_frame = int(_anim_t) % _sheet.frame_count(&"idle")
@@ -367,7 +430,7 @@ func _set_anim(anim: StringName) -> void:
 	if _anim == anim:
 		return
 	_anim = anim
-	if anim == &"walk":
+	if anim == &"walk" or anim == &"umbrella_walk":
 		_anim_t = 0.0
 	_frame = 0
 
@@ -375,3 +438,15 @@ func _set_anim(anim: StringName) -> void:
 func _apply() -> void:
 	if _sheet != null and _sheet.is_valid():
 		_sprite.region_rect = _sheet.region(_anim, facing, _frame)
+	if _cape != null:
+		_cape.visible = def.id == &"laozhou" and (Weather.today == Weather.RAIN or Weather.today == Weather.STORM)
+	if _breath != null:
+		_breath.visible = shows_breath(GameClock.season_id(), _anim, not _path.is_empty())
+		_breath.modulate.a = 0.35 + 0.45 * absf(sin(_anim_t * 3.0))
+
+
+## 冬天站着（发呆或搓手）呵白气。走路、干活、坐着不呵。
+static func shows_breath(season: StringName, anim: StringName, walking: bool) -> bool:
+	if season != &"winter" or walking:
+		return false
+	return anim == &"idle" or anim == &"rub"

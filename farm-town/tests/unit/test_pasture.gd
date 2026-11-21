@@ -1,4 +1,4 @@
-extends GutTest
+﻿extends GutTest
 ## M4：第二幕（牛铃、牧野灯、北坡牧场）、家里的猫狗、稻草人和乌鸦。
 
 const WEST_EDGE := Vector2i(0, 18)
@@ -203,7 +203,7 @@ func test_pasture_is_walkable_from_the_road() -> void:
 	var start := m.spawn_position(&"from_town")
 	assert_false(m.blocked(start))
 	assert_eq(m.trigger_at(GameMap.tile_of(start)), {}, "进来不会立刻又出去")
-	assert_eq(m.trigger_at(Vector2i(43, 14)), {"map": &"town", "spawn": &"from_pasture"})
+	assert_eq(m.trigger_at(Vector2i(75, 14)), {"map": &"town", "spawn": &"from_pasture"})
 	var from := GameMap.tile_of(start)
 	for goal: Vector2i in [Vector2i(14, 12), Vector2i(18, 16), Vector2i(16, 20), Vector2i(31, 10), Vector2i(36, 19)]:
 		assert_gt(m.find_path(from, goal).size(), 0, "从路口走得到 %s" % goal)
@@ -242,6 +242,8 @@ func test_barn_and_hives_have_signs() -> void:
 	assert_string_contains(_banners[-1], "畜棚")
 	m.perform(&"interact", null, Vector2i(30, 8))
 	assert_string_contains(_banners[-1], "蜂箱")
+	# 采集物落点是随机的。先拿掉这一格上的，再看它本身不是牌子。
+	Foraging.take(&"pasture", Vector2i(40, 5))
 	assert_eq(m.query_use(null, Vector2i(40, 5), GameMap.Facing.DOWN), &"")
 
 
@@ -269,7 +271,7 @@ func test_amu_keeps_his_hours() -> void:
 	if npc != null:
 		assert_eq(npc.def.id, &"amu")
 		assert_eq(m.query_use(null, Vector2i(18, 16), GameMap.Facing.DOWN), &"interact")
-	assert_gt(m.find_path(Vector2i(43, 14), Vector2i(14, 12)).size(), 0)
+	assert_gt(m.find_path(Vector2i(75, 14), Vector2i(14, 12)).size(), 0)
 
 
 func test_pasture_grows_forage() -> void:

@@ -1,7 +1,7 @@
 class_name ResidentsPanel
 extends CanvasLayer
 ## 名册：见过的居民、熟悉度、忆的等级、今天有没有说过话送过礼、送过以后知道的喜好。
-## 按 ←→ 翻页：第二页“忆簿”，找回的记忆按那一天前后的顺序排成一条线；第三页“鱼谱”，钓到过的鱼和最长记录。
+## 按 ←→ 翻页：第二页“忆簿”，找回的记忆按那一天前后的顺序排成一条线；第三页“手账”；第四页“鱼谱”。
 
 signal closed
 
@@ -13,8 +13,12 @@ const BAR_W := 100.0
 const MAX_ICONS := 8
 ## 喜好分三行显示：[反应, 标题]
 const TASTE_ROWS: Array = [[&"love", "最喜欢"], [&"like", "喜欢"], [&"dislike", "不喜欢"]]
-const PAGES := 3
-const PAGE_NAMES: Array[String] = ["名册", "忆簿", "鱼谱"]
+const PAGES := 4
+const PAGE_ROSTER := 0
+const PAGE_BOOK := 1
+const PAGE_JOURNAL := 2
+const PAGE_FISH := 3
+const PAGE_NAMES: Array[String] = ["名册", "忆簿", "手账", "鱼谱"]
 ## 鱼谱的格子：每行几条、每格多大
 const FISH_COLS := 6
 const FISH_CELL := 20
@@ -39,7 +43,25 @@ var _book_when: Label
 var _book_text: Label
 var _book_empty: Label
 var _memory: Label
-## 第三页鱼谱
+## 第三页手账
+var _journal: Control
+var _journal_rows: Array[Control] = []
+var _journal_cursor := 0
+var _beast_cursor := 0
+var _beast_face: TextureRect
+var _seen_cursor := 0
+var _ending_cursor := 0
+var _journal_text: Label
+## 食单：右边一格一道，做过的亮，没做过的是暗的
+## 七十二道排成十一列，格子和底下那行菜名都留在窗口里。
+const MENU_COLS := 11
+const MENU_CELL := 17
+var _menu_root: Control
+var _menu_cells: Array[Control] = []
+var _menu_ids: Array[StringName] = []
+var _menu_cursor := 0
+var _menu_line: Label
+## 第四页鱼谱
 var _fishbook: Control
 var _fish_ids: Array[StringName] = []
 var _fish_cells: Array[Control] = []
@@ -94,6 +116,12 @@ func _ready() -> void:
 	_book.visible = false
 	panel.add_child(_book)
 	_build_book()
+	_journal = Control.new()
+	_journal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_journal.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_journal.visible = false
+	panel.add_child(_journal)
+	_build_journal()
 	_fishbook = Control.new()
 	_fishbook.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fishbook.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -208,6 +236,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_move(-1)
 	elif event.is_action_pressed(&"move_down", true):
 		_move(1)
+	elif event.is_action_pressed(&"ui_accept") or event.is_action_pressed(&"use"):
+		if not _replay_selected():
+			return
 	elif event.is_action_pressed(&"move_left") or event.is_action_pressed(&"move_right"):
 		_page = posmod(_page + (1 if event.is_action_pressed(&"move_right") else -1), PAGES)
 		Audio.play("select", 0.0, -10.0)
@@ -218,13 +249,54 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _move(d: int) -> void:
-	if _page == 2:
+	if _page == PAGE_FISH:
 		if not _fish_ids.is_empty():
 			_fish_cursor = posmod(_fish_cursor + d, _fish_ids.size())
 			Audio.play("select", 0.0, -10.0)
 			_refresh()
 		return
-	if _page == 1:
+	if _page == PAGE_JOURNAL:
+		if Journal.page_id(_journal_cursor) == &"menu" and not _menu_ids.is_empty():
+			var last := _menu_ids.size() - 1
+			if not ((d < 0 and _menu_cursor == 0) or (d > 0 and _menu_cursor == last)):
+				_menu_cursor = clampi(_menu_cursor + d, 0, last)
+				Audio.play("select", 0.0, -10.0)
+				_refresh()
+				return
+			if d > 0:
+				_menu_cursor = 0
+		elif Journal.page_id(_journal_cursor) == &"beasts" and Bestiary.listed().size() > 0:
+			var last := Bestiary.listed().size() - 1
+			if not ((d < 0 and _beast_cursor == 0) or (d > 0 and _beast_cursor == last)):
+				_beast_cursor = clampi(_beast_cursor + d, 0, last)
+				Audio.play("select", 0.0, -10.0)
+				_refresh()
+				return
+			if d > 0:
+				_beast_cursor = 0
+		elif Journal.page_id(_journal_cursor) == &"endings":
+			var last := Journal.ENDING_IDS.size() - 1
+			if not ((d < 0 and _ending_cursor == 0) or (d > 0 and _ending_cursor == last)):
+				_ending_cursor = clampi(_ending_cursor + d, 0, last)
+				Audio.play("select", 0.0, -10.0)
+				_refresh()
+				return
+			if d > 0:
+				_ending_cursor = 0
+		elif Journal.page_id(_journal_cursor) == &"seen" and Journal.seen_lines().size() > 0:
+			var last := Journal.seen_lines().size() - 1
+			if not ((d < 0 and _seen_cursor == 0) or (d > 0 and _seen_cursor == last)):
+				_seen_cursor = clampi(_seen_cursor + d, 0, last)
+				Audio.play("select", 0.0, -10.0)
+				_refresh()
+				return
+			if d > 0:
+				_seen_cursor = 0
+		_journal_cursor = posmod(_journal_cursor + d, Journal.page_count())
+		Audio.play("select", 0.0, -10.0)
+		_refresh()
+		return
+	if _page == PAGE_BOOK:
 		var n := Residents.recovered().size()
 		if n > 0:
 			_book_cursor = posmod(_book_cursor + d, n)
@@ -291,6 +363,94 @@ func _build_book() -> void:
 	_book_text.size = Vector2(PANEL_SIZE.x - x - 10.0, 110)
 	_book_text.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	_book.add_child(_book_text)
+
+
+## 手账那一页：左边灯、人、家业、灶、食单、看过、山海录、结局。看过和结局那两页确定键重看。
+func _build_journal() -> void:
+	for i in Journal.page_count():
+		var row := Control.new()
+		row.size = Vector2(LIST_W, ROW_H)
+		row.position = Vector2(8, 20 + i * ROW_H)
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		row.gui_input.connect(_on_journal_input.bind(i))
+		var back := UiKit.row_back()
+		back.name = "Back"
+		back.color = Color("e2c088")
+		back.size = Vector2(LIST_W, ROW_H - 1)
+		back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(back)
+		var text := UiKit.label(Journal.page_name(i), 7)
+		text.position = Vector2(4, 0)
+		row.add_child(text)
+		_journal.add_child(row)
+		_journal_rows.append(row)
+	_journal_text = UiKit.label("", 7)
+	_journal_text.position = Vector2(DETAIL_X, 22)
+	_journal_text.size = Vector2(PANEL_SIZE.x - DETAIL_X - 10.0, 140)
+	_journal_text.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	_journal.add_child(_journal_text)
+	_beast_face = TextureRect.new()
+	_beast_face.position = Vector2(DETAIL_X, 118)
+	_beast_face.custom_minimum_size = Vector2(48, 48)
+	_beast_face.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+	_beast_face.stretch_mode = TextureRect.STRETCH_KEEP
+	_beast_face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_beast_face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_beast_face.visible = false
+	_journal.add_child(_beast_face)
+	_build_menu()
+
+
+func _build_menu() -> void:
+	_menu_root = Control.new()
+	_menu_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_menu_root.visible = false
+	_journal.add_child(_menu_root)
+	_menu_ids = Journal.menu_ids()
+	for i in _menu_ids.size():
+		var cell := Control.new()
+		cell.size = Vector2(MENU_CELL, MENU_CELL)
+		cell.position = Vector2(DETAIL_X + (i % MENU_COLS) * MENU_CELL, 22 + (i / MENU_COLS) * MENU_CELL)
+		cell.mouse_filter = Control.MOUSE_FILTER_STOP
+		cell.gui_input.connect(_on_menu_input.bind(i))
+		var back := ColorRect.new()
+		back.name = "Back"
+		back.color = Color("e2c088")
+		back.size = Vector2(MENU_CELL - 1, MENU_CELL - 1)
+		back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cell.add_child(back)
+		var icon := TextureRect.new()
+		icon.name = "Icon"
+		icon.position = Vector2(1, 1)
+		icon.size = Vector2(16, 16)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.texture = UiKit.item_icon(_menu_ids[i])
+		cell.add_child(icon)
+		_menu_root.add_child(cell)
+		_menu_cells.append(cell)
+	var rows := ceili(_menu_ids.size() / float(MENU_COLS))
+	_menu_line = UiKit.label("", 7)
+	_menu_line.position = Vector2(DETAIL_X, 26 + rows * MENU_CELL)
+	_menu_line.size = Vector2(PANEL_SIZE.x - DETAIL_X - 10.0, 28)
+	_menu_line.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	_menu_root.add_child(_menu_line)
+
+
+func _on_menu_input(event: InputEvent, i: int) -> void:
+	var mb := event as InputEventMouseButton
+	if mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		_menu_cursor = i
+		_refresh()
+
+
+func _on_journal_input(event: InputEvent, i: int) -> void:
+	var mb := event as InputEventMouseButton
+	if mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		_journal_cursor = i
+		_refresh()
 
 
 ## 鱼谱那一页的控件：左边一格一条鱼的图标，右边是选中那条的名字、水域、记录。
@@ -416,21 +576,27 @@ func _refresh_fishbook() -> void:
 
 func _refresh_book() -> void:
 	var list := Residents.recovered()
-	_book_cursor = clampi(_book_cursor, 0, maxi(0, list.size() - 1))
-	_book_empty.visible = list.is_empty()
-	for i in _book_rows.size():
+	var n := list.size()
+	_book_cursor = clampi(_book_cursor, 0, maxi(0, n - 1))
+	_book_empty.visible = n == 0
+	var window := _book_rows.size()
+	var start := 0
+	if n > window:
+		start = clampi(_book_cursor - 2, 0, n - window)
+	for i in window:
 		var row := _book_rows[i]
-		row.visible = i < list.size()
+		var idx := start + i
+		row.visible = idx < n
 		if not row.visible:
 			continue
-		var m := list[i]
+		var m := list[idx]
 		var back: ColorRect = row.get_node("Back")
-		back.visible = i == _book_cursor
+		back.visible = idx == _book_cursor
 		var when: Label = row.get_node("When")
 		when.text = m.when
 		var who: Label = row.get_node("Who")
 		who.text = "%s · %s" % [_memory_who(m.npc), m.title]
-	if list.is_empty():
+	if n == 0:
 		_book_title.text = ""
 		_book_when.text = ""
 		_book_text.text = ""
@@ -438,7 +604,8 @@ func _refresh_book() -> void:
 	var cur := list[_book_cursor]
 	_book_title.text = cur.title
 	_book_when.text = "%s · %s" % [cur.when, _memory_who(cur.npc)]
-	_book_text.text = cur.text
+	var note := PeopleLine.note_for(cur)
+	_book_text.text = cur.text if note == "" else cur.text + "\n" + note
 
 
 func _memory_who(id: StringName) -> String:
@@ -486,6 +653,92 @@ func _on_row_input(event: InputEvent, i: int) -> void:
 		_refresh()
 
 
+func _replay_selected() -> bool:
+	if _page != PAGE_JOURNAL:
+		return false
+	var page := Journal.page_id(_journal_cursor)
+	var id := &""
+	if page == &"seen":
+		id = Journal.seen_id(_seen_cursor)
+	elif page == &"endings":
+		id = Journal.ending_replay(_ending_cursor)
+	else:
+		return false
+	if id == &"":
+		return false
+	close()
+	EventBus.cutscene_replay_requested.emit(id)
+	return true
+
+
+func _refresh_journal() -> void:
+	for i in _journal_rows.size():
+		var back: ColorRect = _journal_rows[i].get_node("Back")
+		back.visible = i == _journal_cursor
+	var menu := Journal.page_id(_journal_cursor) == &"menu"
+	_menu_root.visible = menu
+	_journal_text.visible = not menu
+	_beast_face.visible = false
+	if menu:
+		_refresh_menu()
+		_hint.text = "↑↓ 选一道    ←→ 翻页    R 关闭"
+		return
+	if Journal.page_id(_journal_cursor) == &"endings":
+		var lines := Journal.ending_lines()
+		var marked := PackedStringArray()
+		for i in lines.size():
+			marked.append(("▸ " if i == _ending_cursor else "  ") + lines[i])
+		_journal_text.text = "\n".join(marked)
+		_hint.text = "↑↓ 选一个    确定重看    ←→ 翻页    R 关闭"
+		return
+	if Journal.page_id(_journal_cursor) == &"seen":
+		var lines := Journal.seen_lines()
+		if lines.is_empty():
+			_journal_text.text = Journal.BLANK
+		else:
+			var window := 8
+			var start := clampi(_seen_cursor - 2, 0, maxi(lines.size() - window, 0))
+			var marked := PackedStringArray()
+			for i in range(start, mini(start + window, lines.size())):
+				marked.append(("▸ " if i == _seen_cursor else "  ") + lines[i])
+			_journal_text.text = "\n".join(marked)
+		_hint.text = "↑↓ 选一段    确定重看    ←→ 翻页    R 关闭"
+		return
+	if Journal.page_id(_journal_cursor) == &"beasts":
+		var ids := Bestiary.listed()
+		if ids.is_empty():
+			_journal_text.text = Journal.BLANK
+		else:
+			_beast_cursor = clampi(_beast_cursor, 0, ids.size() - 1)
+			var marked := PackedStringArray()
+			for i in ids.size():
+				marked.append(("▸ " if i == _beast_cursor else "  ") + Bestiary.line(ids[i]))
+			_journal_text.text = "\n".join(marked)
+			_journal_text.size = Vector2(_journal_text.size.x, 90)
+			var face := Bestiary.portrait(ids[_beast_cursor])
+			_beast_face.texture = face
+			_beast_face.visible = face != null
+		_hint.text = "↑↓ 选一只    ←→ 翻页    R 关闭"
+		return
+	_journal_text.size = Vector2(_journal_text.size.x, 140)
+	_journal_text.text = Journal.page_text(_journal_cursor)
+
+
+func _refresh_menu() -> void:
+	if _menu_ids.is_empty():
+		_menu_line.text = Journal.BLANK
+		return
+	_menu_cursor = clampi(_menu_cursor, 0, _menu_ids.size() - 1)
+	for i in _menu_cells.size():
+		var cell := _menu_cells[i]
+		var back: ColorRect = cell.get_node("Back")
+		back.visible = i == _menu_cursor
+		var icon: TextureRect = cell.get_node("Icon")
+		var made := Crafting.made_dishes.has(_menu_ids[i])
+		icon.modulate = Color.WHITE if made else Color(0.72, 0.62, 0.5)
+	_menu_line.text = Journal.menu_line(_menu_ids[_menu_cursor])
+
+
 ## 熟悉度占“现在最多能攒到的量”的几成。
 func _ratio(id: StringName) -> float:
 	return clampf(float(Residents.familiarity_of(id)) / Residents.familiarity_cap(id), 0.0, 1.0)
@@ -494,15 +747,19 @@ func _ratio(id: StringName) -> float:
 func _refresh() -> void:
 	if not _root.visible or _ids.is_empty():
 		return
-	_roster.visible = _page == 0
-	_book.visible = _page == 1
-	_fishbook.visible = _page == 2
+	_roster.visible = _page == PAGE_ROSTER
+	_book.visible = _page == PAGE_BOOK
+	_journal.visible = _page == PAGE_JOURNAL
+	_fishbook.visible = _page == PAGE_FISH
 	_head.text = PAGE_NAMES[_page]
-	_hint.text = ["↑↓ 选人", "↑↓ 选一段", "↑↓ 选鱼"][_page] + "    ←→ 翻页    R 关闭"
-	if _page == 2:
+	_hint.text = ["↑↓ 选人", "↑↓ 选一段", "↑↓ 选一页", "↑↓ 选鱼"][_page] + "    ←→ 翻页    R 关闭"
+	if _page == PAGE_FISH:
 		_refresh_fishbook()
 		return
-	if _page == 1:
+	if _page == PAGE_JOURNAL:
+		_refresh_journal()
+		return
+	if _page == PAGE_BOOK:
 		_refresh_book()
 		return
 	for i in _rows.size():
@@ -535,7 +792,8 @@ func _refresh() -> void:
 	if Residents.gifted_today.get(id, false):
 		today.append("今天送过礼")
 	_today.text = " · ".join(today) if met else ""
-	_memory.text = "忆 %d / 5" % Residents.memory_level(id) if met else ""
+	var cap := Database.memory_cap(id)
+	_memory.text = "忆 %d / %d" % [Residents.memory_level(id), cap] if met and cap > 0 else ""
 	var full := met and Residents.familiarity_of(id) >= Residents.familiarity_cap(id)
 	_note.text = "再熟也只能到这儿了，还缺一件能让对方想起什么的旧物。" if full else ""
 	for row_def: Array in TASTE_ROWS:

@@ -28,13 +28,18 @@ const BASE: Array[Dictionary] = [
 var today: StringName = SUNNY
 var tomorrow: StringName = SUNNY
 var yesterday: StringName = SUNNY
+## 路上的水洼有多深，0 到 1。不单独存“下了多久”，由分钟推出来。
+var wet := 0.0
 
 var _rng := RandomNumberGenerator.new()
+## 上次按分钟算过湿度是哪一分钟。-1 表示还没对齐过。
+var _noted := -1
 
 
 func _ready() -> void:
 	SaveSystem.register(&"weather", self)
 	GameClock.register_daily(GameClock.ORDER_WEATHER, _on_new_day)
+	GameClock.time_changed.connect(_on_time)
 	reset_data()
 
 
@@ -104,10 +109,29 @@ func is_foggy() -> bool:
 
 
 func _on_new_day() -> void:
+	var rained := wets_soil()
 	yesterday = today
 	today = tomorrow
 	tomorrow = pick(weights_for(GameClock.day + 1), _rng.randf())
+	if wets_soil():
+		pass
+	elif rained:
+		wet = 1.0
+	else:
+		wet = 0.0
+	_noted = -1
 	changed.emit()
+
+
+## 时间走到 minute 这一分钟：雨天积水，别的天气变干。
+func catch_up(minute: int) -> void:
+	var next := Surface.soak(wet, _noted, minute, wets_soil())
+	wet = next.x
+	_noted = int(next.y)
+
+
+func _on_time() -> void:
+	catch_up(int(GameClock.minutes))
 
 
 func save_data() -> Dictionary:
@@ -116,6 +140,7 @@ func save_data() -> Dictionary:
 		"tomorrow": String(tomorrow),
 		"yesterday": String(yesterday),
 		"rng": str(_rng.state),
+		"wet": wet,
 	}
 
 
@@ -126,6 +151,13 @@ func load_data(data: Dictionary) -> void:
 	var st := str(data.get("rng", ""))
 	if st.is_valid_int():
 		_rng.state = st.to_int()
+	if data.has("wet"):
+		wet = clampf(float(data["wet"]), 0.0, 1.0)
+	elif wets_soil() == false and (yesterday == RAIN or yesterday == STORM):
+		wet = 1.0
+	else:
+		wet = 0.0
+	_noted = -1
 	changed.emit()
 
 
@@ -135,6 +167,8 @@ func reset_data() -> void:
 	today = SUNNY
 	yesterday = SUNNY
 	tomorrow = pick(weights_for(2), _rng.randf())
+	wet = 0.0
+	_noted = -1
 	changed.emit()
 
 

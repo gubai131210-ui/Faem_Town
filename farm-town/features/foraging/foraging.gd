@@ -25,6 +25,12 @@ var items: Dictionary[StringName, Dictionary] = {}
 var pending: Dictionary[StringName, int] = {}
 ## 雾天攒下的、还没落地的遗物（最多一件）
 var pending_relic: StringName = &""
+## 雾天农场上、山野里各攒一张还没落地的残页。
+var pending_scrap_fog: StringName = &""
+var pending_scrap_wild: StringName = &""
+## 采到过的野物。长在地上还没捡的不算（决策 131）。
+var found: Array[StringName] = []
+const WILD_MAPS: Array[StringName] = [&"nanxi", &"pasture", &"shanci"]
 
 var _rng := RandomNumberGenerator.new()
 
@@ -46,16 +52,16 @@ static func options(season: StringName, term_index: int, shore: bool, beach: boo
 	return out
 
 
-## 按权重选一种；roll 是 [0, 1) 的随机数。没有可选的返回空。
-static func pick(list: Array[ForageDef], roll: float) -> StringName:
+## 按权重选一种；roll 是 [0, 1) 的随机数。没有可选的返回空。term_index 用来算节气加成权重。
+static func pick(list: Array[ForageDef], roll: float, term_index: int = -1) -> StringName:
 	var total := 0
 	for def in list:
-		total += def.weight
+		total += def.weight_at(term_index)
 	if total <= 0:
 		return &""
 	var at := roll * total
 	for def in list:
-		at -= def.weight
+		at -= def.weight_at(term_index)
 		if at < 0.0:
 			return def.item
 	return list[list.size() - 1].item
@@ -76,12 +82,28 @@ func item_at(map_id: StringName, t: Vector2i) -> StringName:
 	return id
 
 
+func _is_forage(id: StringName) -> bool:
+	for def in Database.forage:
+		if def.item == id:
+			return true
+	return false
+
+
+func _found_save() -> Array[String]:
+	var out: Array[String] = []
+	for id: StringName in found:
+		out.append(String(id))
+	return out
+
+
 ## 捡走这一格的采集物，返回物品 id；没有就返回空。
 func take(map_id: StringName, t: Vector2i) -> StringName:
 	var id := item_at(map_id, t)
 	if id == &"":
 		return &""
 	items[map_id].erase(t)
+	if _is_forage(id) and not found.has(id):
+		found.append(id)
 	if Database.has_relic(id):
 		GameState.set_flag(StringName("relic_" + String(id)))
 	changed.emit()
@@ -93,6 +115,8 @@ func take(map_id: StringName, t: Vector2i) -> StringName:
 func settle(map_id: StringName, land: Array[Vector2i], shore: Array[Vector2i], beach: bool = false) -> void:
 	var n := pending_on(map_id)
 	if n <= 0:
+		if _place_scrap(map_id, land):
+			changed.emit()
 		return
 	pending[map_id] = 0
 	if not items.has(map_id):
@@ -111,7 +135,7 @@ func settle(map_id: StringName, land: Array[Vector2i], shore: Array[Vector2i], b
 	var land_options := options(season, term, false, beach)
 	for i in n:
 		var use_shore := not shore.is_empty() and not shore_options.is_empty() and _rng.randf() < SHORE_CHANCE
-		var id := pick(shore_options if use_shore else land_options, _rng.randf())
+		var id := pick(shore_options if use_shore else land_options, _rng.randf(), term)
 		var spots := shore if use_shore else land
 		if id == &"" or spots.is_empty():
 			continue
@@ -121,6 +145,7 @@ func settle(map_id: StringName, land: Array[Vector2i], shore: Array[Vector2i], b
 			if not on_map.has(t):
 				on_map[t] = id
 				break
+	_place_scrap(map_id, land)
 	changed.emit()
 
 
@@ -133,8 +158,12 @@ func _on_new_day() -> void:
 			items[map_id] = {}
 		var room := maxi(0, MAX_PER_MAP - count_on(map_id))
 		pending[map_id] = mini(room, pending_on(map_id) + DAILY + extra)
+	GameState.clear_flag(&"trade_pick_sipped")
 	if Weather.is_foggy() and pending_relic == &"":
 		pending_relic = pick_relic(_rng.randf())
+	if Weather.is_foggy():
+		_queue_scrap(&"fog", _rng.randf())
+	_queue_scrap(&"wild", _rng.randf())
 	changed.emit()
 
 
@@ -156,6 +185,59 @@ func pick_relic(roll: float) -> StringName:
 	return pool[mini(int(roll * pool.size()), pool.size() - 1)]
 
 
+## 还没进背包、但已经算掉出来的残页：攒着的，和躺在地上的。
+func scrap_held() -> Array[StringName]:
+	var out: Array[StringName] = []
+	if pending_scrap_fog != &"":
+		out.append(pending_scrap_fog)
+	if pending_scrap_wild != &"" and not out.has(pending_scrap_wild):
+		out.append(pending_scrap_wild)
+	for map_id: StringName in items:
+		var on_map: Dictionary = items[map_id]
+		for t: Vector2i in on_map:
+			var id: StringName = on_map[t]
+			if String(id).begins_with("scrap_") and not out.has(id):
+				out.append(id)
+	return out
+
+
+func _queue_scrap(place: StringName, roll: float) -> void:
+	if place == &"fog":
+		if pending_scrap_fog != &"":
+			return
+		pending_scrap_fog = Crafting.offer_scrap(&"fog", roll)
+	elif pending_scrap_wild == &"":
+		pending_scrap_wild = Crafting.offer_scrap(&"wild", roll)
+
+
+## 采集物落完以后再放残页，不跟遗物抢格子。没位子这一张就留到下次。放下来返回真。
+func _place_scrap(map_id: StringName, land: Array[Vector2i]) -> bool:
+	var fog_here := map_id == RELIC_MAP and pending_scrap_fog != &""
+	var wild_here := WILD_MAPS.has(map_id) and pending_scrap_wild != &""
+	if not fog_here and not wild_here:
+		return false
+	var id := pending_scrap_fog if fog_here else pending_scrap_wild
+	if land.is_empty() or not Database.has_item(id):
+		return false
+	if not items.has(map_id):
+		items[map_id] = {}
+	var on_map: Dictionary = items[map_id]
+	var placed := false
+	for attempt in 8:
+		var t: Vector2i = land[_rng.randi() % land.size()]
+		if not on_map.has(t):
+			on_map[t] = id
+			placed = true
+			break
+	if not placed:
+		return false
+	if fog_here:
+		pending_scrap_fog = &""
+	else:
+		pending_scrap_wild = &""
+	return true
+
+
 func save_data() -> Dictionary:
 	var out_items := {}
 	for map_id: StringName in items:
@@ -167,7 +249,11 @@ func save_data() -> Dictionary:
 	var out_pending := {}
 	for map_id: StringName in pending:
 		out_pending[String(map_id)] = pending[map_id]
-	return {"items": out_items, "pending": out_pending, "pending_relic": String(pending_relic)}
+	return {
+		"items": out_items, "pending": out_pending, "pending_relic": String(pending_relic),
+		"pending_scrap_fog": String(pending_scrap_fog), "pending_scrap_wild": String(pending_scrap_wild),
+		"found": _found_save(),
+	}
 
 
 func load_data(data: Dictionary) -> void:
@@ -190,6 +276,18 @@ func load_data(data: Dictionary) -> void:
 	pending_relic = StringName(str(data.get("pending_relic", "")))
 	if not Database.has_relic(pending_relic):
 		pending_relic = &""
+	pending_scrap_fog = StringName(str(data.get("pending_scrap_fog", "")))
+	pending_scrap_wild = StringName(str(data.get("pending_scrap_wild", "")))
+	if not Database.has_item(pending_scrap_fog):
+		pending_scrap_fog = &""
+	if not Database.has_item(pending_scrap_wild):
+		pending_scrap_wild = &""
+	found.clear()
+	var saved_found: Array = data.get("found", [])
+	for key: Variant in saved_found:
+		var id := StringName(str(key))
+		if _is_forage(id) and not found.has(id):
+			found.append(id)
 	changed.emit()
 
 
@@ -198,6 +296,9 @@ func reset_data() -> void:
 	items.clear()
 	pending.clear()
 	pending_relic = &""
+	pending_scrap_fog = &""
+	pending_scrap_wild = &""
+	found.clear()
 	for map_id in MAPS:
 		pending[map_id] = START_PENDING
 	changed.emit()

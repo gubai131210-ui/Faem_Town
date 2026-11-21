@@ -17,6 +17,8 @@ const QUALITY_BONUS := 5
 const ENDING_NEWS := "ending_news"
 ## 每一级忆对应这么多熟悉度。熟悉度最多攒到“当前忆等级 + 1”级的门槛，再往上要靠遗物
 const STEP := 100
+## 熟到这个数，居民肯把本来要点灯才给的本事交给你（决策 067）。和老秦交钥匙、柏先生坦白用的是同一个数
+const TRUST := 40
 
 ## 说过第一次话的居民
 var met: Dictionary[StringName, bool] = {}
@@ -24,6 +26,8 @@ var met: Dictionary[StringName, bool] = {}
 var talks_today: Dictionary[StringName, int] = {}
 ## 今天给谁送过礼（每人每天一次）
 var gifted_today: Dictionary[StringName, bool] = {}
+## 今天请谁吃过饭（每人每天一次）
+var hosted_today: Dictionary[StringName, bool] = {}
 var familiarity: Dictionary[StringName, int] = {}
 ## 送过以后才知道的喜好：居民 id -> {物品 id: 反应}
 var known_tastes: Dictionary[StringName, Dictionary] = {}
@@ -187,12 +191,27 @@ func title_for(id: StringName, working: bool) -> String:
 		return "first"
 	if Story.owes_news(id):
 		return ENDING_NEWS
+	if id == &"yunniang" and Crafting.rank_ready():
+		return "rank"
+	var span := PeopleLine.pending_title(id)
+	if span != "":
+		return span
+	var trade := Livelihood.pending_title(id)
+	if trade != "":
+		return trade
+	if id == &"yunniang" and Story.side_ready(Story.FEAST):
+		return "side_feast"
+	if id == &"jiang" and Story.side_ready(Story.VOYAGE):
+		return "side_voyage"
 	if working:
 		return "work"
 	var festival := Festivals.passage(id, talks(id) == 0)
 	if festival != "":
 		return festival
-	return "daily" if talks(id) == 0 else "again"
+	# 雾天会把刚说过的话忘了，今天再说还是当天的那套，不是“又来了”
+	if talks(id) == 0 or Weather.today == &"fog":
+		return "daily"
+	return "again"
 
 
 ## 这一段在哪个对话文件里：节日上的话在 festival.dialogue，别的在各人自己的文件。
@@ -215,6 +234,8 @@ func talk(id: StringName, working: bool) -> void:
 			_offer_to = id
 			EventBus.dialogue_requested.emit(COMMON_DIALOGUE, "relic_early")
 		return
+	if _offer_mine(id, item, working):
+		return
 	if can_gift(id, item) and not Festivals.takes_goods(id):
 		_offer_to = id
 		_offer_working = working
@@ -223,9 +244,37 @@ func talk(id: StringName, working: bool) -> void:
 	_chat(id, working)
 
 
+## 井里捡到的九件东西，拿给老秦或白鹭看一次。不收走。有正事要说时让开。
+func _offer_mine(id: StringName, item: ItemDef, working: bool) -> bool:
+	if item == null or not has_met(id):
+		return false
+	if id != &"laoqin" and id != &"egret":
+		return false
+	if item.kind != &"relic" or not Database.has_relic(item.id):
+		return false
+	if Database.relic(item.id).found != &"mine":
+		return false
+	var title := title_for(id, working)
+	if title != "work" and title != "daily" and title != "again":
+		return false
+	var flag := StringName("shown_%s_%s" % [String(id), String(item.id)])
+	if GameState.has_flag(flag):
+		return false
+	GameState.set_flag(flag)
+	if talks(id) == 0:
+		add_familiarity(id, TALK_POINTS)
+		_gap[id] = GameClock.day - int(last_talk_day.get(id, GameClock.day))
+		last_talk_day[id] = GameClock.day
+	talks_today[id] = talks(id) + 1
+	changed.emit()
+	EventBus.dialogue_requested.emit(dialogue_path(id), "mine_" + String(item.id))
+	return true
+
+
 func _chat(id: StringName, working: bool) -> void:
 	var title := title_for(id, working)
-	if not has_met(id):
+	var known := has_met(id)
+	if not known:
 		add_familiarity(id, MEET_POINTS)
 	elif talks(id) == 0:
 		add_familiarity(id, TALK_POINTS)
@@ -236,8 +285,14 @@ func _chat(id: StringName, working: bool) -> void:
 	talks_today[id] = talks(id) + 1
 	if title == ENDING_NEWS:
 		Story.told(id)
+	if title.begins_with("span_"):
+		PeopleLine.told(title)
+	if title.begins_with("trade_"):
+		Livelihood.grant(title)
 	changed.emit()
 	EventBus.dialogue_requested.emit(path_for(id, title), title)
+	if known:
+		Crafting.mention_set(id)
 
 
 ## 交委托：收走东西，给钱和遗物，加熟悉度，播对方的话。背包放不下遗物就先不交。
@@ -257,7 +312,12 @@ func _deliver(quest: QuestDef) -> void:
 	talks_today[quest.npc] = talks(quest.npc) + 1
 	last_talk_day[quest.npc] = GameClock.day
 	changed.emit()
-	EventBus.dialogue_requested.emit(dialogue_path(quest.npc), quest.dialogue_title())
+	var path := dialogue_path(quest.npc)
+	var title := quest.dialogue_title()
+	if quest.id == Quests.ERRAND_ID:
+		path = COMMON_DIALOGUE
+		title = "errand"
+	EventBus.dialogue_requested.emit(path, title)
 
 
 ## 还遗物：从手里拿走，忆升级，播那段记忆。
@@ -274,9 +334,9 @@ func _return(id: StringName, item: ItemDef) -> void:
 
 # ---------------------------------------------------------------- 礼物
 
-## 这样东西能不能当礼物：地里种的和野外采的都行，工具、种子、肥料不行。
+## 这样东西能不能当礼物：地里的、采的、鱼和花都行。工具、种子、肥料不行。
 func is_giftable(item: ItemDef) -> bool:
-	return item != null and (item.kind == &"crop" or item.kind == &"forage")
+	return item != null and (item.kind == &"crop" or item.kind == &"forage" or item.kind == &"fish" or item.flower != &"")
 
 
 ## 现在能不能把 item 送给这位居民：见过面、今天还没送过。
@@ -359,6 +419,13 @@ func lamp_lit(lamp_id: String) -> bool:
 	return Lamps.is_lit(StringName(lamp_id))
 
 
+## 这扇门开了没有：灯的标记亮了（"lamp_plaza" 这种），或者和这个人熟了。人不写就只看灯。
+func opened(flag: String, npc: String = "") -> bool:
+	if has_flag(flag):
+		return true
+	return npc != "" and knows(npc, TRUST)
+
+
 ## 剧情标记有没有设过。
 func has_flag(flag: String) -> bool:
 	return GameState.has_flag(StringName(flag))
@@ -422,9 +489,14 @@ func all_remembered() -> bool:
 	return Story.true_ready()
 
 
-## 在最初的灯跟前做了选择："light" 点，别的是不点。对话说完以后由游戏主场景播结局。
+## 在最初的灯跟前做了选择："light" 点，"name" 是散雾以后补成归名，别的是不点。对话说完以后由游戏主场景播结局。
 func choose_ending(choice: String) -> void:
-	var id := Story.choose(choice == "light")
+	var id := &""
+	if choice == "name":
+		if Story.complete_name():
+			id = Story.NAME
+	else:
+		id = Story.choose(choice == "light")
 	if id != &"":
 		EventBus.ending_requested.emit(id)
 
@@ -535,6 +607,13 @@ func offer_item_name() -> String:
 	return item.name if item != null else ""
 
 
+## 交掉公告栏上的小事时，对方说的那一句。
+func errand_thanks() -> String:
+	if not Database.has_npc(Quests.errand_who):
+		return ""
+	return "%s把东西收好，递过钱来。“够了。”" % Database.npc(Quests.errand_who).name
+
+
 ## 玩家选了“送”：从手里拿走一个，接着播对方的反应。
 func give_offer() -> void:
 	var id := _offer_to
@@ -561,6 +640,7 @@ func decline_offer() -> void:
 func _on_new_day() -> void:
 	talks_today.clear()
 	gifted_today.clear()
+	hosted_today.clear()
 	_topic_today.clear()
 	_gap.clear()
 
@@ -639,6 +719,7 @@ func reset_data() -> void:
 	met.clear()
 	talks_today.clear()
 	gifted_today.clear()
+	hosted_today.clear()
 	familiarity.clear()
 	known_tastes.clear()
 	last_talk_day.clear()

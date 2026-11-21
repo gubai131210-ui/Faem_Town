@@ -25,9 +25,9 @@ func _map(id: StringName) -> OutdoorMap:
 
 func test_town_south_road_leads_to_nanxi_and_back() -> void:
 	var town := _map(&"town")
-	assert_false(town.blocked(GameMap.tile_center(Vector2i(22, 29))), "南边的路不再有雾")
-	assert_eq(town.trigger_at(Vector2i(22, 29)), {"map": &"nanxi", "spawn": &"from_town"})
-	assert_eq(town.trigger_at(Vector2i(23, 29)), {"map": &"nanxi", "spawn": &"from_town"})
+	assert_false(town.blocked(GameMap.tile_center(Vector2i(22, 29))), "南边的路不再有雾（镇子扩大以后路一直通到最南边）")
+	assert_eq(town.trigger_at(Vector2i(22, 53)), {"map": &"nanxi", "spawn": &"from_town"})
+	assert_eq(town.trigger_at(Vector2i(23, 53)), {"map": &"nanxi", "spawn": &"from_town"})
 	assert_eq(town.spawn_facing(&"from_nanxi"), GameMap.Facing.UP)
 	assert_false(town.blocked(town.spawn_position(&"from_nanxi")), "从南溪回来站的地方能站")
 	# 北边、西边还封着
@@ -79,7 +79,10 @@ func test_laozhou_spends_the_day_on_his_dock() -> void:
 	assert_eq(spot["note"], "dock")
 	assert_eq(NpcSchedule.spot_at(def, 420.0, &"sunny")["map"], &"town", "早上还在镇上卖鱼")
 	assert_eq(NpcSchedule.spot_at(def, 1080.0, &"sunny")["map"], &"town", "傍晚回镇上坐长凳")
-	assert_eq(NpcSchedule.spot_at(def, 600.0, &"rain")["map"], &"", "下雨回家")
+	var rain_spot := NpcSchedule.spot_at(def, 600.0, &"rain")
+	assert_eq(rain_spot["map"], &"nanxi", "下雨照样在码头")
+	assert_eq(rain_spot["note"], "dock")
+	assert_eq(rain_spot["pose"], "fish", "披蓑衣持竿")
 	var nanxi := _map(&"nanxi")
 	var npc := nanxi.npc_at(Vector2i(20, 16))
 	assert_not_null(npc, "十点老周站在码头上")

@@ -43,6 +43,11 @@ const FAINT_LOSS := 0.5
 ## 惊蛰那几天：每层多一只忘形，掉东西的机会乘这么多
 const JINGZHE := &"jingzhe"
 const JINGZHE_DROPS := 1.5
+## 冬至那几天：深层掉东西的机会乘这么多
+const DONGZHI := &"dongzhi"
+const DONGZHI_DROPS := 1.5
+## 深层从第几层起（遗落层）
+const DEEP_FROM := 21
 
 ## 最深到过第几层
 var deepest := 0
@@ -184,7 +189,17 @@ func strike(tile: Vector2i) -> Dictionary:
 	var res := current.hit(tile, power, pick_luck())
 	if bool(res.get("broken", false)):
 		_gain(item, int(res["count"]))
+		grant_scrap(_rng.randf())
 	return res
+
+
+## 敲开石头时有机会多掉半张残页。roll 用来测试。
+func grant_scrap(roll: float) -> StringName:
+	var id := Crafting.offer_scrap(&"mine", roll)
+	if id == &"" or not GameState.inventory.can_add(id, 1):
+		return &""
+	_gain(id, 1)
+	return id
 
 
 ## 镐子一下顶几下：铁镐起带矿的石头也一下敲开。
@@ -202,6 +217,16 @@ func pick_luck() -> float:
 	return GOLD_PICK_LUCK if GameState.tool_level(PICKAXE) >= 3 else MineFloor.DOUBLE_CHANCE
 
 
+## 掉东西（忘形掉落和遗物）的机会乘数：惊蛰全井更旺，冬至只有深层更旺。
+func drop_mult() -> float:
+	var term := GameClock.term_id()
+	if term == JINGZHE:
+		return JINGZHE_DROPS
+	if term == DONGZHI and floor_no >= DEEP_FROM:
+		return DONGZHI_DROPS
+	return 1.0
+
+
 ## 打倒了一只忘形：按它的表掉东西，直接进背包（放不下的那样就不掉）。返回掉了什么：物品 id 的列表。
 ## 它要是什么东西变的，还有机会掉出原来的样子（遗物，每件只掉一回）。
 ## 首领：记下这一层打过了，往下的梯子露出来；它掉的东西背包放不下就先欠着（owed），不会丢。
@@ -210,7 +235,7 @@ func defeat(monster: MineMonster) -> Array[StringName]:
 	if monster == null:
 		return got
 	var def := monster.def
-	var mult := JINGZHE_DROPS if GameClock.term_id() == JINGZHE else 1.0
+	var mult := drop_mult()
 	for drop in def.drops:
 		var item: StringName = drop["item"]
 		if _rng.randf() >= float(drop["chance"]) * mult:
@@ -247,8 +272,7 @@ func roll_relic(def: MonsterDef, roll: float) -> StringName:
 	var layer := Database.mine_layer(floor_no)
 	if layer != null:
 		chance *= layer.relic_bonus
-	if GameClock.term_id() == JINGZHE:
-		chance *= JINGZHE_DROPS
+	chance *= drop_mult()
 	if roll >= chance or not GameState.inventory.can_add(def.relic, 1):
 		return &""
 	return def.relic
@@ -371,6 +395,8 @@ func collect_owed() -> Array[StringName]:
 func faint() -> Dictionary[StringName, int]:
 	var lost: Dictionary[StringName, int] = {}
 	var loss := 0.25 if Residents.memory_level(&"laoqin") >= 5 else FAINT_LOSS
+	if Bestiary.soothed():
+		loss *= 0.5
 	for item: StringName in haul:
 		var n := mini(ceili(haul[item] * loss), GameState.inventory.count_of(item))
 		if n > 0 and GameState.inventory.remove(item, n):

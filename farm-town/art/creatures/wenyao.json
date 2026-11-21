@@ -1,0 +1,18 @@
+{
+	"cell": 32,
+	"foot_row": 26,
+	"dirs": [
+		"down",
+		"up",
+		"right",
+		"left"
+	],
+	"anims": {
+		"flap": {
+			"row": 0,
+			"frames": 4,
+			"loop": true,
+			"fps": 7.0
+		}
+	}
+}

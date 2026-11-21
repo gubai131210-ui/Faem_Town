@@ -20,6 +20,9 @@ if Residents.owes_thanks("jiang")
 	do Residents.thanked("jiang")
 elif Residents.away("jiang") >= 4
 	姜婆婆: 你这孩子，好几天不露面，婆婆还当你病了。瘦了没有？让我看看。
+if Residents.weather_is("fog")
+	姜婆婆: 雾这么大……你是谁家的孩子？哦，是你。婆婆这会儿有点糊涂。
+	=> END
 if Residents.weather_is("rain") or Residents.weather_is("storm") or Residents.weather_is("snow")
 	% 姜婆婆: 这种天还往外跑，鞋湿了没有？回去拿热水泡泡脚，听见没。
 	% 姜婆婆: 一变天，我这膝盖比小满报得还准。
@@ -186,4 +189,23 @@ else
 姜婆婆: 地址是你现在住的那间屋。
 姜婆婆: 收信的人叫阿芸。我女儿。你是她抱走的那个。 [#sad]
 姜婆婆: 信我可以不写了。人回来了，药还是要煮。
+=> END
+
+~ trade_pick_1
+姜婆婆: 这几样草你认得了。路过药铺，我给你续一口。
+=> END
+
+~ trade_pick_2
+姜婆婆: 山里的东西你捡进来了。篮子给你留着。
+=> END
+
+~ trade_pick_3
+姜婆婆: 当季的野物，你闭着眼也摸得着。
+=> END
+
+~ side_voyage
+do Story.begin_side("voyage")
+姜婆婆: 囡囡。另外半张不在镇上。
+姜婆婆: 阿芸走的时候带走了。信退回来是空的，地址上没有她。灯亮了，她也没顺着光回来。
+姜婆婆: 这半张我留着。这回我跟你走。从东滩出去，去找她。
 => END

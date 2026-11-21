@@ -1,0 +1,39 @@
+{
+	"name": "bifang",
+	"body": "bird",
+	"scale": 1.0,
+	"cell": 48,
+	"foot_row": 40,
+	"bird": {
+		"comb": false,
+		"wattle": false,
+		"bill": "cone",
+		"bill_len": 1.9,
+		"cap": true,
+		"tail": 0.12,
+		"neck": 0.34,
+		"neck_up": 0.44,
+		"head_scale": 0.9,
+		"body": [
+			0.2,
+			0.3,
+			0.19
+		],
+		"leg": 0.36,
+		"one_leg": true
+	},
+	"parts": {
+		"body": [
+			"#5a86c0",
+			"#3f6496"
+		],
+		"head": [
+			"#5a86c0",
+			"#3f6496"
+		],
+		"wing": "red",
+		"comb": "red",
+		"beak": "white",
+		"leg": "red"
+	}
+}

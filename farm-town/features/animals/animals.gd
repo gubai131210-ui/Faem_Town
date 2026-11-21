@@ -18,6 +18,9 @@ const SULK_MOOD := 20
 const GOOD_MOOD := 60
 const GREAT_MOOD := 85
 const FEED_ID := &"feed"
+const HAY_ID := &"hay"
+## 小暑、大暑在外面过的，算它躲过树荫，心情多这么多
+const SHADE_MOOD := 8
 ## 建筑里攒着没收的东西最多是容量的几倍
 const STORE_PER_ANIMAL := 3
 ## 送回给阿牧按原价的几成算
@@ -39,6 +42,8 @@ var last_name := ""
 var nectar := Callable()
 ## 哪一天摸过家里的猫狗（它不在 animals 里：养猫还是狗记在 GameState 的标记 pet_dog / pet_cat 上）
 var pet_day := -1
+## 养过的种类。送走了也还算养过（决策 131）。
+var raised: Array[StringName] = []
 
 var _rng := RandomNumberGenerator.new()
 
@@ -68,13 +73,13 @@ func building_state(id: String) -> int:
 	return buildings.get(StringName(id), -1)
 
 
-## 青竹现在肯不肯接这栋建筑的活：对应的灯亮了、还没盖过、前置建筑有了。
+## 青竹现在肯不肯接这栋建筑的活：灯亮了或和她熟了、还没盖过、前置建筑有了。
 func can_offer(id: String) -> bool:
 	var key := StringName(id)
 	if not Database.has_building(key) or buildings.has(key):
 		return false
 	var def := Database.building(key)
-	if not GameState.has_flag(def.flag):
+	if not Residents.opened(String(def.flag), String(def.by)):
 		return false
 	return def.requires == &"" or is_built(def.requires)
 
@@ -122,13 +127,13 @@ func order(id: String) -> bool:
 
 # ---------------------------------------------------------------- 动物
 
-## 阿牧现在卖不卖这种：对应的灯亮了，而且有地方住。
+## 阿牧现在卖不卖这种：灯亮了或和他熟了，而且有地方住。羊、牛、蜂只看灯。
 func sells_kind(kind: String) -> bool:
 	var key := StringName(kind)
 	if not Database.has_animal(key):
 		return false
 	var def := Database.animal(key)
-	return GameState.has_flag(def.flag) and room(String(def.building)) > 0
+	return Residents.opened(String(def.flag), String(def.by)) and room(String(def.building)) > 0
 
 
 ## 阿牧现在有没有能卖给你的。
@@ -173,6 +178,8 @@ func buy(kind: String) -> bool:
 	GameState.money -= animal_price(kind)
 	last_name = _pick_name(def)
 	animals.append({"kind": def.id, "name": last_name, "mood": START_MOOD, "fed": false, "petted": false, "days": 0, "work": 0})
+	if not raised.has(def.id):
+		raised.append(def.id)
 	changed.emit()
 	return true
 
@@ -298,7 +305,7 @@ func mood_text(index: int) -> String:
 func feed(index: int) -> bool:
 	if index < 0 or index >= animals.size() or is_fed(index):
 		return false
-	if not GameState.inventory.remove(def_of(index).feed, 1):
+	if not GameState.inventory.remove(ration_of(index), 1):
 		return false
 	animals[index]["fed"] = true
 	changed.emit()
@@ -310,7 +317,7 @@ func feed_all(building: StringName, item: StringName = FEED_ID) -> int:
 	var n := 0
 	for i in animals.size():
 		var def := def_of(i)
-		if def.building == building and def.feed == item and not is_fed(i) and GameState.inventory.remove(item, 1):
+		if def.building == building and ration_of(i) == item and not is_fed(i) and GameState.inventory.remove(item, 1):
 			animals[i]["fed"] = true
 			n += 1
 	if n > 0:
@@ -323,7 +330,7 @@ func hungry_in(building: StringName, item: StringName = &"") -> int:
 	var n := 0
 	for i in animals.size():
 		var def := def_of(i)
-		if def.building == building and not is_fed(i) and (item == &"" or def.feed == item):
+		if def.building == building and not is_fed(i) and (item == &"" or ration_of(i) == item):
 			n += 1
 	return n
 
@@ -333,7 +340,7 @@ func pet(index: int) -> bool:
 	if index < 0 or index >= animals.size() or is_petted(index):
 		return false
 	animals[index]["petted"] = true
-	animals[index]["mood"] = mini(MAX_MOOD, mood_of(index) + PET_MOOD)
+	animals[index]["mood"] = mini(MAX_MOOD, mood_of(index) + PET_MOOD + Livelihood.herd_extra())
 	changed.emit()
 	return true
 
@@ -378,6 +385,24 @@ func collect(building: StringName) -> Array:
 	if not got.is_empty():
 		changed.emit()
 	return got
+
+
+## 立冬进舍，不下地。
+static func stays_in(term: StringName) -> bool:
+	return term == &"lidong"
+
+
+## 立冬那四天，吃平常饲料的家畜改吃干草。蚕和蜜蜂不动。
+func ration_of(index: int) -> StringName:
+	var def := def_of(index)
+	if def.outdoor and def.feed == FEED_ID and GameClock.term_id() == &"lidong":
+		return HAY_ID
+	return def.feed
+
+
+## 小暑或大暑。心情在过夜结算时加上，表示这一天它在树荫下歇过。
+static func _in_shade(term: StringName) -> bool:
+	return term == &"xiaoshu" or term == &"dashu"
 
 
 ## 心情换成产物的品质。
@@ -435,6 +460,8 @@ func settle(rainy: bool) -> void:
 			mood += HUNGRY_MOOD
 		if rainy and def.outdoor:
 			mood += def.rain_mood
+		if def.outdoor and _in_shade(GameClock.term_id()):
+			mood += SHADE_MOOD
 		a["mood"] = clampi(mood, 0, MAX_MOOD)
 		a["fed"] = false
 		a["petted"] = false
@@ -468,7 +495,10 @@ func save_data() -> Dictionary:
 		for e: Array in stores[id]:
 			list.append([String(e[0]), e[1]])
 		out_stores[String(id)] = list
-	return {"buildings": out_buildings, "animals": out_animals, "stores": out_stores, "pet_day": pet_day}
+	var out_raised: Array[String] = []
+	for id: StringName in raised:
+		out_raised.append(String(id))
+	return {"buildings": out_buildings, "animals": out_animals, "stores": out_stores, "pet_day": pet_day, "raised": out_raised}
 
 
 func load_data(data: Dictionary) -> void:
@@ -510,6 +540,16 @@ func load_data(data: Dictionary) -> void:
 				if Database.has_item(item):
 					list.append([item, clampi(int(entry[1]), 0, 2)])
 		stores[id] = list
+	raised.clear()
+	var saved_raised: Array = data.get("raised", [])
+	for key: Variant in saved_raised:
+		var id := StringName(str(key))
+		if Database.has_animal(id) and not raised.has(id):
+			raised.append(id)
+	for a in animals:
+		var kind := StringName(str(a["kind"]))
+		if not raised.has(kind):
+			raised.append(kind)
 	roster_changed.emit()
 	changed.emit()
 
@@ -521,5 +561,6 @@ func reset_data() -> void:
 	morning_notes.clear()
 	last_name = ""
 	pet_day = -1
+	raised.clear()
 	roster_changed.emit()
 	changed.emit()

@@ -1,0 +1,33 @@
+{
+	"cell": 48,
+	"foot_row": 40,
+	"dirs": [
+		"down",
+		"up",
+		"right",
+		"left"
+	],
+	"anims": {
+		"idle": {
+			"row": 0,
+			"frames": 2,
+			"loop": true,
+			"fps": 1.6
+		},
+		"walk": {
+			"row": 4,
+			"frames": 4,
+			"loop": true,
+			"step_frames": [
+				0,
+				2
+			]
+		},
+		"peck": {
+			"row": 8,
+			"frames": 2,
+			"loop": true,
+			"fps": 4.0
+		}
+	}
+}

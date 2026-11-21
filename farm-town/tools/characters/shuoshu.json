@@ -1,0 +1,35 @@
+{
+	"name": "shuoshu",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": "cap",
+	"hair": "short",
+	"outfit": "robe",
+	"beard": true,
+	"stoop": 3,
+	"parts": {
+		"shirt": "gray",
+		"band": "red",
+		"hat": "charcoal",
+		"hair": "hair_gray",
+		"boot": "charcoal",
+		"blue": "charcoal"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thin",
+		"fringe": "short",
+		"mouth": "smile",
+		"jaw": "soft",
+		"crop": true
+	}
+}

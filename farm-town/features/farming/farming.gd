@@ -4,6 +4,10 @@ extends Node
 
 ## 稻草人立起来、倒了、收走了
 signal scarecrows_changed
+## 栅栏摆了、收了
+signal fences_changed
+## 农场上的石头、灌木被清掉了
+signal cleared_changed
 
 ## 雷雨过后的早上，有这么大的概率劈坏一株作物
 const STRIKE_CHANCE := 0.4
@@ -14,6 +18,10 @@ const CROW_MAX := 2
 const SCARE_RANGE := 6
 const BLOW_CHANCE := 0.25
 const SCARECROW_ID := &"scarecrow"
+const FENCE_ID := &"fence"
+## 老农场那一圈栅栏：新开的档和没有栅栏记录的老档都从这一圈开始，之后随人拆、随人摆。
+const OLD_FENCE := Rect2i(14, 8, 14, 10)
+const OLD_FENCE_GAPS: Array[Vector2i] = [Vector2i(14, 11), Vector2i(14, 12), Vector2i(27, 11), Vector2i(27, 12)]
 ## 家里养了猫：它守着屋门口这一格周围这么多格（起始那块田的西半边），再远就管不到了
 const CAT_HOME := Vector2i(8, 8)
 const CAT_RANGE := 12
@@ -25,15 +33,22 @@ var orchard := Orchard.new()
 var morning_notes := PackedStringArray()
 ## 稻草人：格子 -> 是不是倒了
 var scarecrows: Dictionary[Vector2i, bool] = {}
+## 人摆的栅栏：格子 -> true
+var fences: Dictionary[Vector2i, bool] = {}
+## 被清掉的野石头和灌木：格子 -> true
+var cleared: Dictionary[Vector2i, bool] = {}
 ## 今天早上乌鸦刨过的格子（不进存档，农场地图拿它摆乌鸦）
 var raided: Array[Vector2i] = []
 ## 今天播了多少颗种子（不进存档：只在睡觉时存档，一觉醒来就清零。播种节的比赛看它）
 var sown_today := 0
+## 见过当康的那一天。-1 表示没见过。只在这一天，成熟的非巨型作物多收一个。
+var dangkang_day := -1
 
 var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	fences = old_fence()
 	SaveSystem.register(&"farming", self)
 	GameClock.register_daily(GameClock.ORDER_CROPS, _on_new_day)
 
@@ -108,6 +123,57 @@ func take_scarecrow(t: Vector2i) -> bool:
 	return true
 
 
+# ---------------------------------------------------------------- 栅栏和清地
+
+## 老农场那一圈栅栏占的格子。
+static func old_fence() -> Dictionary[Vector2i, bool]:
+	var out: Dictionary[Vector2i, bool] = {}
+	var r := OLD_FENCE
+	for x in range(r.position.x, r.end.x):
+		out[Vector2i(x, r.position.y)] = true
+		out[Vector2i(x, r.end.y - 1)] = true
+	for y in range(r.position.y, r.end.y):
+		out[Vector2i(r.position.x, y)] = true
+		out[Vector2i(r.end.x - 1, y)] = true
+	for t in OLD_FENCE_GAPS:
+		out.erase(t)
+	return out
+
+
+func has_fence(t: Vector2i) -> bool:
+	return fences.has(t)
+
+
+## 在空地上摆一段栅栏。这一格有耕地、水渠、果树、稻草人或者已经有栅栏就不行。不动背包。
+func place_fence(t: Vector2i) -> bool:
+	if fences.has(t) or scarecrows.has(t) or state.is_tilled(t) or state.is_canal(t) or orchard.has(t):
+		return false
+	fences[t] = true
+	fences_changed.emit()
+	return true
+
+
+## 收走一段。不动背包。
+func take_fence(t: Vector2i) -> bool:
+	if not fences.erase(t):
+		return false
+	fences_changed.emit()
+	return true
+
+
+func is_cleared(t: Vector2i) -> bool:
+	return cleared.has(t)
+
+
+## 记下这一格的石头或灌木清掉了。
+func clear_wild(t: Vector2i) -> bool:
+	if cleared.has(t):
+		return false
+	cleared[t] = true
+	cleared_changed.emit()
+	return true
+
+
 func has_cat() -> bool:
 	return GameState.has_flag(&"pet_cat")
 
@@ -166,6 +232,16 @@ func raid(count: int, rng: RandomNumberGenerator) -> Array[Vector2i]:
 	return eaten
 
 
+## 后山对着当康按使用时记下今天。同一天再按还是这一天；换一天再按，加成挪到新的一天。
+func note_dangkang() -> void:
+	dangkang_day = GameClock.day
+
+
+## 今天是不是见过当康的那一天。没见过（-1）不算。
+func dangkang_today() -> bool:
+	return dangkang_day >= 0 and dangkang_day == GameClock.day
+
+
 func save_data() -> Dictionary:
 	var data := state.to_dict()
 	data["trees"] = orchard.to_array()
@@ -173,11 +249,22 @@ func save_data() -> Dictionary:
 	for t: Vector2i in scarecrows:
 		list.append([t.x, t.y, scarecrows[t]])
 	data["scarecrows"] = list
+	var fence_list: Array = []
+	for t: Vector2i in fences:
+		fence_list.append([t.x, t.y])
+	data["fences"] = fence_list
+	var cleared_list: Array = []
+	for t: Vector2i in cleared:
+		cleared_list.append([t.x, t.y])
+	data["cleared"] = cleared_list
+	data["dangkang_day"] = dangkang_day
 	return data
 
 
 func load_data(data: Dictionary) -> void:
 	state.from_dict(data)
+	# 旧档没有这一项，当成没见过
+	dangkang_day = int(data.get("dangkang_day", -1))
 	var tree_list: Array = data.get("trees", [])
 	orchard.from_array(tree_list)
 	scarecrows.clear()
@@ -187,13 +274,36 @@ func load_data(data: Dictionary) -> void:
 		if entry is Array and entry.size() >= 3:
 			var e: Array = entry
 			scarecrows[Vector2i(int(e[0]), int(e[1]))] = bool(e[2])
+	# 扩大农场以前的档没有这两项：栅栏还是原来那一圈，什么都没清过
+	if data.has("fences"):
+		fences = _tiles_from(data["fences"])
+	else:
+		fences = old_fence()
+	cleared = _tiles_from(data.get("cleared", []))
 	scarecrows_changed.emit()
+	fences_changed.emit()
+	cleared_changed.emit()
+
+
+func _tiles_from(list: Variant) -> Dictionary[Vector2i, bool]:
+	var out: Dictionary[Vector2i, bool] = {}
+	if list is Array:
+		for entry: Variant in list:
+			if entry is Array and entry.size() >= 2:
+				var e: Array = entry
+				out[Vector2i(int(e[0]), int(e[1]))] = true
+	return out
 
 
 func reset_data() -> void:
 	morning_notes.clear()
+	dangkang_day = -1
 	state.clear()
 	orchard.clear()
 	scarecrows.clear()
 	raided.clear()
+	fences = old_fence()
+	cleared.clear()
 	scarecrows_changed.emit()
+	fences_changed.emit()
+	cleared_changed.emit()

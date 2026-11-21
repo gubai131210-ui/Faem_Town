@@ -109,6 +109,8 @@ def colors(cfg):
     for part, keys in cfg.get("parts", {}).items():
         if isinstance(keys, str):
             pal[part] = tuple(rgb(c) for c in LETTERS["cloth"][keys])
+        elif keys[0].startswith("#"):
+            pal[part] = tuple(rgb(c[1:]) for c in keys)
         else:
             pal[part] = (rgb(LETTERS[keys[0]]), rgb(LETTERS[keys[1]]))
     return pal
@@ -182,6 +184,15 @@ def draw(cfg, mood):
             c.row(37 - i * 9 // 10, 38 - i * 9 // 10, y, band_d if i > 6 else band)
     else:
         c.paint(ell(32, sh_top - 1, 7.5, 4.5) & body, shirt_d)
+    if cfg.get("costume_detail") == "child":
+        band, band_d = pal["band"]
+        for i in range(N - sh_top):
+            x = 25 + i * 2 // 3
+            c.row(x, x + 2, sh_top + i, band if i < 7 else band_d)
+    elif cfg.get("costume_detail") == "cook":
+        band, band_d = pal["band"]
+        c.paint(rect(24, 60, 30, 63), band)
+        c.paint(rect(24, 62, 30, 64), band_d)
 
     # ---- 脖子
     c.paint(rect(28, chin - 4, 37, sh_top + 2), skin_d)
@@ -369,6 +380,21 @@ def draw(cfg, mood):
         c.shaded(beret, hat_c, hat_d, -3, -2)
         c.paint(rect(34, top - 9, 36, top - 6), hat_d)
         c.paint(shift(beret, 0, 1) & ~beret & (c.a[..., 3] > 0) & ~head, hair_d)
+    elif hat == "official":
+        # 乌纱帽：前低后高两截，两边横着一对帽翅
+        back = rect(22, top - 8, 43, top + 2)
+        front = ell(32, top + 5, 16, 9) & (YY < top + 6)
+        wings = rect(3, top - 1, 18, top + 3) | rect(47, top - 1, 62, top + 3)
+        c.shaded(wings, hat_c, hat_d, -2, 0)
+        c.shaded(back, hat_c, hat_d, -3, -1)
+        c.shaded(front, hat_c, hat_d, -3, -1)
+        c.paint(rect(17, top + 4, 48, top + 6) & front, hat_d)
+    elif hat == "cap":
+        # 瓜皮帽：扣在头顶的半个圆，顶上一粒结子
+        dome = ell(32, top + 5, 15.5, 12) & (YY < top + 6)
+        c.shaded(dome, hat_c, hat_d, -3, -1)
+        c.paint(rect(17, top + 4, 48, top + 6) & dome, hat_d)
+        c.paint(rect(31, top - 9, 34, top - 6), band_c)
     elif hat == "headband":
         hb = rect(0, cy - 10, N, cy - 6) & (cap | head)
         c.shaded(hb, band_c, band_d2, -3, 0)

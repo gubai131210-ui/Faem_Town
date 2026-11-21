@@ -28,6 +28,45 @@
 			"frames": 1,
 			"loop": true,
 			"fps": 1.0
+		},
+		"umbrella_walk": {
+			"row": 12,
+			"frames": 8,
+			"loop": true,
+			"step_frames": [
+				0,
+				4
+			]
+		},
+		"fan": {
+			"row": 16,
+			"frames": 4,
+			"loop": true,
+			"fps": 3.0
+		},
+		"rub": {
+			"row": 20,
+			"frames": 4,
+			"loop": true,
+			"fps": 3.0
+		},
+		"sweep": {
+			"row": 24,
+			"frames": 6,
+			"loop": true,
+			"fps": 4.0
+		},
+		"squat": {
+			"row": 28,
+			"frames": 2,
+			"loop": true,
+			"fps": 1.5
+		},
+		"paint": {
+			"row": 32,
+			"frames": 4,
+			"loop": true,
+			"fps": 3.0
 		}
 	}
 }

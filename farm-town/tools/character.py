@@ -22,7 +22,7 @@ from bpy_extras.object_utils import world_to_camera_view
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.dirname(HERE)
-TMP = os.path.join(HERE, "_tmp")
+TMP = os.path.join(HERE, "_tmp_" + str(os.getpid()))
 
 _args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 CONFIG_NAME = _args[0] if _args else "farmer"
@@ -36,12 +36,21 @@ NAME = CONFIG.get("name", CONFIG_NAME)
 #   scale   个头，1 是成年人，小孩 0.8 左右
 #   bulk    身板的宽度，1 是普通
 #   stoop   驼背的角度
-#   hat     true 或 "straw" 草帽；"headband" 头巾；"cone" 斗笠；"beret" 软帽；false 不戴
+#   hat     true 或 "straw" 草帽；"headband" 头巾；"cone" 斗笠；"beret" 软帽；"cap" 瓜皮帽；false 不戴
+#   pack    背上背的东西："box" 木箱；"basket" 背篓；不写就不背
 #   hair    "short" 短发；"bun" 发髻；"pigtails" 两个小辫；"long" 披肩；"ponytail" 马尾；"bald" 光头
 #   beard   true 留胡子
 #   outfit  "overalls" 背带裤；"tunic" 上衣加裤子；"apron" 再系一条围裙；"robe" 长袍
 #   parts   各部位的颜色：写 data/palette.json 里 cloth 的名字，或者 [亮, 暗] 两个单字符键
 #   blend   true 时另存一份 .blend 模型文件
+# 下面几样是给人形的异兽用的：
+#   hair    另有 "shaggy" 一头乱毛
+#   hat     另有 "official" 两边带翅的乌纱帽
+#   beard   写 "long" 是垂到胸口的长须
+#   ears    "ape" 头两侧一对圆耳朵，用 ear 这个部位的颜色
+#   muzzle  true 脸下半截鼓出一块嘴，用 band 的颜色
+#   legs    "fishtail" 没有腿，腰以下是一条鱼尾（尾巴用 blue 的颜色，尾鳍用 band 的颜色）
+#   parts   颜色也可以直接写 ["#rrggbb", "#rrggbb"]
 BODY_SCALE = float(CONFIG.get("scale", 1.0))
 BULK = float(CONFIG.get("bulk", 1.0))
 STOOP = float(CONFIG.get("stoop", 0.0))
@@ -89,9 +98,32 @@ ANIMS = [
     ("smash", 6, {"seq": [[0, 0.08], [1, 0.13], [2, 0.04], [3, 0.1], [4, 0.09], [5, 0.12]], "strike": 3}),
     # 翻滚：缩成一团往前滚一圈，四帧；游戏里按翻滚的时长摊开播
     ("roll", 4, {"loop": True, "fps": 13.0}),
+    # 下雨打伞走：走路的腿 + 一只手举伞（居民共用）
+    ("umbrella_walk", 8, {"loop": True, "step_frames": [0, 4]}),
+    # 扇扇子：一手举扇轻摇，四帧循环
+    ("fan", 4, {"loop": True, "fps": 3.0}),
+    # 搓手：两只手在胸前搓，四帧循环
+    ("rub", 4, {"loop": True, "fps": 3.0}),
+    # 扫地：双手握帚左右扫，六帧循环
+    ("sweep", 6, {"loop": True, "fps": 4.0}),
+    # 蹲下：蹲在地上，两帧轻轻起伏
+    ("squat", 2, {"loop": True, "fps": 1.5}),
+    # 踩水洼：原地高抬腿踩，四帧循环
+    ("stomp", 4, {"loop": True, "fps": 5.0}),
+    # 画画：一手执笔在画布上点，四帧循环
+    ("paint", 4, {"loop": True, "fps": 3.0}),
+    # 做菜：一手端锅、铲子绕着圈炒，八帧转一整圈（只有主角用；排在最后，前面的行号不变）
+    ("cook", 8, {"loop": True, "fps": 10.0}),
 ]
 if "anims" in CONFIG:
     ANIMS = [a for a in ANIMS if a[0] in CONFIG["anims"]]
+# 试渲染：blender ... -- farmer idle walk hoe，并设 CHAR_OUT 写到别的文件，不覆盖正式序列帧
+_ONLY = _args[1:]
+if _ONLY:
+    ANIMS = [a for a in ANIMS if a[0] in _ONLY]
+if os.environ.get("CHAR_OUT"):
+    OUT = os.environ["CHAR_OUT"]
+    OUT_JSON = os.path.splitext(OUT)[0] + ".json"
 DIRS = [0.0, 180.0, 90.0, -90.0]   # 下 上 右 左
 COLS = 8
 
@@ -109,11 +141,16 @@ PARTS = {
     "can": ("g", "G"),
     "eye": ("e", "e"),
     "apron": ("b", "B"),
+    "ear": ("s", "S"),
+    # 锅里的菜：暖红，读作食物而不是草帽的黄
+    "food": ("r", "R"),
 }
 PAL = {part: (LETTERS[a], LETTERS[b]) for part, (a, b) in PARTS.items()}
 for _part, _keys in CONFIG.get("parts", {}).items():
     if isinstance(_keys, str):
         PAL[_part] = tuple(LETTERS["cloth"][_keys])
+    elif _keys[0].startswith("#"):
+        PAL[_part] = (_keys[0][1:], _keys[1][1:])
     else:
         PAL[_part] = (LETTERS[_keys[0]], LETTERS[_keys[1]])
 HAT = CONFIG.get("hat", True)
@@ -301,6 +338,24 @@ elif OUTFIT == "robe":
     skirt.scale = (1.0, 0.78, 1.0)
     box("Sash", chest, (0.52, 0.34, 0.06), (0, 0, 0.14), "band")
 
+detail = CONFIG.get("costume_detail", "")
+if detail == "field":
+    box("PinaforePocket", chest, (0.16, 0.039, 0.084), (0, -0.201, 0.225), "apron")
+    box("Scarf", chest, (0.27, 0.35, 0.07), (0, 0, 0.364), "band")
+elif detail == "herbalist":
+    lapel = box("CrossCollar", chest, (0.085, 0.045, 0.28), (0.045, -0.171, 0.256), "band")
+    lapel.rotation_euler.y = d(-33)
+    box("MedicinePouch", hips, (0.16, 0.18, 0.16), (0.26, -0.073, 0.022), "wood")
+elif detail == "child":
+    strap = box("SatchelStrap", chest, (0.074, 0.04, 0.31), (0, -0.168, 0.24), "band")
+    strap.rotation_euler.y = d(35)
+    box("Satchel", hips, (0.19, 0.22, 0.19), (0.235, -0.091, 0.065), "wood")
+elif detail == "cook":
+    box("ApronPocket", chest, (0.18, 0.035, 0.105), (-0.1, -0.204, 0.018), "band")
+    for sx in (-1, 1):
+        tie = box("ApronRibbon", chest, (0.095, 0.05, 0.21), (0.08 * sx, 0.189, 0.058), "apron")
+        tie.rotation_euler.y = d(23 * sx)
+
 head = empty("Head", torso, (0, 0, 0.40))
 ball("Skull", head, (0.37, 0.34, 0.30), (0, 0, 0.27), "skin")
 if HAIR != "bald":
@@ -313,19 +368,34 @@ if HAIR != "bald":
     bm.to_mesh(hair.data)
     bm.free()
 if HAIR == "bun":
-    ball("Bun", head, (0.14, 0.13, 0.12), (0, 0.3, 0.5), "hair")
+    # 髻盘在头顶偏后，正面从额头上方冒出一截，侧面是脑后一个圆包
+    ball("Bun", head, (0.17, 0.16, 0.15), (0, 0.2, 0.56), "hair")
 elif HAIR == "pigtails":
+    # 两根小辫垂在耳朵下面，比脸宽出一截，正面才看得出是辫子
     for sx in (-1, 1):
-        ball("Pigtail", head, (0.11, 0.11, 0.17), (0.4 * sx, 0.08, 0.14), "hair")
-        ball("PigtailTie", head, (0.07, 0.07, 0.05), (0.39 * sx, 0.08, 0.3), "band")
+        ball("Pigtail", head, (0.12, 0.12, 0.22), (0.43 * sx, 0.1, 0.06), "hair")
+        ball("PigtailTie", head, (0.08, 0.08, 0.05), (0.41 * sx, 0.1, 0.27), "band")
 elif HAIR == "long":
     ball("HairBack", head, (0.37, 0.2, 0.36), (0, 0.2, 0.1), "hair")
 elif HAIR == "ponytail":
     ball("TailTie", head, (0.08, 0.08, 0.07), (0, 0.36, 0.36), "band")
     ball("Tail", head, (0.1, 0.11, 0.24), (0, 0.42, 0.16), "hair")
+if HAIR == "shaggy":
+    # 一头乱毛：脑后一大团，两鬓各一撮，头顶翘一撮
+    ball("ShagBack", head, (0.42, 0.26, 0.4), (0, 0.2, 0.2), "hair")
+    for sx in (-1, 1):
+        ball("ShagSide", head, (0.13, 0.2, 0.24), (0.36 * sx, 0.02, 0.12), "hair")
+    ball("ShagTop", head, (0.2, 0.2, 0.14), (0, 0.02, 0.6), "hair")
 if BEARD:
     # 胡子贴在下半张脸上，不垂到胸口
     ball("Beard", head, (0.25, 0.1, 0.085), (0, -0.215, 0.07), "hair")
+if CONFIG.get("beard") == "long":
+    ball("BeardLong", head, (0.16, 0.08, 0.2), (0, -0.23, -0.07), "hair")
+if CONFIG.get("ears") == "ape":
+    for sx in (-1, 1):
+        ball("ApeEar", head, (0.09, 0.07, 0.12), (0.4 * sx, 0.0, 0.3), "ear")
+if CONFIG.get("muzzle", False):
+    ball("Muzzle", head, (0.2, 0.11, 0.11), (0, -0.27, 0.11), "band")
 # 眼睛在屏幕上是 1 像素宽、2 像素高的一竖，两眼之间空 4 像素；按像素算位置，个头不同的人也对得齐
 _px = 1.0 / (PPU * SCALE)
 
@@ -351,7 +421,11 @@ for sx in (-1, 1):
 hat = empty("Hat", head, (0, 0.03, 0.50))
 hat.rotation_euler = (d(-13), 0, 0)
 if HAT == "straw":
-    cyl("Brim", hat, 0.45, 0.45, 0.05, (0, 0, 0.0), "hat")
+    if detail == "field":
+        hat.location.z += 0.025
+        hat.rotation_euler.x = d(-4)
+    brim = 0.425 if detail == "field" else 0.45
+    cyl("Brim", hat, brim, brim, 0.05, (0, 0, 0.0), "hat")
     cyl("Band", hat, 0.315, 0.31, 0.07, (0, 0, 0.06), "band")
     cyl("Crown", hat, 0.31, 0.25, 0.17, (0, 0, 0.18), "hat")
 elif HAT == "cone":
@@ -363,15 +437,53 @@ elif HAT == "beret":
 elif HAT == "headband":
     hb = cyl("Headband", head, 0.375, 0.375, 0.07, (0, 0.01, 0.45), "band")
     hb.scale = (1.0, 0.93, 1.0)
+elif HAT == "official":
+    # 乌纱帽：前低后高两截，后面横着一对帽翅
+    cyl("OfficialRim", hat, 0.34, 0.33, 0.12, (0, 0, 0.02), "hat")
+    box("OfficialBack", hat, (0.44, 0.26, 0.2), (0, 0.14, 0.16), "hat")
+    for sx in (-1, 1):
+        box("OfficialWing", hat, (0.3, 0.05, 0.09), (0.44 * sx, 0.2, 0.1), "hat")
+elif HAT == "cap":
+    # 瓜皮帽：扣在头顶的半个圆，顶上一粒结子
+    cyl("CapRim", hat, 0.33, 0.33, 0.06, (0, 0, -0.02), "hat")
+    ball("Cap", hat, (0.33, 0.33, 0.16), (0, 0, 0.0), "hat")
+    ball("CapKnob", hat, (0.05, 0.05, 0.05), (0, 0, 0.17), "band")
+
+# 背上的东西："box" 货郎的木箱；"basket" 山里人的背篓。用 wood 这个部位的颜色
+PACK = CONFIG.get("pack", "")
+if PACK == "box":
+    box("PackBox", chest, (0.44, 0.2, 0.42), (0, 0.27, 0.24), "wood")
+    box("PackLid", chest, (0.48, 0.24, 0.05), (0, 0.27, 0.47), "band")
+    for sx in (-1, 1):
+        box("PackStrap", chest, (0.06, 0.36, 0.05), (0.17 * sx, 0.02, 0.4), "band")
+    # 箱子上插一根杆，杆头一面拨浪鼓，高过帽檐，从正面也看得见
+    cyl("PackPole", chest, 0.028, 0.028, 0.8, (0.33, 0.3, 0.86), "wood")
+    cyl("PackDrum", chest, 0.11, 0.11, 0.07, (0.33, 0.3, 1.26), "band").rotation_euler = (d(90), 0, 0)
+    cyl("PackDrumFace", chest, 0.07, 0.07, 0.085, (0.33, 0.3, 1.26), "hat").rotation_euler = (d(90), 0, 0)
+elif PACK == "basket":
+    cyl("PackBasket", chest, 0.21, 0.15, 0.4, (0, 0.3, 0.26), "wood")
+    cyl("PackRim", chest, 0.225, 0.225, 0.05, (0, 0.3, 0.47), "band")
+    for sx in (-1, 1):
+        box("PackStrap", chest, (0.06, 0.36, 0.05), (0.17 * sx, 0.02, 0.4), "band")
 
 legs = []
 arms = []
+FISHTAIL = CONFIG.get("legs") == "fishtail"
+if FISHTAIL:
+    # 鲛人：腰以下一条鱼尾，尾尖往后拐，末端一对尾鳍
+    _t = cyl("FishTail", hips, 0.27, 0.13, 0.3, (0, 0.0, -0.12), "blue")
+    _t.scale = (1.0, 0.8, 1.0)
+    cyl("FishTailEnd", hips, 0.13, 0.07, 0.16, (0, 0.05, -0.27), "blue").rotation_euler = (d(-40), 0, 0)
+    for sx in (-1, 1):
+        ball("TailFin", hips, (0.21, 0.12, 0.075), (0.2 * sx, 0.12, -0.3), "band").rotation_euler = (0, d(-18 * sx), d(-25 * sx))
 for sx in (1, -1):
     hip = empty("LegPivot", hips, (0.13 * sx, 0, 0))
-    box("Thigh", hip, (0.20, 0.21, 0.20), (0, 0, -0.08), "blue")
     knee = empty("Knee", hip, (0, 0, -0.17))
-    box("Shin", knee, (0.19, 0.20, 0.10), (0, 0, -0.03), "blue")
-    box("Boot", knee, (0.22, 0.30, 0.12), (0, -0.035, -0.13), "boot")
+    if not FISHTAIL:
+        # 两条腿之间留一条缝，正面才看得出是两条腿、哪只脚抬了起来
+        box("Thigh", hip, (0.15, 0.20, 0.20), (0.015 * sx, 0, -0.08), "blue")
+        box("Shin", knee, (0.14, 0.19, 0.10), (0.015 * sx, 0, -0.03), "blue")
+        box("Boot", knee, (0.18, 0.30, 0.12), (0.02 * sx, -0.035, -0.13), "boot")
     legs.append((hip, knee))
 
     sh = empty("ArmPivot", chest, (0.315 * sx, 0, 0.34))
@@ -408,6 +520,32 @@ box("DaggerBlade", dagger, (0.08, 0.05, 0.40), (0, 0, -0.32), "metal")
 hammer = empty("Hammer", grip)
 cyl("HammerHandle", hammer, 0.038, 0.038, 0.72, (0, 0, -0.24), "wood")
 box("HammerHead", hammer, (0.22, 0.34, 0.22), (0, 0, -0.64), "metal")
+# 雨伞：柄朝上（+Z），伞面撑在头顶；打伞走时举在一只手上方
+umbrella = empty("Umbrella", grip)
+cyl("UmbrellaShaft", umbrella, 0.035, 0.035, 0.75, (0, 0, 0.375), "wood")
+cyl("UmbrellaCanopy", umbrella, 0.34, 0.04, 0.20, (0, 0, 0.80), "band")
+ball("UmbrellaTip", umbrella, (0.022, 0.022, 0.03), (0, 0, 0.92), "wood")
+# 团扇：短柄 + 一面圆扇，举在胸前轻摇
+fan = empty("Fan", grip)
+cyl("FanHandle", fan, 0.02, 0.02, 0.12, (0, 0, -0.06), "wood")
+cyl("FanFace", fan, 0.16, 0.16, 0.02, (0, 0, -0.20), "band")
+# 扫帚：长柄斜朝下，帚头扫到地面
+broom = empty("Broom", grip)
+cyl("BroomHandle", broom, 0.025, 0.025, 0.80, (0, 0, -0.30), "wood")
+box("BroomHead", broom, (0.16, 0.10, 0.20), (0, 0, -0.74), "band")
+# 画笔：短柄，笔头朝下点在画布上
+brush = empty("Brush", grip)
+cyl("BrushHandle", brush, 0.015, 0.015, 0.22, (0, 0, -0.05), "wood")
+box("BrushTip", brush, (0.03, 0.03, 0.06), (0, 0, -0.18), "metal")
+# 炒锅：锅口比锅底宽、锅壁有一点深，斜着看才是一口锅。柄和铲要够粗，像素化之后还剩得下。
+wok = empty("Wok", grip)
+cyl("WokHandle", wok, 0.035, 0.035, 0.22, (0, -0.04, 0.02), "wood").rotation_euler = (d(90), 0, 0)
+cyl("WokPan", wok, 0.16, 0.32, 0.20, (0, -0.36, 0.02), "metal")
+wok_food = ball("WokFood", wok, (0.16, 0.16, 0.07), (0, -0.36, 0.10), "food")
+spatula = empty("Spatula", wok)
+cyl("SpatulaHandle", spatula, 0.045, 0.04, 0.58, (0, 0, 0.18), "wood")
+# 铲刃用木色：金属灰和锅同色，静帧上铲刃会溶进锅里只剩一根柄。
+box("SpatulaBlade", spatula, (0.22, 0.10, 0.05), (0, 0.02, -0.04), "wood")
 
 
 def set_visible(obj, vis):
@@ -420,7 +558,7 @@ def set_visible(obj, vis):
 
 BASE = dict(bob=0.0, crouch=0.0, lean=0.0, twist=0.0, head=0.0,
             leg=(0.0, 0.0), knee=(0.0, 0.0), arm=(0.0, 0.0), elbow=(-8.0, -8.0),
-            yaw=0.0, spread=4.0, tool=None, tool_pitch=0.0, tool_off=(0.0, 0.0),
+            yaw=0.0, spread=4.0, sway=0.0, step=False, tool=None, tool_pitch=0.0, tool_off=(0.0, 0.0),
             # 正面和背面时工具绕竖轴转开这个角度，不然鱼竿正对镜头看不见
             tool_yaw=0.0,
             # 鱼竿上半截往线的方向弯多少度
@@ -430,13 +568,54 @@ BASE = dict(bob=0.0, crouch=0.0, lean=0.0, twist=0.0, head=0.0,
             # 整个人绕腰往前翻多少度（翻滚）
             tumble=0.0,
             # 整个人再往上抬多少（翻到头朝下的那一帧不抬会伸到格子外面）
-            lift=0.0)
+            lift=0.0,
+            # 道具锚在哪只手：-1 双手中间（默认），0 第一只手，1 第二只手
+            grip_hand=-1,
+            # 锅里的菜颠起来多高
+            toss=0.0,
+            # 铲子绕锅转过的角度（弧度）。四个方向都用它，不跟着朝向清掉
+            stir=0.0)
 
 
 def pose(**kw):
     p = dict(BASE)
     p.update(kw)
     return p
+
+
+# 八拍，0 和 4 是落脚。负的 leg 是往前迈，knee 是膝盖往后弯。
+# 俯视正面看不出前后摆，要靠三样：抬起来的那只脚比另一只高两像素、
+# 身子往撑地的那条腿那边挪一像素、落脚后往下沉一像素。侧面照样是一整步。
+# (leg, knee, bob 像素, sway 像素)
+def _walk_row(i):
+    """按相位生成：腿按余弦前后摆，抬腿那一程膝盖才弯，相邻两帧的角度差都在 40 度以内。"""
+    t = math.tau * i / 8.0
+    amp = 34.0
+    leg = (-amp * math.cos(t), amp * math.cos(t))
+    # 腿往前迈的那一程（余弦在变小）是抬腿，膝盖弯；落地那一程伸直
+    swing = (max(0.0, -math.sin(t)), max(0.0, math.sin(t)))
+    knee = tuple(6.0 + 78.0 * s ** 0.9 for s in swing)
+    bob = -1 if i in (1, 5) else 0
+    sway = (0, 1, 1, 1, 0, -1, -1, -1)[i]
+    return (leg, knee, bob, sway)
+
+
+_WALK = [_walk_row(i) for i in range(8)]
+
+
+def _walk_pose(i, hold=None):
+    leg, knee, bob, sway = _WALK[i]
+    # 手和对侧的腿一起摆；往前的那只手肘弯得多一点，正面也能看出手抬了起来
+    arm = (-leg[1] * 1.1, -leg[0] * 1.1)
+    elbow = tuple(-12 - 22 * max(0.0, -a / 30.0) for a in arm)
+    kw = dict(bob=bob * PIX, lean=4, head=-5, leg=leg, knee=knee, arm=arm, elbow=elbow, sway=sway, step=True)
+    if hold == "umbrella":
+        kw["arm"] = (-124, arm[1])
+        kw["elbow"] = (-28, elbow[1])
+        kw["grip_hand"] = 0
+        kw["tool"] = "umbrella"
+        kw["tool_pitch"] = 0
+    return pose(**kw)
 
 
 def frames(anim):
@@ -448,20 +627,7 @@ def frames(anim):
             pose(arm=(3, 3), head=2),
         ]
     if anim == "walk":
-        out = []
-        amp, bend = 38.0, 60.0
-        for i in range(8):
-            ph = math.tau * i / 8.0 + math.pi / 2.0
-            s, c = math.sin(ph), math.cos(ph)
-            out.append(pose(
-                bob=0.035 * math.cos(2.0 * ph) - 0.03,
-                lean=4, twist=9.0 * s, head=-6,
-                leg=(amp * s, -amp * s),
-                knee=(bend * max(0.0, -c), bend * max(0.0, c)),
-                arm=(-34.0 * s, 34.0 * s),
-                elbow=(-14 - 12 * max(0.0, s), -14 - 12 * max(0.0, -s)),
-            ))
-        return out
+        return [_walk_pose(i) for i in range(8)]
     if anim == "sit":
         # 大腿平放、小腿垂下，屁股落到凳面的高度；手搭在腿上
         return [pose(bob=-0.19, lean=-3, head=3, leg=(-84, -84), knee=(80, 80),
@@ -559,6 +725,81 @@ def frames(anim):
         return [pose(tumble=t, lift=up, **tuck) for t, up in ((45, 0.0), (135, 0.4), (225, 0.1), (315, 0.0))]
     if anim == "trophy":
         return [pose(arm=(-168, -168), elbow=(-15, -15), yaw=4, spread=12, head=10, lean=-3)]
+    if anim == "umbrella_walk":
+        return [_walk_pose(i, "umbrella") for i in range(8)]
+    if anim == "fan":
+        return [
+            pose(arm=(-40, -18), elbow=(-70, -12), yaw=12, head=3, grip_hand=0, tool="fan", tool_pitch=-75, tool_swing=-18),
+            pose(arm=(-46, -18), elbow=(-62, -12), yaw=12, head=3, grip_hand=0, tool="fan", tool_pitch=-75, tool_swing=0),
+            pose(arm=(-40, -18), elbow=(-70, -12), yaw=12, head=3, grip_hand=0, tool="fan", tool_pitch=-75, tool_swing=18),
+            pose(arm=(-34, -18), elbow=(-78, -12), yaw=12, head=3, grip_hand=0, tool="fan", tool_pitch=-75, tool_swing=0),
+        ]
+    if anim == "rub":
+        return [
+            pose(arm=(-46, -46), elbow=(-62, -62), yaw=10, lean=3, head=4, spread=8),
+            pose(arm=(-42, -50), elbow=(-66, -58), yaw=10, lean=3, head=4, spread=8, bob=-PIX),
+            pose(arm=(-46, -46), elbow=(-62, -62), yaw=10, lean=3, head=4, spread=8),
+            pose(arm=(-50, -42), elbow=(-58, -66), yaw=10, lean=3, head=4, spread=8, bob=-PIX),
+        ]
+    if anim == "sweep":
+        return [
+            pose(arm=(-50, -50), elbow=(-25, -25), yaw=20, lean=12, head=4, tool="broom", tool_pitch=-58, tool_swing=-26),
+            pose(arm=(-52, -48), elbow=(-22, -28), yaw=24, lean=14, head=4, tool="broom", tool_pitch=-60, tool_swing=-10),
+            pose(arm=(-50, -50), elbow=(-25, -25), yaw=20, lean=12, head=4, tool="broom", tool_pitch=-58, tool_swing=8),
+            pose(arm=(-48, -52), elbow=(-28, -22), yaw=16, lean=10, head=4, tool="broom", tool_pitch=-56, tool_swing=24),
+            pose(arm=(-50, -50), elbow=(-25, -25), yaw=20, lean=12, head=4, tool="broom", tool_pitch=-58, tool_swing=8),
+            pose(arm=(-52, -48), elbow=(-22, -28), yaw=24, lean=14, head=4, tool="broom", tool_pitch=-60, tool_swing=-10),
+        ]
+    if anim == "squat":
+        return [
+            pose(bob=-0.11, crouch=26, lean=10, head=6, leg=(-80, -80), knee=(62, 62),
+                 arm=(-30, -30), elbow=(-50, -50), spread=3),
+            pose(bob=-0.12, crouch=28, lean=11, head=7, leg=(-82, -82), knee=(64, 64),
+                 arm=(-32, -28), elbow=(-52, -48), spread=3),
+        ]
+    if anim == "stomp":
+        out = []
+        for i in range(4):
+            hi, lo = (74.0, 0.0) if i % 2 == 0 else (0.0, 74.0)
+            out.append(pose(
+                bob=-0.02, lean=3, head=2,
+                leg=(-hi, -lo), knee=(hi * 1.15, lo * 1.15),
+                arm=(-20, -20), elbow=(-30, -30), spread=5, step=True,
+            ))
+        return out
+    if anim == "paint":
+        return [
+            pose(arm=(-55, -18), elbow=(-30, -12), yaw=16, lean=6, head=5, grip_hand=0, tool="brush", tool_pitch=-70, tool_swing=-6),
+            pose(arm=(-58, -18), elbow=(-26, -12), yaw=16, lean=7, head=5, grip_hand=0, tool="brush", tool_pitch=-72, tool_swing=4),
+            pose(arm=(-55, -18), elbow=(-30, -12), yaw=16, lean=6, head=5, grip_hand=0, tool="brush", tool_pitch=-70, tool_swing=10),
+            pose(arm=(-52, -18), elbow=(-34, -12), yaw=16, lean=5, head=5, grip_hand=0, tool="brush", tool_pitch=-68, tool_swing=2),
+        ]
+    if anim == "cook":
+        # 八帧绕一圈，首尾接得上。锅一直偏在身侧，不从身子正前穿过去，背面才不会被挡住。
+        # 每一步的位移一样大。正弦会在两端停住、中间跳一截。
+        xs = [-1.0, -0.5, 0.0, 0.5, 1.0, 0.5, 0.0, -0.5]
+        ys = [0.0, 0.5, 1.0, 0.5, 0.0, -0.5, -1.0, -0.5]
+        out = []
+        for i in range(8):
+            x, y = xs[i], ys[i]
+            out.append(pose(
+                arm=(-16 + x * 30, -52),
+                elbow=(2 + y * 18, -42),
+                yaw=36, spread=14,
+                lean=4 + x * 4,
+                head=1 + y * 2,
+                bob=y * PIX * 0.25,
+                grip_hand=0,
+                tool="wok",
+                tool_pitch=-24 + y * 6,
+                tool_swing=-72 + x * 8,
+                tool_yaw=62,
+                # 颠锅高度整圈都变：原来 y<=0 时 toss 恒定，圈底几步几乎不动、像素差掉下去
+                toss=0.06 + y * 0.05,
+                # 铲子每步转同样 45°：atan2 会在圈顶压小角速度，那几步像素差掉下去。
+                stir=math.tau * i / 8.0 - math.pi / 2.0,
+            ))
+        return out
     raise ValueError(anim)
 
 
@@ -571,11 +812,19 @@ def apply_pose(p, facing_deg):
     _pivot = Vector((0.0, 0.0, 0.5 * SCALE))
     root.location = _pivot - root.rotation_euler.to_matrix() @ _pivot if p["tumble"] else (0.0, 0.0, 0.0)
     root.location.z += p["lift"]
-    hips.location = (0, 0, HIP + z)
+    # 左右挪按整像素，正面看是重心换到另一条腿上
+    hips.location = (p["sway"] * _px, 0, HIP + z)
     torso.rotation_euler = (d(p["lean"] + STOOP), 0, 0)
     chest.rotation_euler = (0, 0, d(p["twist"]))
     head.rotation_euler = (d(p["head"] - STOOP * 0.7), 0, 0)
+    sideways = abs(abs(facing_deg) - 90.0) < 1.0
     for i, (hip, knee) in enumerate(legs):
+        # 正面和背面俯视时，抬腿往镜头那边送，屏幕上几乎不往上走。
+        # 弯得厉害的那条腿整条往上提一两像素，才看得出是哪只脚离了地。
+        hike = 0
+        if not sideways and p["step"]:
+            hike = 2 if p["knee"][i] >= 80 else (1 if p["knee"][i] >= 30 else 0)
+        hip.location = (0.13 * (1 if i == 0 else -1), 0, hike * PIX / SCALE)
         hip.rotation_euler = (d(p["leg"][i]) - c, 0, 0)
         knee.rotation_euler = (d(p["knee"][i]) + 2.0 * c, 0, 0)
     for i, (sh, elbow, hand, sx) in enumerate(arms):
@@ -590,12 +839,34 @@ def apply_pose(p, facing_deg):
     set_visible(sickle, p["tool"] == "sickle")
     set_visible(dagger, p["tool"] == "dagger")
     set_visible(hammer, p["tool"] == "hammer")
+    set_visible(umbrella, p["tool"] == "umbrella")
+    set_visible(fan, p["tool"] == "fan")
+    set_visible(broom, p["tool"] == "broom")
+    set_visible(brush, p["tool"] == "brush")
+    set_visible(wok, p["tool"] == "wok")
+    ang = p["stir"]
+    sx, sy = math.sin(ang), math.cos(ang)
+    wok_food.location = (sx * 0.07, -0.36 + sy * 0.04, 0.1 + p["toss"])
+    # 铲子绕得离身子更远一点，背面看才不会贴进后背里
+    spatula.location = (sx * 0.22, -0.30 + sy * 0.10, 0.2 + p["toss"] * 0.5)
+    spatula.rotation_euler = (d(50), 0, -ang)
     if p["tool"] is not None:
         bpy.context.view_layer.update()
         inv = root.matrix_world.inverted()
-        mid = (inv @ arms[0][2].matrix_world.translation + inv @ arms[1][2].matrix_world.translation) * 0.5
-        grip.location = mid
-        grip.rotation_euler = (d(p["tool_pitch"]), 0, (0 if sideways else d(p["tool_yaw"])) + d(p["tool_swing"]))
+        gh = p["grip_hand"]
+        if gh < 0:
+            anchor = (inv @ arms[0][2].matrix_world.translation + inv @ arms[1][2].matrix_world.translation) * 0.5
+        else:
+            anchor = inv @ arms[gh][2].matrix_world.translation
+        grip.location = anchor
+        yaw = d(p["tool_yaw"])
+        # 侧面把工具的左右转平掉，锄头鱼竿才不会横着穿出画面。
+        # 炒锅留一半转角，侧面才看得见锅口，不是一条边。
+        if sideways and p["tool"] != "wok":
+            yaw = 0.0
+        elif sideways:
+            yaw *= 0.55
+        grip.rotation_euler = (d(p["tool_pitch"]), 0, yaw + d(p["tool_swing"]))
         rod_upper.rotation_euler = (d(p["rod_bend"]), 0, 0)
     bpy.context.view_layer.update()
 
@@ -701,7 +972,7 @@ def main():
         f.write("\n")
     shutil.rmtree(TMP, ignore_errors=True)
 
-    if CONFIG.get("blend", False):
+    if CONFIG.get("blend", False) and not os.environ.get("CHAR_OUT"):
         # 存一份模型文件，停在挥锄的姿势，方便用 Blender 打开看
         apply_pose(frames("hoe")[3], 0.0)
         scene.render.resolution_x = 768

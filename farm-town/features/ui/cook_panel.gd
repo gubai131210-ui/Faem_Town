@@ -19,6 +19,8 @@ var _rows: Array[Control] = []
 var _list: Array[RecipeDef] = []
 var _cursor := 0
 var _scroll := 0
+## 随手试试放进去的三样。关上不扣。
+var _trial: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -74,6 +76,7 @@ func open() -> void:
 	_list = Crafting.known_recipes()
 	_cursor = 0
 	_scroll = 0
+	_trial.clear()
 	_root.visible = true
 	UiKit.pop(_panel)
 	_refresh()
@@ -82,6 +85,7 @@ func open() -> void:
 func close() -> void:
 	if not _root.visible:
 		return
+	_trial.clear()
 	_root.visible = false
 	closed.emit()
 
@@ -96,6 +100,7 @@ func cook_selected() -> bool:
 		_desc.text = "材料不够" if Crafting.servings(def.id) < 1 else "背包放不下了"
 		return false
 	Audio.play("harvest", 0.0, -4.0)
+	EventBus.cook_show_requested.emit(def.id)
 	return true
 
 
@@ -109,19 +114,82 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"move_down", true):
 		_move(1)
 	elif event.is_action_pressed(&"use"):
-		cook_selected()
+		if _on_trial():
+			_add_trial()
+		else:
+			cook_selected()
 	else:
 		return
 	get_viewport().set_input_as_handled()
 
 
+func _on_trial() -> bool:
+	return _cursor == _list.size()
+
+
+func _span() -> int:
+	return _list.size() + 1
+
+
 func _move(d: int) -> void:
-	if _list.is_empty():
-		return
-	_cursor = posmod(_cursor + d, _list.size())
+	_cursor = posmod(_cursor + d, _span())
 	_scroll = clampi(_scroll, _cursor - VISIBLE_ROWS + 1, _cursor)
 	Audio.play("select", 0.0, -10.0)
 	_refresh()
+
+
+func _trial_text() -> String:
+	if _trial.is_empty():
+		return "手里拿着材料，按使用放进去"
+	var parts := PackedStringArray()
+	for id: StringName in _trial:
+		parts.append(Database.item(id).name)
+	return "锅里：" + "、".join(parts)
+
+
+func _add_trial() -> void:
+	if _trial.size() >= 3:
+		_finish_trial()
+		return
+	var item := GameState.selected_item()
+	if item == null:
+		_desc.text = "手里空着"
+		Audio.play("deny", 0.0, -4.0)
+		return
+	if Crafting.TRIAL_BLOCK.has(item.kind):
+		_desc.text = "这个不能下锅"
+		Audio.play("deny", 0.0, -4.0)
+		return
+	var have := 0
+	for id: StringName in _trial:
+		if id == item.id:
+			have += 1
+	if GameState.inventory.count_of(item.id) < have + 1:
+		_desc.text = "手里不够"
+		Audio.play("deny", 0.0, -4.0)
+		return
+	_trial.append(item.id)
+	if _trial.size() >= 3:
+		_finish_trial()
+	else:
+		_refresh()
+
+
+func _finish_trial() -> void:
+	var made := Crafting.experiment(_trial)
+	if made == &"":
+		_desc.text = "背包放不下了"
+		Audio.play("deny", 0.0, -4.0)
+		return
+	_trial.clear()
+	_refresh()
+	if made == Crafting.ODD_BOWL:
+		_desc.text = "说不上来是什么"
+		EventBus.banner_requested.emit("做出来一碗说不上来的东西")
+		Audio.play("deny", 0.0, -4.0)
+		return
+	Audio.play("harvest", 0.0, -4.0)
+	EventBus.cook_show_requested.emit(made)
 
 
 func _make_row(i: int) -> Control:
@@ -159,10 +227,13 @@ func _on_row_input(event: InputEvent, i: int) -> void:
 	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
 		return
 	var index := _scroll + i
-	if index >= _list.size():
+	if index >= _span():
 		return
 	if index == _cursor:
-		cook_selected()
+		if _on_trial():
+			_add_trial()
+		else:
+			cook_selected()
 	else:
 		_cursor = index
 		_refresh()
@@ -174,8 +245,19 @@ func _refresh() -> void:
 	for i in _rows.size():
 		var row := _rows[i]
 		var index := _scroll + i
-		row.visible = index < _list.size()
+		row.visible = index < _span()
 		if not row.visible:
+			continue
+		if index == _list.size():
+			var trial_back: ColorRect = row.get_node("Back")
+			trial_back.visible = index == _cursor
+			var trial_icon: TextureRect = row.get_node("Icon")
+			trial_icon.texture = null
+			var trial_dish: Label = row.get_node("Dish")
+			trial_dish.text = "随手试试"
+			var trial_can: Label = row.get_node("Can")
+			trial_can.text = "%d/3" % _trial.size()
+			trial_can.add_theme_color_override(&"font_color", UiKit.TEXT_DIM)
 			continue
 		var def := _list[index]
 		var item := Database.item(def.id)
@@ -189,6 +271,11 @@ func _refresh() -> void:
 		var n := Crafting.servings(def.id)
 		can.text = "能做 %d 份" % n if n > 0 else "材料不够"
 		can.add_theme_color_override(&"font_color", UiKit.TEXT_DIM if n > 0 else Color("c8483c"))
+	if _on_trial():
+		_more.text = "%d / %d" % [_cursor + 1, _span()] if _span() > VISIBLE_ROWS else ""
+		_need.text = _trial_text()
+		_desc.text = "齐了就出锅。对了学会，不对是糊的。"
+		return
 	if _list.is_empty():
 		_need.text = ""
 		_desc.text = "还不会做什么菜。"
@@ -196,5 +283,12 @@ func _refresh() -> void:
 		return
 	var cur := _list[_cursor]
 	_more.text = "%d / %d" % [_cursor + 1, _list.size()] if _list.size() > VISIBLE_ROWS else ""
-	_need.text = "要：" + cur.ingredients_text()
-	_desc.text = Database.item(cur.id).desc
+	var mark := ""
+	if Crafting.in_term(cur):
+		mark += " · 当令"
+	if Crafting.is_fresh(cur):
+		mark += " · 新鲜"
+	if Crafting.has_heat(cur.id):
+		mark += " · 火候到过"
+	_need.text = "要：" + cur.ingredients_text() + mark
+	_desc.text = "切配、控火、翻炒。随时可跳过。" if cur.id == &"tomato_egg" else Database.item(cur.id).desc

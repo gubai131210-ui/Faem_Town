@@ -66,7 +66,10 @@ func test_time_season_and_term_rules() -> void:
 	assert_has(_ids(Fishing.pool(&"river")), &"catfish", "鲶鱼夜里咬钩")
 	GameClock.minutes = 600.0
 	assert_does_not_have(_ids(Fishing.pool(&"river")), &"catfish")
-	GameClock.day = 24 * 3 + 1  # 冬
+	GameClock.day = 24 * 3 + 1  # 立冬
+	assert_does_not_have(_ids(Fishing.pool(&"lake")), &"ice_fish", "银鱼要等湖面结冰")
+	GameClock.day = 24 * 3 + 9  # 大雪
+	assert_eq(GameClock.term_id(), &"daxue")
 	assert_has(_ids(Fishing.pool(&"lake")), &"ice_fish")
 	assert_does_not_have(_ids(Fishing.pool(&"sea")), &"tide_born", "潮生要冬至夜")
 	GameClock.day = 24 * 3 + 4 * 3 + 1  # 冬至
@@ -114,6 +117,20 @@ func test_size_roll_and_quality() -> void:
 	assert_eq(f.quality_for(f.min_size), 0)
 	assert_eq(f.quality_for(f.max_size), 2)
 	assert_eq(f.quality_for(roundi(lerpf(f.min_size, f.max_size, 0.6))), 1)
+
+
+func test_xiaoman_bites_faster_and_fish_are_bigger() -> void:
+	GameClock.day = 1
+	var plain := Fishing.bite_wait(0, 0.5)
+	# 小满是夏天第 5–8 天
+	GameClock.day = GameClock.DAYS_PER_SEASON + 5
+	assert_eq(GameClock.term_id(), &"xiaoman")
+	assert_almost_eq(Fishing.bite_wait(0, 0.5), plain * Fishing.XIAOMAN_WAIT_MULT, 0.001, "河水上涨，咬钩更快")
+	assert_almost_eq(Fishing.bite_wait(0, 0.5, true), plain * Fishing.XIAOMAN_WAIT_MULT * Fishing.BAIT_WAIT_MULT, 0.001, "鱼饵照样减半")
+	var f := Database.fish_def(&"crucian")
+	assert_gt(Fishing.roll_size(f, 0.5, &"xiaoman"), Fishing.roll_size(f, 0.5), "鱼更大")
+	assert_gt(Fishing.roll_size(f, 0.0, &"xiaoman"), f.min_size, "最小的也比平常大")
+	assert_eq(Fishing.roll_size(f, 1.0, &"xiaoman"), f.max_size, "不超过这种鱼的上限")
 
 
 # ---------------------------------------------------------------- 收放线

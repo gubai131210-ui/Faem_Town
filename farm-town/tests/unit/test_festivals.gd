@@ -2,6 +2,7 @@ extends GutTest
 ## M6 第四批：六个节日。日子和天气、居民的站位、每个节日的活动、对话、摆设。
 
 const PATH := "res://dialogue/festival.dialogue"
+const CutsceneScript := preload("res://game/cutscene.gd")
 ## 六个节日是一年里的第几天
 const SOWING := 13
 const LANTERN := 17
@@ -144,6 +145,23 @@ func test_festival_is_open_only_in_its_hours() -> void:
 	assert_false(Festivals.is_open())
 	_at(NEWYEAR, 1500.0 - 1.0)
 	assert_true(Festivals.is_open(&"newyear"), "除夕开到后半夜")
+
+
+func test_opening_names_the_festival_once_a_year() -> void:
+	_at(SOWING, 360.0)
+	assert_eq(Festivals.opening_id(), &"", "九点以前还没有开场")
+	_at(SOWING, 600.0)
+	assert_eq(Festivals.opening_id(), &"fest_sowing_y1")
+	assert_eq(CutsceneScript.festival_line(&"sowing"), "播种节。广场上摆开了摊子。")
+	assert_eq(CutsceneScript.festival_steps("播种节。广场上摆开了摊子。")[0]["picture"], &"")
+	for id in [&"lantern", &"firefly", &"harvest", &"dumpling", &"newyear"]:
+		assert_false(CutsceneScript.festival_line(id).is_empty(), id)
+	assert_eq(CutsceneScript.festival_line(&"none"), "")
+	assert_eq(CutsceneScript.dawn_steps()[0]["text"], "天亮了。过年了。")
+	assert_eq(Festivals.year_of(NEWYEAR), 1)
+	assert_eq(Festivals.year_of(NEWYEAR + 96), 2)
+	_at(SOWING + 1, 600.0)
+	assert_eq(Festivals.opening_id(), &"")
 
 
 func test_morning_note_names_the_festival() -> void:
@@ -615,6 +633,43 @@ func test_fillings_have_flavors() -> void:
 	assert_eq(Festivals.flavor(null), &"")
 
 
+func test_brought_dishes_sit_on_the_festival_table() -> void:
+	_at(DUMPLING, 1080.0)
+	var m := _map(&"town")
+	await wait_process_frames(2)
+	var table: Sprite2D = m.get(&"_fest_table")
+	assert_not_null(table)
+	assert_eq(table.get_child_count(), 0, "没带菜时还是原来的饺子桌")
+	_hold(&"radish_soup")
+	var soup := Database.item(&"radish_soup")
+	m.perform(&"interact", soup, Database.festival(&"dumpling").counter[1])
+	assert_true(Crafting.table_dishes.has(&"radish_soup"))
+	assert_eq(GameState.inventory.count_of(&"radish_soup"), 0)
+	assert_eq(_dialogues.size(), 0, "摆菜不跟云娘搭话")
+	assert_eq(table.get_child_count(), 1)
+	var dish := table.get_child(0) as Sprite2D
+	assert_eq(dish.texture, (load("res://art_gen/dish_art.gd") as GDScript).call(&"frame", &"radish_soup", 0))
+	_hold(&"bok_choy")
+	m.perform(&"interact", Database.item(&"bok_choy"), Database.festival(&"dumpling").counter[1])
+	assert_false(Crafting.table_dishes.has(&"bok_choy"), "馅不是摆上桌的菜")
+	m.free()
+	_at(NEWYEAR, 1140.0)
+	Crafting.table_dishes.clear()
+	Crafting.table_dishes.append(&"strawberry_bowl")
+	var eve := _map(&"town")
+	await wait_process_frames(2)
+	var eve_table: Sprite2D = eve.get(&"_fest_table")
+	assert_eq(eve_table.get_child_count(), 1, "除夕的长桌上是带来的那道")
+	var counter: Vector2i = Database.festival(&"newyear").counter[1]
+	assert_false(eve.call(&"_walkable", counter))
+	_hold(&"fried_egg")
+	eve.perform(&"interact", Database.item(&"fried_egg"), counter)
+	assert_true(Crafting.table_dishes.has(&"fried_egg"))
+	assert_string_contains(_banners[-1], "煎蛋")
+	eve.perform(&"interact", null, counter)
+	assert_string_contains(_banners[-1], "今年带了")
+
+
 func test_dumpling_feast_takes_one_filling() -> void:
 	_at(DUMPLING, 1000.0)
 	_hold(&"bok_choy")
@@ -691,22 +746,23 @@ func test_plaza_hangs_lanterns_on_new_years_eve() -> void:
 
 func test_year_income_adds_up_and_starts_over_in_spring() -> void:
 	GameClock.day = 90
+	var each := Database.item(&"white_radish").price
 	Shipping.add(&"white_radish", 2)
 	GameClock.advance_day()
-	assert_eq(Shipping.year_income, 70)
+	assert_eq(Shipping.year_income, each * 2)
 	Shipping.add(&"white_radish", 1)
 	GameClock.advance_day()
-	assert_eq(Shipping.year_income, 105)
+	assert_eq(Shipping.year_income, each * 3)
 	var data := Shipping.save_data()
 	Shipping.reset_data()
 	assert_eq(Shipping.year_income, 0)
 	Shipping.load_data(data)
-	assert_eq(Shipping.year_income, 105, "进了存档")
+	assert_eq(Shipping.year_income, each * 3, "进了存档")
 	GameClock.day = 96
 	Shipping.add(&"white_radish", 1)
 	GameClock.advance_day()
 	assert_eq(GameClock.day_of_season(), 1)
-	assert_eq(Shipping.year_income, 35, "开春重新算，头一天早上结的货算新年的")
+	assert_eq(Shipping.year_income, each, "开春重新算，头一天早上结的货算新年的")
 
 
 func test_new_year_summary_and_vigil() -> void:
@@ -729,7 +785,7 @@ func test_new_year_summary_and_vigil() -> void:
 	assert_string_contains(said, "1 盏")
 	assert_string_contains(said, "1 段")
 	assert_string_contains(said, "第 17 层")
-	assert_string_contains(said, "12 位")
+	assert_string_contains(said, "18 位")
 	await _say("fest_newyear_host", 1)
 	assert_eq(_dialogues[-1], "fest_newyear_vigil")
 	assert_true(Festivals.done("vigil"))
@@ -758,6 +814,16 @@ func test_festival_art() -> void:
 	assert_eq(FestivalArt.stall().get_size(), Vector2i(36, 36))
 	assert_eq(FestivalArt.table("harvest").get_size(), Vector2i(52, 24))
 	assert_ne(FestivalArt.table("harvest").get_data(), FestivalArt.table("dumpling").get_data())
+	assert_ne(FestivalArt.cloth("dumpling").get_data(), FestivalArt.table("dumpling").get_data(), "空桌布上没有蒸笼")
+	assert_eq(FestivalArt.cloth("dumpling").get_size(), Vector2i(52, 24))
+	assert_eq(FestivalArt.cloth("newyear").get_pixel(26, 14), FestivalArt.cloth("dumpling").get_pixel(26, 14), "除夕和饺子宴是同一块红桌布")
+	var places := FestivalArt.dish_places(2)
+	assert_eq(places.size(), 2)
+	for p: Vector2 in places:
+		assert_gt(p.x, 4.0)
+		assert_lt(p.x, 48.0)
+		assert_gt(p.y, 2.0)
+		assert_lt(p.y, 20.0)
 	assert_ne(FestivalArt.lantern_pole(true).get_data(), FestivalArt.lantern_pole(false).get_data())
 	assert_ne(FestivalArt.river_lantern(0).get_data(), FestivalArt.river_lantern(1).get_data())
 	assert_ne(FestivalArt.firefly(0).get_data(), FestivalArt.firefly(1).get_data())

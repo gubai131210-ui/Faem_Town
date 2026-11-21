@@ -24,6 +24,8 @@ var yard := Rect2i()
 var swim := Rect2i()
 ## 青竹要哪盏灯亮了才接这个活（GameState 的标记）
 var flag: StringName = &"lamp_plaza"
+## 和这个人熟了也肯接（空就是只看灯）。大牲口的棚不写，仍要牧野灯
+var by: StringName = &""
 ## 要先有哪栋建筑（空表示不用）
 var requires: StringName = &""
 var desc: String
@@ -50,6 +52,7 @@ static func from_dict(d: Dictionary) -> BuildingDef:
 	if w is Array and w.size() >= 4:
 		def.swim = Rect2i(int(w[0]), int(w[1]), int(w[2]) - int(w[0]) + 1, int(w[3]) - int(w[1]) + 1)
 	def.flag = StringName(str(d.get("flag", "lamp_plaza")))
+	def.by = StringName(str(d.get("by", "")))
 	def.requires = StringName(str(d.get("requires", "")))
 	def.desc = str(d.get("desc", ""))
 	return def

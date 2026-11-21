@@ -3,15 +3,21 @@
 	"anims": [
 		"idle",
 		"walk",
-		"sit"
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
 	],
 	"hat": false,
 	"hair": "bun",
 	"outfit": "robe",
 	"scale": 0.94,
 	"stoop": 9,
+	"costume_detail": "herbalist",
 	"parts": {
-		"shirt": "purple",
+		"shirt": ["#8e829f", "#55516e"],
 		"band": "cream",
 		"hair": "hair_gray",
 		"boot": "charcoal",

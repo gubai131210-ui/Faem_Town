@@ -28,6 +28,18 @@
 			"frames": 2,
 			"loop": true,
 			"fps": 4.0
+		},
+		"lie": {
+			"row": 12,
+			"frames": 2,
+			"loop": true,
+			"fps": 1.2
+		},
+		"shake": {
+			"row": 16,
+			"frames": 4,
+			"loop": true,
+			"fps": 10.0
 		}
 	}
 }

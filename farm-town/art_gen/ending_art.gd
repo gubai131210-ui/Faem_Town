@@ -1,8 +1,10 @@
 class_name EndingArt
 extends RefCounted
-## 三个结局各一张画，192×108：远山、近山、山谷里的镇子。
+## 结局亮名字时铺满屏幕的画，192×108：远山、近山、山谷里的镇子。
 ## 留雾：黄昏，雾一层一层压着山腰和镇子。散雾：晴夜，星星、月亮、灯塔的光，一串灯笼往井口去。
-## 归名：清晨，山脚一线薄雾，山脊上站着一头白鹿。
+## 归名和山海有名：清晨，山脚一线薄雾，山脊上站着一头白鹿。
+## 团圆饭：傍晚，窗子是暖的。家业：白天，镇子中间挂着那块匾。
+## 远行：黄昏的海边，灯塔亮着，岸上钉着撕开的半张船票。人不画在这张上。
 
 const W := 192
 const H := 108
@@ -32,7 +34,7 @@ static func scene(id: StringName) -> Image:
 			ground = Color.html("0e142a")
 			house = Color.html("0a0e20")
 			window = Color.html("ffd76a")
-		Story.NAME:
+		Story.NAME, Story.NAMED:
 			top = Color.html("7c8cc4")
 			low = Color.html("f4bc94")
 			far = Color.html("8c88b0")
@@ -40,6 +42,30 @@ static func scene(id: StringName) -> Image:
 			ground = Color.html("3c5444")
 			house = Color.html("2c3440")
 			window = Color.html("ffe08a")
+		Story.FEAST:
+			top = Color.html("c46a3a")
+			low = Color.html("f4c07a")
+			far = Color.html("a06048")
+			near = Color.html("6a4038")
+			ground = Color.html("4a3428")
+			house = Color.html("3a2820")
+			window = Color.html("ffd76a")
+		Story.ESTATE:
+			top = Color.html("8ec4e8")
+			low = Color.html("f4e2b0")
+			far = Color.html("7aa0b0")
+			near = Color.html("5a7848")
+			ground = Color.html("4a8a40")
+			house = Color.html("f4efe4")
+			window = Color.html("f7dc80")
+		Story.VOYAGE:
+			top = Color.html("1a3860")
+			low = Color.html("7aa4c4")
+			far = Color.html("3a6888")
+			near = Color.html("2a5870")
+			ground = Color.html("d4c4a0")
+			house = Color.html("8a6a4e")
+			window = Color.html("ffe07a")
 	# 天：分成几档的渐变
 	for y in H:
 		var t := floorf(clampf(y / 70.0, 0.0, 1.0) * 9.0) / 9.0
@@ -51,7 +77,7 @@ static func scene(id: StringName) -> Image:
 			Px.px(img, sx, sy, Color.html("fff6d8") if i % 5 == 0 else Color.html("8c9cd0"))
 		_disc(img, 40, 32, 5.0, Color.html("f4f0d8"))
 		_disc(img, 42, 31, 4.0, top.lerp(low, 0.3))
-	elif id == Story.NAME:
+	elif id == Story.NAME or id == Story.NAMED:
 		# 太阳刚露出远山
 		_disc(img, 96, 58, 13.0, Color(1.0, 0.92, 0.7, 0.35), true)
 		_disc(img, 96, 58, 8.0, Color.html("fff0c0"))
@@ -102,11 +128,23 @@ static func scene(id: StringName) -> Image:
 				var px := int(lerpf(128.0, WELL.x - 5.0, t))
 				_glow(img, px, _near_y(px) - 2 + (4 - int(t * 4.0)), Color(1.0, 0.8, 0.45), 1)
 			_lighthouse(img, 180, true)
-		Story.NAME:
+		Story.NAME, Story.NAMED:
 			_glow(img, WELL.x, WELL.y - 3, Color(1.0, 0.9, 0.6), 4)
 			_fog(img, 88, 4, 0.34, 10)
 			_lighthouse(img, 180, false)
 			_deer(img, 22, _near_y(26) - 1)
+		Story.FEAST:
+			_glow(img, WELL.x, WELL.y - 3, Color(1.0, 0.7, 0.35), 4)
+			for i in 8:
+				_glow(img, 40 + i * 14, 86, Color(1.0, 0.72, 0.35), 2)
+		Story.ESTATE:
+			_lighthouse(img, 180, false)
+			img.blend_rect(plaque(), Rect2i(0, 0, 30, 16), Vector2i(81, 74))
+		Story.VOYAGE:
+			_lighthouse(img, 168, true)
+			var slip := ticket_half()
+			slip.resize(36, 28, Image.INTERPOLATE_NEAREST)
+			img.blend_rect(slip, Rect2i(0, 0, 36, 28), Vector2i(40, 88))
 	# 整张画往上提：屏幕底下那一截要让给对话框，镇子得露在它上面
 	var out := Px.new_img(W, H)
 	out.fill(ground)
@@ -186,3 +224,51 @@ static func _deer(img: Image, x: int, y: int) -> void:
 	Px.px(img, x + 3, y - 15, c)
 	Px.px(img, x + 1, y - 13, c)
 	Px.px(img, x - 7, y - 7, c)
+
+
+## 农场屋檐下的匾。两个字是从系统字体收成的点阵：家、业。
+static func plaque() -> Image:
+	var jia: PackedStringArray = [
+		".....##.....", "############", "############", "..########..",
+		"...########.", "..#########.", ".#########..", ".#########..",
+		"########.##.", "#####.##.###", "....####..#.", "....##......",
+	]
+	var ye: PackedStringArray = [
+		"...##..##...", "...##..##...", "##.##..##.##", "#####..##.##",
+		".####..####.", ".####..####.", "..###..####.", "..###..###..",
+		"...##..##...", "...##..##...", "############", "############",
+	]
+	var img := Px.new_img(30, 16)
+	var wood := Color.html("c4a06a")
+	var edge := Color.html("3a2218")
+	var ink := Color.html("3a2218")
+	Px.rect(img, 0, 0, 30, 16, wood)
+	Px.rect(img, 0, 0, 30, 1, edge)
+	Px.rect(img, 0, 15, 30, 1, edge)
+	Px.rect(img, 0, 0, 1, 16, edge)
+	Px.rect(img, 29, 0, 1, 16, edge)
+	_stamp(img, jia, 2, 2, ink)
+	_stamp(img, ye, 16, 2, ink)
+	return img
+
+
+## 撕开的半张船票。右边缺一截，左边留着一道红线。另外半张不在这张上。
+static func ticket_half() -> Image:
+	var img := Px.new_img(18, 14)
+	var paper := Color.html("f6efe6")
+	var edge := Color.html("d6c8bd")
+	var ink := Color.html("c8483c")
+	for y in 14:
+		var cut := 13 - (y % 3)
+		Px.rect(img, 0, y, cut, 1, paper)
+		Px.px(img, cut, y, edge)
+	Px.rect(img, 2, 2, 2, 10, ink)
+	return img
+
+
+static func _stamp(img: Image, rows: PackedStringArray, ox: int, oy: int, ink: Color) -> void:
+	for r in rows.size():
+		var row: String = rows[r]
+		for c in row.length():
+			if row[c] == "#":
+				Px.px(img, ox + c, oy + r, ink)

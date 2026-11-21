@@ -832,7 +832,7 @@ func test_key_help_lists_every_action() -> void:
 	for row: Array in rows:
 		assert_ne(String(row[1]), "", "%s 写了键" % row[0])
 		by_name[String(row[0])] = String(row[1])
-	assert_string_contains(by_name["翻滚（井里）"], "Shift")
+	assert_string_contains(by_name["翻滚（井里、竹海、后山、雾岛）"], "Shift")
 	assert_string_contains(by_name["使用、搭话（按住蓄力）"], "空格")
 	assert_string_contains(by_name["走动"], "↑")
 	assert_eq(by_name["换手里的东西"], "1 – 8")

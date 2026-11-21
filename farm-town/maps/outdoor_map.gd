@@ -38,6 +38,12 @@ var tbuf := PackedByteArray()
 ## 草丛和小花，按格子记录，开垦或种东西时清掉
 var decor: Dictionary = {}
 var occupied: Dictionary = {}
+## 撒树、灌木、草丛只在左上角这么大的一块里撒；0 表示整张图。
+## 地图往东往南扩大以后，原来那一块撒出来的位置不变（决策 147）。
+var _scatter_cols := 0
+var _scatter_rows := 0
+## 撒出来的灌木和石头：格子 -> [精灵, 影子, 是不是石头]
+var _bush_nodes: Dictionary[Vector2i, Array] = {}
 ## 两个居民离得这么近（像素）就可能聊起来，以及每次检查开聊的概率
 const CHAT_DISTANCE := 38.0
 const CHAT_CHANCE := 0.1
@@ -54,12 +60,40 @@ var _season := 0
 var _rng := RandomNumberGenerator.new()
 var _tree_mat: ShaderMaterial
 var _tuft_mat: ShaderMaterial
+## 作物也用同一套摇摆 shader，但整株都摇、幅度另算（有风才晃）
+var _crop_mat: ShaderMaterial
+## 树上飘下来的花瓣、叶子、雪、桂花：[树冠位置, 种类, 第几片]
+var _fall_drops: Array = []
+var _fall_fx: Node2D
+var _fall_time := 0.0
 var _tree_shadow: Texture2D
 var _small_shadow: Texture2D
 var _npc_minute := -1
 var _chat_t := 0.0
 var _sparkles: Array = []
+## 石板或土路上隔几格一个水洼，雨下久了才显出来
+var _puddles: Array[Vector2i] = []
+## 沙滩挨着海水的像素，浪线在这上面来回
+var _shore: Array[Vector2] = []
+## 雨点打上去的水花：[位置, 已经过了多久, 是不是打在水上]
+var _splashes: Array = []
+var _splash_cd := 0.0
+## 挡路的雾团，记下原来的位置，好让它绕着那一点翻
+var _fog_motion: Array[Sprite2D] = []
 var _lights: Array[PointLight2D] = []
+## 傍晚一扇扇亮的窗：[精灵, 第几扇]
+var _windows: Array = []
+## 烟或火星：[粒子, 是不是铁匠铺的火星]
+var _plumes: Array = []
+var _window_tex: Texture2D
+## 夏天晚上水边的萤火虫。-1 表示还没按今天的钟点对过
+var _flies: Array[Sprite2D] = []
+var _fly_homes: Array[Vector2] = []
+var _fly_tex: Array[Texture2D] = []
+var _flies_key := -1
+## 窗、烟、萤火虫的开关只在钟点变了才需要写回节点，别每帧重复赋同一个值
+var _last_glow_minute := -1
+var _last_fly_alpha := -1.0
 var _light_tex: GradientTexture2D
 var _fx_t := 0.0
 var _time := 0.0
@@ -85,19 +119,32 @@ func _setup_grid(new_cols: int, new_rows: int) -> void:
 	_tuft_mat.shader = sway
 	_tuft_mat.set_shader_parameter("still_from", 1.0)
 	_tuft_mat.set_shader_parameter("amp", 1.2)
+	_crop_mat = ShaderMaterial.new()
+	_crop_mat.shader = sway
+	_crop_mat.set_shader_parameter("still_from", 1.0)
+	_crop_mat.set_shader_parameter("amp", 0.0)
+	_apply_sway()
+	if not Weather.changed.is_connected(_apply_sway):
+		Weather.changed.connect(_apply_sway)
 	_tree_shadow = Px.tex(PixelArt.shadow(30, 9, 0.25))
 	_small_shadow = Px.tex(PixelArt.shadow(16, 5, 0.22))
 
 
 ## 地形排好以后调：画地面，建好按 y 排序的图层。
+func _ground_key() -> String:
+	return "%s:%d" % [map_id, _season]
+
+
 func _build_ground() -> void:
-	var key := "%s:%d" % [map_id, _season]
+	var key := _ground_key()
 	if not _ground_cache.has(key):
 		var painted := GroundArt.paint(terrain, cols, rows, _season)
 		var img: Image = painted["image"]
 		_ground_cache[key] = [Px.tex(img), painted["tbuf"]]
 	var cached: Array = _ground_cache[key]
 	tbuf = cached[1]
+	_collect_surface()
+	_ensure_surface()
 	var ground := Sprite2D.new()
 	ground.centered = false
 	ground.texture = cached[0]
@@ -111,20 +158,96 @@ func _make_entities() -> void:
 	add_child(entities)
 
 
+func _exit_tree() -> void:
+	if Weather.changed.is_connected(_apply_sway):
+		Weather.changed.disconnect(_apply_sway)
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	_fx_t += delta
-	if water_fx != null and _fx_t > 0.12:
+	_fall_time += delta
+	_churn_fog()
+	_age_splashes(delta)
+	if _fx_t > 0.06:
 		_fx_t = 0.0
-		water_fx.queue_redraw()
+		if water_fx != null:
+			water_fx.queue_redraw()
+		if _fall_fx != null:
+			_fall_fx.queue_redraw()
 	_update_npcs()
+	_glow_pass()
+	_ensure_scenic()
 	_chat_t += delta
 	if _chat_t >= 0.5:
 		_chat_t = 0.0
 		_start_chats()
-	var night := clampf((GameClock.minutes - 1080.0) / 150.0, 0.0, 1.0)
+		_overhear()
+	var night := clampf((GameClock.minutes - GameClock.dusk_shift() - 1080.0) / 150.0, 0.0, 1.0)
 	for l in _lights:
-		l.energy = night * 0.9
+		var phase := float(l.get_meta(&"phase", 0.0))
+		l.energy = night * 0.9 * Glow.flicker(_time, phase)
+	_sync_companion()
+
+
+var _scenic: Node2D
+var _pal: Sprite2D
+var _pal_who := ""
+var _pal_sheet: CharacterSheet
+var _banner: Node2D
+
+
+## 结了缘带出门的那一只，走在旁边一格。不挡路。
+func _sync_companion() -> void:
+	var who := String(Bestiary.out_id())
+	if who == "" or player == null or entities == null:
+		_drop_companion()
+		return
+	if _pal == null or _pal_who != who:
+		_drop_companion()
+		_pal_sheet = CharacterSheet.load_sheet(who, CharacterSheet.CREATURE_DIR)
+		if not _pal_sheet.is_valid():
+			return
+		_pal_who = who
+		_pal = Sprite2D.new()
+		_pal.texture = _pal_sheet.texture
+		_pal.centered = false
+		_pal.region_enabled = true
+		_pal.offset = Vector2(-_pal_sheet.cell / 2.0, -float(_pal_sheet.foot_row))
+		entities.add_child(_pal)
+	var tile := Bestiary.beside_tile(self)
+	_pal.position = tile_center(tile) + Vector2(0, 4)
+	var count := _pal_sheet.frame_count(&"idle")
+	var frame := int(_time * _pal_sheet.fps(&"idle")) % maxi(count, 1)
+	_pal.region_rect = _pal_sheet.region(&"idle", Facing.RIGHT, frame)
+
+
+func _drop_companion() -> void:
+	if _pal != null and is_instance_valid(_pal):
+		_pal.queue_free()
+	_pal = null
+	_pal_who = ""
+
+
+func _ensure_scenic() -> void:
+	if _scenic != null:
+		return
+	var script := load("res://maps/scenic.gd") as GDScript
+	_scenic = script.new()
+	_scenic.z_index = -1
+	_scenic.set(&"draw_banner", false)
+	_scenic.set(&"draw_sky", false)
+	add_child(_scenic)
+	var sky: Node2D = script.new()
+	sky.z_index = 3
+	sky.set(&"draw_banner", false)
+	sky.set(&"draw_ground", false)
+	add_child(sky)
+	_banner = script.new()
+	_banner.z_index = 1
+	_banner.set(&"draw_sky", false)
+	_banner.set(&"draw_ground", false)
+	add_child(_banner)
 
 
 func size_px() -> Vector2i:
@@ -194,6 +317,14 @@ func _sprite(tex: Texture2D, pos: Vector2, offset: Vector2) -> Sprite2D:
 	return s
 
 
+## 能翻能看的小东西贴在这一格上。lift 是底边落到格子中心以下几像素。人站不到这一格。
+func _hang_clue(tile: Vector2i, img: Image, lift: float) -> void:
+	var pos := tile_center(tile)
+	_sprite(Px.tex(img), pos, Vector2(-img.get_width() / 2.0, -float(img.get_height()) + lift))
+	_ground_shadow(pos + Vector2(0, -1), Px.tex(PixelArt.shadow(maxi(img.get_width() - 2, 8), 4, 0.2)))
+	_block(tile)
+
+
 ## 放一个 Blender 渲染的物件，锚点对齐到 pos。
 func _prop(prop: String, pos: Vector2) -> Sprite2D:
 	var s := PropArt.sprite(prop, pos)
@@ -261,6 +392,26 @@ func _no_scatter(_t: Vector2i) -> bool:
 	return false
 
 
+## 这一格原来有一棵边界树，现在不画了：撒树撒灌木的时候先占着，免得别的树和灌木挪位，撒完调 _release_ghosts() 放开。子类覆盖。
+func _ghost_tree(_t: Vector2i) -> bool:
+	return false
+
+
+## 这一格是不是老地图（左上角 old_cols×old_rows）东、南两排当边界的那一圈。往东南扩大的地图用它来写 _ghost_tree。
+func _legacy_edge(t: Vector2i, old_cols: int, old_rows: int) -> bool:
+	return t.x < old_cols and t.y < old_rows and (t.x >= old_cols - 2 or t.y >= old_rows - 2)
+
+
+var _ghosts: Array[Vector2i] = []
+
+
+func _release_ghosts() -> void:
+	for t in _ghosts:
+		solid[idx(t)] = 0
+		occupied.erase(t)
+	_ghosts.clear()
+
+
 ## 种野生的树：地图四边围一圈，里面再随机放 inner 棵。树挡路。
 func _scatter_trees(inner: int) -> void:
 	# 树是脚本画的（见 PixelArt.round_tree / plum_tree），每项是 [贴图, 锚点偏移]
@@ -273,17 +424,19 @@ func _scatter_trees(inner: int) -> void:
 		[Px.tex(PixelArt.plum_tree(0, _season)), Vector2(-24, -57)],
 		[Px.tex(PixelArt.plum_tree(1, _season)), Vector2(-24, -57)],
 	]
+	var sc := _scatter_cols if _scatter_cols > 0 else cols
+	var sr := _scatter_rows if _scatter_rows > 0 else rows
 	var tree_tiles: Array[Vector2i] = []
-	for y in rows:
-		for x in cols:
-			var border := x < 2 or y < 2 or x >= cols - 2 or y >= rows - 2
+	for y in sr:
+		for x in sc:
+			var border := x < 2 or y < 2 or x >= sc - 2 or y >= sr - 2
 			if border and (x + y) % 2 == 0 and _rng.randf() < 0.8:
 				tree_tiles.append(Vector2i(x, y))
 	var tries := 0
 	var placed := 0
 	while placed < inner and tries < 800:
 		tries += 1
-		var t := Vector2i(_rng.randi_range(2, cols - 3), _rng.randi_range(2, rows - 3))
+		var t := Vector2i(_rng.randi_range(2, sc - 3), _rng.randi_range(2, sr - 3))
 		if _keep_clear(t, 2):
 			continue
 		var ok := true
@@ -300,6 +453,10 @@ func _scatter_trees(inner: int) -> void:
 		var pos := Vector2(t.x * TS + 8 + _rng.randi_range(-2, 2), t.y * TS + 14)
 		var kind: Array = tree_kinds[_rng.randi_range(0, tree_kinds.size() - 1)]
 		# 随机数照常取完再跳过，别处的树位置不变
+		if _ghost_tree(t):
+			_block(t)
+			_ghosts.append(t)
+			continue
 		if _no_scatter(t):
 			continue
 		var s := _sprite(kind[0], pos, kind[1])
@@ -310,17 +467,42 @@ func _scatter_trees(inner: int) -> void:
 
 ## 灌木和石头，每三个里有一块石头。挡路。
 func _scatter_bushes(count: int) -> void:
+	var sc := _scatter_cols if _scatter_cols > 0 else cols
+	var sr := _scatter_rows if _scatter_rows > 0 else rows
 	for i in count:
-		var t := Vector2i(_rng.randi_range(2, cols - 3), _rng.randi_range(2, rows - 3))
+		var t := Vector2i(_rng.randi_range(2, sc - 3), _rng.randi_range(2, sr - 3))
 		if not _is_free(t) or _keep_clear(t, 1) or _no_scatter(t):
 			continue
-		var pos := tile_center(t) + Vector2(0, 6)
-		if i % 3 == 0:
-			_prop("rock_%d" % (i % 2), pos)
-		else:
-			_prop("bush_%d" % (i % 2), pos).modulate = BUSH_TINTS[_season]
-		_ground_shadow(pos + Vector2(0, -1), _small_shadow)
-		_block(t)
+		_wild_thing(t, i % 3 == 0, i % 2)
+
+
+## 在这一格放一块野石头或一丛灌木，挡路，记在 _bush_nodes 里。
+func _wild_thing(t: Vector2i, rock: bool, variant: int) -> void:
+	var pos := tile_center(t) + Vector2(0, 6)
+	var s: Sprite2D
+	if rock:
+		s = _prop("rock_%d" % variant, pos)
+	else:
+		s = _prop("bush_%d" % variant, pos)
+		s.modulate = BUSH_TINTS[_season]
+	var shade := _ground_shadow(pos + Vector2(0, -1), _small_shadow)
+	_block(t)
+	_bush_nodes[t] = [s, shade, rock]
+
+
+## 把这一格的野石头或灌木拿掉，格子空出来。没有就返回 false。
+func _remove_wild(t: Vector2i) -> bool:
+	if not _bush_nodes.has(t):
+		return false
+	var entry: Array = _bush_nodes[t]
+	for k in 2:
+		var n: Node = entry[k]
+		if is_instance_valid(n):
+			n.queue_free()
+	_bush_nodes.erase(t)
+	solid[idx(t)] = 0
+	occupied.erase(t)
+	return true
 
 
 ## 草丛和小花：不挡路，记在 decor 里。花春夏多，秋天少，冬天没有；随机数照常取，这样四季物件的位置不变。
@@ -330,8 +512,10 @@ func _scatter_tufts(count: int) -> void:
 	var flower_tex: Array = []
 	for i in 4:
 		flower_tex.append(Px.tex(PixelArt.flower(i)))
+	var sc := _scatter_cols if _scatter_cols > 0 else cols
+	var sr := _scatter_rows if _scatter_rows > 0 else rows
 	for i in count:
-		var t := Vector2i(_rng.randi_range(0, cols - 1), _rng.randi_range(0, rows - 1))
+		var t := Vector2i(_rng.randi_range(0, sc - 1), _rng.randi_range(0, sr - 1))
 		if terrain[idx(t)] != GRASS or solid[idx(t)] == 1:
 			continue
 		var pos := Vector2(t.x * TS + _rng.randi_range(3, 13), t.y * TS + _rng.randi_range(5, 15))
@@ -352,8 +536,135 @@ func _scatter_tufts(count: int) -> void:
 func _add_night_light(pos: Vector2, light_scale: float) -> void:
 	var l := _glow(light_scale, Color(1.0, 0.82, 0.5), 0.0)
 	l.position = pos
+	l.set_meta(&"phase", float(_lights.size()) * 1.3)
 	add_child(l)
 	_lights.append(l)
+
+
+## 在房子上贴一扇窗。local 是相对这栋房子锚点的位置，order 决定它第几个亮。
+func _add_window(host: Node2D, local: Vector2, order: int) -> void:
+	if _window_tex == null:
+		_window_tex = Px.tex(Glow.window_image())
+	var s := Sprite2D.new()
+	s.texture = _window_tex
+	s.centered = true
+	s.position = local
+	s.modulate.a = 0.0
+	host.add_child(s)
+	_windows.append([s, order])
+
+
+## 屋脊上的烟，或炉口的火星。sparks 为真是铁匠铺。
+func _add_plume(host: Node2D, local: Vector2, sparks: bool) -> void:
+	var p := CPUParticles2D.new()
+	p.position = local
+	p.z_index = 2
+	p.amount = 8 if sparks else 12
+	p.lifetime = 0.45 if sparks else 1.5
+	p.explosiveness = 0.15 if sparks else 0.0
+	p.direction = Vector2(0, -1)
+	p.spread = 46.0 if sparks else 16.0
+	p.gravity = Vector2(0, 40) if sparks else Vector2(-6, -8)
+	p.initial_velocity_min = 16.0 if sparks else 6.0
+	p.initial_velocity_max = 28.0 if sparks else 12.0
+	p.scale_amount_min = 1.0
+	# 烟粒比火星大一点，不然 384×216 上几乎看不见
+	p.scale_amount_max = 1.0 if sparks else 2.0
+	p.color = Glow.SPARK if sparks else Glow.SMOKE
+	p.emitting = false
+	host.add_child(p)
+	_plumes.append([p, sparks])
+
+
+func _glow_pass() -> void:
+	_sync_flies()
+	# 灯、窗、萤火虫跟着天黑走：夏至推迟、冬至提前。做饭和打铁按钟点，不挪。
+	var dusk := GameClock.minutes - GameClock.dusk_shift()
+	# 萤火虫的亮度不能放进下面的分钟缓存：_sync_flies 重建时把 _last_fly_alpha
+	# 清成 -1，新建的精灵得立刻拿到当前亮度，不能黑到下一分钟才突然亮起来。
+	var alpha := Glow.firefly_alpha(dusk)
+	if not is_equal_approx(alpha, _last_fly_alpha):
+		_last_fly_alpha = alpha
+		for fly in _flies:
+			if is_instance_valid(fly):
+				fly.modulate.a = alpha
+	var minute := int(GameClock.minutes)
+	if minute != _last_glow_minute:
+		_last_glow_minute = minute
+		for w in _windows:
+			var s: Sprite2D = w[0]
+			if is_instance_valid(s):
+				s.modulate.a = Glow.window_alpha(int(w[1]), dusk)
+		var cooking := Glow.cooking(GameClock.minutes)
+		var forging := Glow.forge(GameClock.minutes)
+		var fest := Festivals.today()
+		if fest != null and fest.map == map_id:
+			forging = false
+		for plume in _plumes:
+			var p: CPUParticles2D = plume[0]
+			if is_instance_valid(p):
+				p.emitting = forging if plume[1] else cooking
+	# 飘动是动画，位置每帧走；贴图只在自己那一帧换了才写。
+	for i in _flies.size():
+		var fly := _flies[i]
+		if not is_instance_valid(fly):
+			continue
+		var frame := Glow.fly_frame(i, _time)
+		if int(fly.get_meta(&"frame", -1)) != frame:
+			fly.set_meta(&"frame", frame)
+			fly.texture = _fly_tex[frame]
+		fly.position = _fly_homes[i] + Glow.fly_pos(i, _time)
+
+
+func _sync_flies() -> void:
+	var want := Glow.firefly_count(GameClock.season(), GameClock.minutes - GameClock.dusk_shift())
+	var fest := Festivals.today()
+	if want > 0 and fest != null and fest.id == &"firefly" and fest.map == map_id:
+		want = 0
+	# 只按"今晚有没有"建一次。数量按钟点一只只添，不再整批删掉重建，
+	# 免得七点一到四只"啪"地一起冒出来。
+	var key := GameClock.day * 10 + (1 if want > 0 else 0)
+	if key != _flies_key:
+		_flies_key = key
+		for fly in _flies:
+			if is_instance_valid(fly):
+				fly.queue_free()
+		_flies.clear()
+		_fly_homes.clear()
+		_last_fly_alpha = -1.0
+		if want > 0:
+			if _fly_tex.is_empty():
+				_fly_tex = [Px.tex(FestivalArt.firefly(0)), Px.tex(FestivalArt.firefly(1))]
+			for home in _fly_spots(Glow.FLY_COUNT):
+				var s := Sprite2D.new()
+				s.texture = _fly_tex[0]
+				s.centered = true
+				s.position = home
+				s.z_index = 4
+				s.modulate.a = 0.0
+				entities.add_child(s)
+				_flies.append(s)
+				_fly_homes.append(home)
+	for i in _flies.size():
+		var fly := _flies[i]
+		if is_instance_valid(fly):
+			fly.visible = i < want
+
+
+## 水边的草地，每天换一批，最多 n 处。
+func _fly_spots(n: int) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for ty in rows:
+		for tx in cols:
+			var t := Vector2i(tx, ty)
+			if terrain[idx(t)] != GRASS or solid[idx(t)] != 0 or not _next_to_water(t):
+				continue
+			if Px.h2(tx, ty + GameClock.day) % 7 != 0:
+				continue
+			out.append(tile_center(t) + Vector2(0, -6))
+			if out.size() >= n:
+				return out
+	return out
 
 
 ## 一团一直亮着的小光（河灯、萤火虫），自己挂到要跟着的东西上。不随傍晚渐亮。
@@ -398,16 +709,27 @@ func _add_fog_bank(fog: Rect2i, out: Vector2) -> Array[Sprite2D]:
 		puff.scale = Vector2(1.5, 1.5) if k == 1 else Vector2(1.2, 1.2)
 		puff.z_index = 5
 		add_child(puff)
+		_remember_fog(puff)
 		puffs.append(puff)
 	return puffs
 
 
-## 雾慢慢散掉。
-func _fade_fog(puffs: Array[Sprite2D]) -> void:
+## 雾从灯那边往外退着散掉。不给灯的位置就原地淡掉。
+static func fog_drift(from: Vector2, lamp: Vector2) -> Vector2:
+	var away := from - lamp
+	if away.length() < 1.0:
+		away = Vector2(0, -1)
+	return away.normalized() * 42.0
+
+
+func _fade_fog(puffs: Array[Sprite2D], lamp := Vector2.INF) -> void:
 	for puff in puffs:
 		var tw := create_tween()
-		tw.tween_property(puff, "modulate:a", 0.0, 1.5)
-		tw.tween_callback(puff.queue_free)
+		tw.set_parallel(true)
+		tw.tween_property(puff, "modulate:a", 0.0, 1.4)
+		if lamp != Vector2.INF:
+			tw.tween_property(puff, "position", puff.position + fog_drift(puff.position, lamp), 1.4)
+		tw.chain().tween_callback(puff.queue_free)
 	puffs.clear()
 
 
@@ -470,7 +792,7 @@ func _trap_perform(action: StringName, tile: Vector2i, item: ItemDef = null) -> 
 	var caught := Fishing.trap_catch(map_id, tile)
 	if caught != &"":
 		var def := Database.fish_def(caught)
-		var size := Fishing.roll_size(def, _rng.randf())
+		var size := Fishing.roll_size(def, _rng.randf(), GameClock.term_id())
 		var quality := def.quality_for(size)
 		if not GameState.inventory.can_add(caught, 1, quality):
 			EventBus.banner_requested.emit("背包满了")
@@ -520,10 +842,7 @@ func _sync_traps() -> void:
 
 ## 水面上一闪一闪的波光，count 是最多放几处。要在 _build_ground 之后调。
 func _make_water_fx(count: int) -> void:
-	water_fx = Node2D.new()
-	water_fx.z_index = -8
-	water_fx.draw.connect(_draw_water)
-	add_child(water_fx)
+	_ensure_surface()
 	var pw := cols * TS
 	var ph := rows * TS
 	var tries := 0
@@ -539,27 +858,192 @@ func _make_water_fx(count: int) -> void:
 				if tbuf[(y + dy) * pw + x + dx] != WATER:
 					ok = false
 		if ok:
-			_sparkles.append([Vector2(x, y), _rng.randf(), _rng.randi_range(3, 6), 0.25 + _rng.randf() * 0.2])
+			var tile := Vector2i(int(x / TS), int(y / TS))
+			_sparkles.append([Vector2(x, y), _rng.randf(), _rng.randi_range(3, 6), 0.25 + _rng.randf() * 0.2, fishing_water(tile)])
 
 
 func _draw_water() -> void:
-	var c1 := Color.html("d6f1fb")
-	var c2 := Color.html("8fd0ee")
+	_draw_puddles()
+	_draw_shore()
 	for sv in _sparkles:
 		var s: Array = sv
 		var pos: Vector2 = s[0]
 		var phase: float = s[1]
 		var length: int = s[2]
 		var speed: float = s[3]
+		var kind: StringName = s[4]
 		var t := fmod(_time * speed + phase, 1.0)
-		if t > 0.55:
+		var grow := Surface.grow(t)
+		if grow < 0.08:
 			continue
-		var grow := sin(t / 0.55 * PI)
 		var w := maxf(1.0, roundf(length * grow))
-		var x := pos.x + roundf(t * 6.0) - floorf(w * 0.5)
-		water_fx.draw_rect(Rect2(x, pos.y, w, 1), c1 if grow > 0.6 else c2)
-		if grow > 0.8 and length > 4:
-			water_fx.draw_rect(Rect2(x + 2, pos.y + 2, w - 3, 1), c2)
+		var at := pos + Surface.drift(kind, t) - Vector2(floorf(w * 0.5), 0)
+		var flow := Surface.flow_of(kind)
+		var col: Color = Surface.FOAM if grow > 0.6 else Surface.WATER_LIGHT
+		col.a = grow  # 两头淡下去，循环回原点时看不见，不会跳一下
+		if absf(flow.y) > absf(flow.x):
+			water_fx.draw_rect(Rect2(at.x, at.y, 1, w), col)
+		else:
+			water_fx.draw_rect(Rect2(at.x, at.y, w, 1), col)
+			if grow > 0.8 and length > 4:
+				water_fx.draw_rect(Rect2(at.x + 2, at.y + 2, w - 3, 1), Surface.WATER_MID)
+	for splash in _splashes:
+		var age: float = splash[1]
+		var k := clampf(age / 0.28, 0.0, 1.0)
+		var p: Vector2 = splash[0]
+		var wide := 1.0 + roundf(k * 4.0)
+		if splash[2]:
+			water_fx.draw_rect(Rect2(p.x - wide * 0.5, p.y, wide, 1), Surface.FOAM)
+			if k > 0.4:
+				water_fx.draw_rect(Rect2(p.x, p.y - 1, 1, 1), Surface.WATER_LIGHT)
+		else:
+			water_fx.draw_rect(Rect2(p.x - 1, p.y, wide, 1), Surface.PAVE_WET)
+
+
+func _ensure_surface() -> void:
+	if water_fx != null:
+		return
+	water_fx = Node2D.new()
+	water_fx.z_index = -8
+	water_fx.draw.connect(_draw_water)
+	add_child(water_fx)
+
+
+func _apply_sway() -> void:
+	if _tree_mat != null:
+		_tree_mat.set_shader_parameter(&"amp", Surface.sway_amp(Weather.today, 1.5))
+	if _tuft_mat != null:
+		_tuft_mat.set_shader_parameter(&"amp", Surface.sway_amp(Weather.today, 1.2))
+	if _crop_mat != null:
+		_crop_mat.set_shader_parameter(&"amp", FieldMotion.crop_sway(Weather.today))
+
+
+## 清掉上一批飘落物。换季、果树增减时由子类重摆。
+func _clear_falling() -> void:
+	_fall_drops.clear()
+	if _fall_fx != null:
+		_fall_fx.queue_redraw()
+
+
+## 在这些树冠上挂几片飘落物。kind 由 FieldMotion.fall_kind 按季节定。
+func _add_falling(kind: StringName, homes: Array, per_tree: int) -> void:
+	if kind == &"" or homes.is_empty():
+		return
+	_ensure_fall_fx()
+	var i := _fall_drops.size()
+	for home: Vector2 in homes:
+		for k in per_tree:
+			var jitter := Vector2(float((i * 7 + k * 3) % 24) - 12.0, -float((i * 5 + k * 2) % 10))
+			_fall_drops.append([home + jitter, kind, i])
+			i += 1
+	_fall_fx.queue_redraw()
+
+
+func _ensure_fall_fx() -> void:
+	if _fall_fx != null:
+		return
+	_fall_fx = Node2D.new()
+	_fall_fx.z_index = 6
+	_fall_fx.draw.connect(_draw_falling)
+	add_child(_fall_fx)
+
+
+func _draw_falling() -> void:
+	for d in _fall_drops:
+		var kind: StringName = d[1]
+		var i: int = d[2]
+		var p := FieldMotion.fall_pos(i, _fall_time)
+		var at: Vector2 = d[0] + p
+		var col: Color = FieldMotion.fall_color(kind)
+		col.a = clampf(0.9 * (1.0 - p.y / FieldMotion.FALL_HEIGHT), 0.15, 0.9)
+		_fall_fx.draw_rect(Rect2(roundf(at.x), roundf(at.y), 2, 1), col)
+
+
+func _remember_fog(puff: Sprite2D) -> void:
+	puff.set_meta(&"home", puff.position)
+	puff.set_meta(&"phase", float(_fog_motion.size()) * 1.7)
+	_fog_motion.append(puff)
+
+
+func _churn_fog() -> void:
+	var keep: Array[Sprite2D] = []
+	for puff in _fog_motion:
+		if not is_instance_valid(puff):
+			continue
+		keep.append(puff)
+		var home: Vector2 = puff.get_meta(&"home")
+		var phase: float = puff.get_meta(&"phase")
+		var ox := roundf(sin(_time * 0.6 + phase) * 2.0)
+		var oy := roundf(cos(_time * 0.45 + phase) * 1.0)
+		puff.position = home + Vector2(ox, oy)
+	_fog_motion = keep
+
+
+func _collect_surface() -> void:
+	_puddles.clear()
+	_shore.clear()
+	for ty in rows:
+		for tx in cols:
+			var tile := Vector2i(tx, ty)
+			var kind := terrain[ty * cols + tx]
+			var road := kind == PAVE or (kind == DIRT and not Farming.state.soil.has(tile))
+			if road and solid[ty * cols + tx] == 0 and Px.h2(tx, ty) % 6 == 0:
+				_puddles.append(tile)
+	if tbuf.is_empty():
+		return
+	var pw := cols * TS
+	var ph := rows * TS
+	for py in range(0, ph, 3):
+		for px in range(0, pw, 3):
+			if tbuf[py * pw + px] != SAND:
+				continue
+			if py + 1 >= ph or tbuf[(py + 1) * pw + px] != WATER:
+				continue
+			_shore.append(Vector2(px, py))
+			if _shore.size() >= 120:
+				return
+
+
+func _draw_puddles() -> void:
+	var alpha := Surface.puddle_alpha(Weather.wet)
+	if alpha <= 0.0:
+		return
+	for tile in _puddles:
+		var kind := terrain[tile.y * cols + tile.x]
+		var col := (Surface.PAVE_WET if kind == PAVE else Surface.DIRT_WET)
+		col.a = alpha
+		var at := tile_center(tile)
+		water_fx.draw_rect(Rect2(at.x - 3, at.y, 6, 2), col)
+		water_fx.draw_rect(Rect2(at.x - 1, at.y - 1, 3, 1), col)
+
+
+func _draw_shore() -> void:
+	if _shore.is_empty():
+		return
+	for p in _shore:
+		var shift := Surface.wave_at(p.x, _time)
+		water_fx.draw_rect(Rect2(p.x, p.y + shift, 2, 1), Surface.FOAM)
+
+
+func _age_splashes(delta: float) -> void:
+	var alive: Array = []
+	for splash in _splashes:
+		splash[1] = float(splash[1]) + delta
+		if float(splash[1]) < 0.28:
+			alive.append(splash)
+	_splashes = alive
+	if not Weather.wets_soil():
+		return
+	_splash_cd -= delta
+	if _splash_cd > 0.0 or _splashes.size() >= 10:
+		return
+	_splash_cd = 0.16
+	if not _sparkles.is_empty() and _rng.randf() < 0.55:
+		var s: Array = _sparkles[_rng.randi() % _sparkles.size()]
+		_splashes.append([(s[0] as Vector2), 0.0, true])
+	elif not _puddles.is_empty():
+		var tile: Vector2i = _puddles[_rng.randi() % _puddles.size()]
+		_splashes.append([tile_center(tile), 0.0, false])
 
 
 # ---------------------------------------------------------------- 居民
@@ -573,7 +1057,9 @@ func _spawn_npcs() -> void:
 		if where == map_id:
 			var tile: Vector2i = spot["tile"]
 			var facing: int = spot["facing"]
-			_add_npc(def, tile, facing).spot = spot
+			var npc := _add_npc(def, tile, facing)
+			npc.spot = spot
+			_maybe_snowman(npc)
 	_npc_minute = int(GameClock.minutes)
 
 
@@ -628,6 +1114,14 @@ func _on_npc_arrived(npc: Npc, vanish: bool) -> void:
 	if vanish:
 		npcs.erase(npc)
 		npc.queue_free()
+		return
+	_maybe_snowman(npc)
+
+
+## 小满雪天走到堆雪人的地方：雪人立起来，化雪才没。
+func _maybe_snowman(npc: Npc) -> void:
+	if npc.def.id == &"xiaoman" and str(npc.spot.get("note", "")) == "snowman" and Weather.today == Weather.SNOW:
+		GameState.set_flag(&"snowman_built")
 
 
 ## 居民被人挡住太久：绕开站着的人和玩家重新找路。
@@ -686,6 +1180,34 @@ func _start_chats() -> void:
 				var seconds := randf_range(8.0, 15.0)
 				a.chat(b, seconds, 0.0)
 				b.chat(a, seconds, 1.2)
+
+
+## 人走到正在说话的两个人旁边，听见一两句。一天一对只听见一次。正说话或过场时不插进来。
+func _overhear() -> void:
+	if player == null or cutscene or not GameClock.running:
+		return
+	var game := get_tree().current_scene
+	if game != null and game.has_method(&"is_locked") and bool(game.call(&"is_locked")):
+		return
+	var pick_a := &""
+	var pick_b := &""
+	var best := 42.0
+	for npc in npcs:
+		if not npc.is_chatting():
+			continue
+		var other := npc.chat_with()
+		if other == null or npc.get_instance_id() > other.get_instance_id():
+			continue
+		var d := player.position.distance_to((npc.position + other.position) * 0.5)
+		if d < best:
+			best = d
+			pick_a = npc.def.id
+			pick_b = other.def.id
+	if pick_a == &"":
+		return
+	var heard := Chatter.notice(pick_a, pick_b)
+	if heard != "":
+		EventBus.banner_requested.emit(heard)
 
 
 func _npc_of(id: StringName) -> Npc:

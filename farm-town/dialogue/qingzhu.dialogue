@@ -10,7 +10,16 @@
 => daily
 
 ~ build
-青竹: 对了，你家那块地我去量过。要不要盖点什么？
+if Animals.any_offer() or Home.can_offer()
+	青竹: 对了，你家那块地我去量过。要不要盖点什么？
+else
+	青竹: 要点什么？铺子里有现成的家具，墙纸地板也有。
+- 扩建农舍：{{Home.upgrade_name()}}（{{Home.upgrade_price()}} 文，{{Home.materials_text()}}，{{Home.upgrade_days()}} 天） [if Home.can_offer() /]
+	if Home.order()
+		青竹: 早想给你那老屋加一间了！梁接在老梁上，墙一样刷白。 [#happy]
+		青竹: 这几天你照常住，我从外头砌，屋里的东西一样不动。
+	else
+		=> house_poor
 - 鸡舍（{{Animals.price("coop")}} 文，{{Animals.build_days("coop")}} 天） [if Animals.can_offer("coop") /]
 	if Animals.order("coop")
 		青竹: 成！池塘北边那块平地正好。明天一早我就带家伙过去，你到时候别踩我的线。 [#happy]
@@ -35,10 +44,17 @@
 		青竹: 蜂箱我不碰，那个你找阿牧。我怕蜇。
 	else
 		=> build_poor
+- 看看家具
+	do EventBus.request_shop("carpenter")
 - 先不盖，聊聊别的
 	if Residents.nth("qingzhu") >= 2
 		=> again_chat
 	=> daily_chat
+=> END
+
+~ house_poor
+青竹: 钱要{{Home.upgrade_price()}}文，石料要{{Home.materials_text()}}。石头去井里敲，或者把你地里那些乱石头敲了。
+青竹: 料齐了再来，价钱不变。
 => END
 
 ~ build_poor
@@ -46,12 +62,13 @@
 => END
 
 ~ daily
+if Home.building_now() != ""
+	青竹: 你家的{{Home.building_now()}}。墙已经砌起来了，别催。
+	=> END
 if Animals.building_now() != ""
 	青竹: 你家的{{Animals.building_now()}}。梁已经上了，别催。
 	=> END
-if Animals.any_offer()
-	=> build
-=> daily_chat
+=> build
 
 ~ daily_chat
 if Residents.owes_thanks("qingzhu")
@@ -96,7 +113,7 @@ else
 => END
 
 ~ again
-if Animals.building_now() == "" and Animals.any_offer()
+if Animals.building_now() == "" and Home.building_now() == ""
 	=> build
 => again_chat
 

@@ -14,6 +14,8 @@ const CANAL_WATER := Color("4aa0d8")
 const CANAL_SHINE := Color("a6dcf2")
 const PADDY_WATER := Color(0.33, 0.66, 0.88, 0.62)
 const PADDY_BUND := Color("7d5030")
+const STRAW := Color("e2c56a")
+const STRAW_DARK := Color("c4a04a")
 
 ## 地图给的函数：这一格是不是天然的水。水渠朝着水的那一边要接过去。
 var water_at := Callable()
@@ -23,12 +25,18 @@ var _entities: Node2D
 var _soil_tex: Array = [[], []]
 var _crop_tex: Dictionary[String, Texture2D] = {}
 var _sprites: Dictionary[Vector2i, Sprite2D] = {}
+## 地图给的摇动材质（有风才晃）；成熟作物偶尔闪一下
+var sway_material: ShaderMaterial
+var _ripe: Array[Sprite2D] = []
+var _ripe_base: Array[Color] = []
+var _time := 0.0
 
 
 ## entities 是地图上按 y 排序的图层，作物精灵放在里面。
 func setup(state: FarmState, entities: Node2D) -> void:
 	_state = state
 	_entities = entities
+	set_process(true)
 	for wet in 2:
 		for mask in 16:
 			_soil_tex[wet].append(Px.tex(PixelArt.soil(mask, wet == 1)))
@@ -64,6 +72,12 @@ func _draw() -> void:
 				var gx := 2 + Px.h2(t.x * 7 + i, t.y) % 12
 				var gy := 3 + Px.h2(t.x, t.y * 5 + i) % 10
 				draw_rect(Rect2(t.x * TS + gx, t.y * TS + gy, 1, 1), grain)
+		if _state.is_covered(t):
+			var sx := t.x * TS
+			var sy := t.y * TS
+			draw_rect(Rect2(sx + 2, sy + 12, 12, 1), STRAW)
+			draw_rect(Rect2(sx + 3, sy + 14, 10, 1), STRAW_DARK)
+			draw_rect(Rect2(sx + 4, sy + 10, 8, 1), STRAW)
 
 
 	for t: Vector2i in _state.paddies:
@@ -110,8 +124,23 @@ func _draw_canal(t: Vector2i) -> void:
 		draw_rect(Rect2(x + 6 + Px.h2(t.x, t.y) % 3, y + 6 + Px.h2(t.y, t.x) % 3, 2, 1), CANAL_SHINE)
 
 
+func _process(delta: float) -> void:
+	if _ripe.is_empty():
+		return
+	_time += delta
+	for i in _ripe.size():
+		var s: Sprite2D = _ripe[i]
+		if not is_instance_valid(s):
+			continue
+		var f := FieldMotion.ripe_flash(_time, float(i) * 0.9)
+		var base: Color = _ripe_base[i]
+		s.modulate = Color(base.r * f, base.g * f, base.b * f, base.a)
+
+
 func _sync() -> void:
 	queue_redraw()
+	_ripe.clear()
+	_ripe_base.clear()
 	for t: Vector2i in _sprites.keys():
 		if not _state.has_crop(t):
 			_sprites[t].queue_free()
@@ -133,7 +162,14 @@ func _sync() -> void:
 			sprite.texture = _giant_texture(_state.crop_id_at(t))
 		else:
 			sprite.texture = _texture_for(_state.crop_id_at(t), _state.crop_stage_at(t), _state.is_dead(t))
-		sprite.modulate = WILT_TINT if _state.is_wilted(t) and not _state.is_dead(t) else Color.WHITE
+		var base: Color = WILT_TINT if _state.is_wilted(t) and not _state.is_dead(t) else Color.WHITE
+		sprite.material = sway_material
+		sprite.modulate = base
+		# 熟了又没枯的，隔一会儿亮一下
+		var crop_def := Database.crop(_state.crop_id_at(t))
+		if crop_def != null and _state.crop_stage_at(t) >= crop_def.stage_days.size() and not _state.is_dead(t):
+			_ripe.append(sprite)
+			_ripe_base.append(base)
 
 
 func _giant_texture(crop_id: StringName) -> Texture2D:

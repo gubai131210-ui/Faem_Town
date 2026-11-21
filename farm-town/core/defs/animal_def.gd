@@ -34,6 +34,8 @@ var plows := false
 var sound := ""
 ## 阿牧要哪盏灯亮了才卖（GameState 的标记）
 var flag: StringName = &"lamp_river"
+## 和这个人熟了也卖（空就是只看灯）。羊、牛、蜂不写，仍要牧野灯
+var by: StringName = &""
 ## 量词
 var unit := "只"
 ## 蜜蜂：附近开着哪种花（作物 id）就出哪种蜜（物品 id）；都不是就出 produce
@@ -64,6 +66,7 @@ static func from_dict(d: Dictionary) -> AnimalDef:
 	def.plows = bool(d.get("plows", false))
 	def.sound = str(d.get("sound", ""))
 	def.flag = StringName(str(d.get("flag", "lamp_river")))
+	def.by = StringName(str(d.get("by", "")))
 	def.unit = str(d.get("unit", "只"))
 	var h: Variant = d.get("honeys", {})
 	if h is Dictionary:

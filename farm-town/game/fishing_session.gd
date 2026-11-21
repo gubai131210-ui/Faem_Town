@@ -91,7 +91,7 @@ func update(delta: float) -> void:
 				_hold(&"fish")
 			if view.flight < 0.0 and not player.is_acting():
 				phase = Phase.WAITING
-				_timer = Fishing.bite_wait(Fishing.effective_rod(water), _rng.randf(), baited)
+				_timer = Fishing.bite_wait(Fishing.effective_rod(water), _rng.randf(), baited) * Livelihood.fish_wait_mult()
 				_pick_shadow_side()
 		Phase.WAITING:
 			if just or moving:
@@ -108,7 +108,7 @@ func update(delta: float) -> void:
 					# 这片水现在没有鱼：鱼影游走，浮漂动一下，什么都没咬
 					view.show_shadow = false
 					view.ripple(bobber, 0.6)
-					_timer = Fishing.bite_wait(Fishing.effective_rod(water), _rng.randf(), baited)
+					_timer = Fishing.bite_wait(Fishing.effective_rod(water), _rng.randf(), baited) * Livelihood.fish_wait_mult()
 					_pick_shadow_side()
 					return
 				phase = Phase.BITE
@@ -194,7 +194,7 @@ func _catch() -> void:
 		view.ripple(bobber, 1.6)
 		_end()
 		return
-	var size := Fishing.roll_size(fish, _rng.randf())
+	var size := Fishing.roll_size(fish, _rng.randf(), GameClock.term_id())
 	var quality := fish.quality_for(size)
 	if not GameState.inventory.can_add(fish.id, 1, quality):
 		EventBus.banner_requested.emit("背包满了，%s 放回了水里" % fish.name)

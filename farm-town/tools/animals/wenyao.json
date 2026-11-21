@@ -1,0 +1,47 @@
+{
+	"name": "wenyao",
+	"body": "flyer",
+	"scale": 1.0,
+	"cell": 32,
+	"foot_row": 26,
+	"flyer": {
+		"body": [
+			0.085,
+			0.21,
+			0.115
+		],
+		"head": 0.095,
+		"wing": 0.34,
+		"chord": 0.17,
+		"sweep": 0.7,
+		"wing_at": 0.3,
+		"tail": "fin",
+		"tail_len": 0.16,
+		"fish": true,
+		"stripes": 3,
+		"fps": 7.0,
+		"flap_up": 44.0,
+		"flap_down": -26.0
+	},
+	"parts": {
+		"body": [
+			"#6f8fb4",
+			"#516d90"
+		],
+		"stripe": [
+			"#44608a",
+			"#32486a"
+		],
+		"head": "white",
+		"belly": "white",
+		"beak": "red",
+		"wing": [
+			"#cfe6ee",
+			"#9cc0cc"
+		],
+		"tail": [
+			"#cfe6ee",
+			"#9cc0cc"
+		]
+	}
+}

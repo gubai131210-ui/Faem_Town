@@ -1,0 +1,39 @@
+{
+	"name": "xingxing",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"rub",
+		"squat"
+	],
+	"scale": 0.86,
+	"bulk": 1.1,
+	"stoop": 13,
+	"hat": false,
+	"hair": "short",
+	"outfit": "tunic",
+	"ears": "ape",
+	"muzzle": true,
+	"parts": {
+		"skin": "skin_tan",
+		"hair": [
+			"#b0683c",
+			"#864a28"
+		],
+		"shirt": [
+			"#b0683c",
+			"#864a28"
+		],
+		"blue": [
+			"#b0683c",
+			"#864a28"
+		],
+		"boot": [
+			"#864a28",
+			"#643620"
+		],
+		"ear": "white",
+		"band": "cream"
+	}
+}

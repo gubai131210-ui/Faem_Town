@@ -1,6 +1,31 @@
 {
 	"name": "farmer",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"hoe",
+		"water",
+		"reach",
+		"cast",
+		"fish",
+		"hook",
+		"reel",
+		"strain",
+		"trophy",
+		"slash",
+		"stab",
+		"smash",
+		"roll",
+		"cook"
+	],
 	"hat": true,
 	"blend": true,
-	"parts": {}
+	"costume_detail": "field",
+	"parts": {
+		"blue": ["#68938b", "#365c63"],
+		"apron": ["#92b7a5", "#5b8b81"],
+		"band": ["#b75e45", "#783a37"],
+		"hat": ["#eac478", "#b48645"]
+	}
 }

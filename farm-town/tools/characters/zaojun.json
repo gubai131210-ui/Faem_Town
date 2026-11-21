@@ -1,0 +1,34 @@
+{
+	"name": "zaojun",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"rub",
+		"squat",
+		"fan"
+	],
+	"bulk": 1.16,
+	"hat": "official",
+	"hair": "short",
+	"outfit": "robe",
+	"beard": "long",
+	"parts": {
+		"shirt": "red",
+		"band": "ochre",
+		"hat": "charcoal",
+		"hair": "hair_black",
+		"boot": "charcoal",
+		"blue": "charcoal"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "smile",
+		"jaw": "soft",
+		"crop": true,
+		"moustache": true
+	}
+}

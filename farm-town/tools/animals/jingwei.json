@@ -1,0 +1,33 @@
+{
+	"name": "jingwei",
+	"body": "flyer",
+	"scale": 1.0,
+	"cell": 32,
+	"foot_row": 26,
+	"flyer": {
+		"body": [
+			0.1,
+			0.2,
+			0.1
+		],
+		"head": 0.105,
+		"wing": 0.44,
+		"chord": 0.2,
+		"sweep": 0.6,
+		"tail": "fan",
+		"tail_len": 0.16,
+		"cap": 1.5,
+		"belly": false,
+		"bill_len": 1.5,
+		"fps": 7.0,
+		"feet": true
+	},
+	"parts": {
+		"body": "hair_black",
+		"head": "white",
+		"wing": "charcoal",
+		"comb": "ochre",
+		"beak": "white",
+		"leg": "red"
+	}
+}

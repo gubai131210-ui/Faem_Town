@@ -172,7 +172,27 @@ static func icon(id: String) -> Image:
 	return Px.outline(img)
 
 
-## 遗物的 16×16 图标，按 data/relics.json 里的 shape 画。都是旧东西，颜色压得灰一点。
+## 半张残页。同一道菜左右两半墨色一样，撕口朝中间。
+static func scrap(recipe_id: StringName, half: int) -> Image:
+	var img := Px.new_img(16, 16)
+	var paper := CropArt.ramp(Color.html("e6d7b8"))
+	var ink := Color.html(str(RecipeDef.SCRAP_INK.get(recipe_id, "4a4038")))
+	var x0 := 2 if half == 0 else 8
+	var x1 := 9 if half == 0 else 14
+	Px.rect(img, x0, 3, x1 - x0, 10, paper[0])
+	Px.rect(img, x0, 3, x1 - x0, 1, paper[1])
+	Px.rect(img, x0, 12, x1 - x0, 1, paper[2])
+	var tear := 8 if half == 0 else 7
+	Px.px(img, tear, 4, paper[2])
+	Px.px(img, tear, 6, paper[2])
+	Px.px(img, tear, 9, paper[2])
+	Px.px(img, tear, 11, paper[2])
+	var blot_x := 7 if half == 0 else 8
+	Px.rect(img, blot_x, 7, 2, 2, ink)
+	Px.px(img, blot_x, 6, ink)
+	return img
+
+
 ## 动物的产物和饲料的 16×16 图标。图标名是 "product:物品id"。
 static func product(id: StringName) -> Image:
 	var img := Px.new_img(16, 16)
@@ -300,6 +320,27 @@ static func product(id: StringName) -> Image:
 				CropArt.ball(img, 4.5 + k * 1.8, 11.5 - k * 1.8, 2.4, 2.0, c)
 			Px.line(img, Vector2i(3, 11), Vector2i(11, 3), Color.html("fffdf6"))
 			Px.rect(img, 7, 7, 2, 2, Color.html("c8483c"))
+		&"soy_sauce":
+			var jar := CropArt.ramp(Color.html("5a3018"))
+			CropArt.ball(img, 8.0, 10.0, 4.0, 5.0, jar)
+			Px.rect(img, 6, 4, 4, 3, jar[0])
+			Px.rect(img, 6, 3, 4, 1, Color.html("2a1810"))
+		&"rice_vinegar":
+			var jar2 := CropArt.ramp(Color.html("e8d8a0"))
+			CropArt.ball(img, 8.0, 10.0, 4.0, 5.0, jar2)
+			Px.rect(img, 6, 4, 4, 3, jar2[0])
+			Px.rect(img, 7, 6, 2, 4, Color.html("c8a84a"))
+		&"rice_wine":
+			var jar3 := CropArt.ramp(Color.html("f2e6c8"))
+			CropArt.ball(img, 8.0, 11.0, 4.5, 4.0, jar3)
+			Px.rect(img, 6, 5, 4, 4, jar3[1])
+			Px.rect(img, 5, 4, 6, 2, Color.html("c4382a"))
+		&"malt_sugar":
+			var sugar := CropArt.ramp(Color.html("f0c878"))
+			Px.rect(img, 4, 8, 8, 5, sugar[1])
+			Px.rect(img, 4, 8, 8, 1, sugar[0])
+			Px.rect(img, 10, 4, 1, 5, sugar[0])
+			Px.rect(img, 6, 3, 1, 6, sugar[1])
 		&"cheese":
 			# 切开的一角
 			var c := CropArt.ramp(Color.html("f0cc5a"))
@@ -308,6 +349,16 @@ static func product(id: StringName) -> Image:
 			Px.rect(img, 3, 6, 4, 1, c[0])
 			for p: Vector2i in [Vector2i(5, 9), Vector2i(8, 11), Vector2i(10, 12), Vector2i(4, 12)]:
 				Px.px(img, p.x, p.y, c[2])
+		&"fence":
+			var rail := Color.html("b98a58")
+			var dark := Color.html("6e4526")
+			for px: int in [2, 7, 12]:
+				Px.rect(img, px, 3, 2, 11, rail)
+				Px.rect(img, px + 1, 4, 1, 10, dark)
+				Px.px(img, px, 2, Color.html("d6a468"))
+			Px.rect(img, 1, 6, 14, 2, Color.html("c89a66"))
+			Px.rect(img, 1, 10, 14, 2, Color.html("a37648"))
+			img = Px.outline(img)
 		&"scarecrow":
 			var straw := CropArt.ramp(Color.html("d8b45a"))
 			Px.rect(img, 7, 3, 2, 12, Color.html("7a5a36"))
@@ -318,6 +369,19 @@ static func product(id: StringName) -> Image:
 			Px.rect(img, 6, 1, 4, 1, straw[2])
 			Px.px(img, 2, 9, straw[1])
 			Px.px(img, 13, 9, straw[1])
+		&"straw":
+			# 竖着的一把，中间一道红绳，和斜放的干草分开
+			var sheaf := CropArt.ramp(Color.html("e2c56a"))
+			for k in 5:
+				var sx := 4 + k * 2
+				Px.line(img, Vector2i(sx, 13), Vector2i(sx, 3), sheaf[k % 3])
+			Px.rect(img, 4, 8, 9, 1, Color.html("c4382a"))
+			Px.rect(img, 7, 7, 2, 3, Color.html("a02820"))
+		&"hay":
+			var straw := CropArt.ramp(Color.html("e2c56a"))
+			for k in 4:
+				Px.line(img, Vector2i(4, 12 - k), Vector2i(12, 6 - k), straw[k % 3])
+			Px.rect(img, 6, 11, 4, 2, Color.html("8a6238"))
 		&"feed":
 			var sack := CropArt.ramp(Color.html("d8b45a"))
 			Px.rect(img, 4, 6, 8, 8, sack[1])
@@ -395,6 +459,20 @@ static func machine(id: StringName) -> Image:
 				Px.rect(img, 5, y, 6, 1, Color.html("fffdf6"))
 				Px.rect(img, 5, y + 3, 6, 1, Color.html("d0c6a8"))
 				Px.px(img, 7, y + 2, Color.html("d0c6a8"))
+		&"sauce_vat":
+			# 矮黑缸，口里一汪深酱
+			var glaze := CropArt.ramp(Color.html("3a2c28"))
+			CropArt.ball(img, 8.0, 10.0, 6.0, 5.0, glaze)
+			Px.rect(img, 4, 6, 8, 3, glaze[1])
+			Px.rect(img, 5, 5, 6, 2, Color.html("6a3018"))
+			Px.rect(img, 6, 4, 4, 1, Color.html("8a4030"))
+		&"wine_jar":
+			# 细颈坛，口上一块红布
+			var clay := CropArt.ramp(Color.html("c47a4a"))
+			CropArt.ball(img, 8.0, 11.0, 5.0, 4.0, clay)
+			Px.rect(img, 6, 4, 4, 5, clay[1])
+			Px.rect(img, 5, 3, 6, 2, Color.html("c4382a"))
+			Px.rect(img, 7, 2, 2, 2, Color.html("e0b04a"))
 		&"cheese_rack":
 			# 三层木架，每层晾着奶酪
 			Px.rect(img, 3, 2, 1, 13, wood[2])
@@ -410,11 +488,25 @@ static func machine(id: StringName) -> Image:
 	return img
 
 
-## 食物的 16×16 图标。图标名是 "food:物品id"。汤、饭、面都盛在碗里，靠颜色和点缀区分。
+static func _food_sheet(id: StringName) -> Image:
+	var path := "res://art/food/%s.png" % id
+	if not FileAccess.file_exists(path):
+		return null
+	return Image.load_from_file(ProjectSettings.globalize_path(path))
+
+
+## 食物的 16×16 图标。图标名是 "food:物品id"。有画好的菜就用那张的第一帧，没有再画一只碗。
 static func food(id: StringName) -> Image:
+	var sheet := _food_sheet(id)
+	if sheet != null:
+		var chip := Image.create(32, 32, false, Image.FORMAT_RGBA8)
+		chip.blit_rect(sheet, Rect2i(0, 0, 32, 32), Vector2i.ZERO)
+		chip.resize(16, 16, Image.INTERPOLATE_NEAREST)
+		return chip
 	var img := Px.new_img(16, 16)
 	# 碗里的东西：[主色, 点缀的颜色]
 	var bowls: Dictionary[StringName, Array] = {
+		&"odd_bowl": ["8a8878", "5a5048"],
 		&"radish_soup": ["efe6cf", "fbf7ec"],
 		&"stir_greens": ["5fa848", "9ad878"],
 		&"rice_bowl": ["fbf7ec", "e2dccc"],
@@ -474,6 +566,7 @@ static func food(id: StringName) -> Image:
 	return img
 
 
+## 遗物的 16×16 图标，按 data/relics.json 里的 shape 画。都是旧东西，颜色压得灰一点。
 static func relic(id: StringName) -> Image:
 	var img := Px.new_img(16, 16)
 	var shape := Database.relic(id).shape if Database.has_relic(id) else ""

@@ -29,6 +29,12 @@ var _shown := 0.0
 var _waiting_choice := false
 var _blink := 0.0
 var _pause := 0.0
+## 头像的四种状态（睁/闭 × 三档嘴）现算现缓存，不写回素材文件
+var _face_base: Image
+var _face_frames: Dictionary[int, ImageTexture] = {}
+var _face_key := -1
+var _face_time := 0.0
+var _face_seed := 0.0
 
 
 func _ready() -> void:
@@ -112,6 +118,51 @@ func _process(delta: float) -> void:
 			_on_line_fully_shown()
 	_blink += delta
 	_more.visible = _shown >= total and not _waiting_choice and fmod(_blink, 0.8) < 0.5
+	_animate_face(delta, _shown < float(total))
+
+
+## 说话的时候嘴跟着逐字动，每隔几秒眨一下；状态只换纹理，不新建节点。
+func _animate_face(delta: float, talking: bool) -> void:
+	if _face_base == null or not _face_frame.visible:
+		return
+	_face_time += delta
+	var closed := UiMotion.blink_closed(_face_time, _face_seed)
+	var mouth := UiMotion.mouth_frame(_face_time, talking, _face_seed)
+	var key := (4 if closed else 0) + mouth
+	if key == _face_key:
+		return
+	_face_key = key
+	_face.texture = _frame_tex(key)
+
+
+func _frame_tex(key: int) -> ImageTexture:
+	if not _face_frames.has(key):
+		_face_frames[key] = ImageTexture.create_from_image(
+				UiMotion.face_variant(_face_base, key >= 4, key % 4))
+	return _face_frames[key]
+
+
+## UiKit.face 给的是三表情长条里的一格，取出这一格的像素来合成状态。
+static func _face_image(tex: Texture2D) -> Image:
+	if tex == null:
+		return null
+	var img: Image = null
+	if tex is AtlasTexture:
+		var at := tex as AtlasTexture
+		var atlas := at.atlas as Texture2D
+		if atlas == null:
+			return null
+		var strip := atlas.get_image()
+		if strip == null:
+			return null
+		var r := at.region
+		img = strip.get_region(Rect2i(int(r.position.x), int(r.position.y),
+				int(r.size.x), int(r.size.y)))
+	else:
+		img = tex.get_image()
+	if img != null and img.get_format() != Image.FORMAT_RGBA8:
+		img.convert(Image.FORMAT_RGBA8)
+	return img
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -167,7 +218,12 @@ func _show_next(key: String) -> void:
 	var who := Database.npc_by_name(line.character)
 	var mood := "happy" if line.has_tag("happy") else ("sad" if line.has_tag("sad") else "")
 	var face := UiKit.face(who.sheet, mood) if who != null else null
-	_face.texture = face
+	_face_frames.clear()
+	_face_key = -1
+	_face_time = 0.0
+	_face_base = _face_image(face)
+	_face_seed = float(absi(line.character.hash()) % 97) / 10.0
+	_face.texture = _frame_tex(0) if _face_base != null else face
 	_face_frame.visible = face != null
 	var left := TEXT_LEFT_FACE if face != null else TEXT_LEFT
 	_text.position.x = left

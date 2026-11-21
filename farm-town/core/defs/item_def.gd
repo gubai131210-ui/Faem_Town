@@ -2,7 +2,7 @@ class_name ItemDef
 extends RefCounted
 ## 一种物品的定义，来自 data/items.json。
 
-const KINDS: Array[StringName] = [&"tool", &"seed", &"sapling", &"crop", &"forage", &"fertilizer", &"misc", &"relic", &"fish", &"gear", &"feed", &"product", &"food", &"ore", &"weapon", &"accessory"]
+const KINDS: Array[StringName] = [&"tool", &"seed", &"sapling", &"crop", &"forage", &"fertilizer", &"misc", &"relic", &"fish", &"gear", &"feed", &"product", &"food", &"ore", &"weapon", &"accessory", &"decor"]
 ## 品质对售价的倍数：普通、良、优
 const QUALITY_MULT: Array[float] = [1.0, 1.25, 1.5]
 const QUALITY_NAMES: Array[String] = ["", "良", "优"]

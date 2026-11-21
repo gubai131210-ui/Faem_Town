@@ -241,6 +241,54 @@ func test_every_resident_sheet_has_a_sit_pose() -> void:
 		assert_true(npc._sheet.has_anim(&"sit"), "%s 的序列帧里有坐姿" % id)
 
 
+func test_every_resident_sheet_has_the_shared_actions() -> void:
+	for id: StringName in Database.npcs:
+		if id == &"farmer":
+			continue
+		var npc := _npc(id, Vector2i(2, 2))
+		for anim: StringName in [&"umbrella_walk", &"fan", &"rub", &"sweep", &"squat"]:
+			assert_true(npc._sheet.has_anim(anim), "%s 的序列帧里有 %s" % [id, anim])
+
+
+func test_npc_plays_the_spot_pose_while_standing() -> void:
+	GameClock.running = true
+	var npc := _npc(&"qingzhu", Vector2i(2, 2))
+	npc.spot = {"map": &"town", "tile": Vector2i(2, 2), "facing": GameMap.Facing.DOWN, "note": "door", "pose": "sweep"}
+	npc._process(0.05)
+	assert_eq(npc._anim, &"sweep", "日程写了扫地就播扫地")
+	npc.spot["pose"] = ""
+	npc._process(0.05)
+	assert_eq(npc._anim, &"idle", "没写 pose 就照常站着")
+
+
+func test_npc_walks_with_umbrella_only_in_rain() -> void:
+	GameClock.running = true
+	var was := Weather.today
+	var npc := _npc(&"ahe", Vector2i(2, 2))
+	npc.walk([Vector2i(10, 2)] as Array[Vector2i], GameMap.Facing.DOWN)
+	Weather.today = Weather.RAIN
+	for i in 20:
+		npc._process(0.05)
+	assert_eq(npc._anim, &"umbrella_walk", "下雨走路打伞")
+	Weather.today = Weather.SUNNY
+	for i in 3:
+		npc._process(0.05)
+	assert_eq(npc._anim, &"walk", "晴天照常走")
+	Weather.today = was
+
+
+func test_laozhou_wears_a_rain_cape_only_in_rain() -> void:
+	var was := Weather.today
+	var npc := _npc(&"laozhou", Vector2i(2, 2))
+	Weather.today = Weather.RAIN
+	npc._apply()
+	assert_true(npc._cape.visible, "下雨披蓑衣")
+	Weather.today = Weather.SUNNY
+	npc._apply()
+	assert_false(npc._cape.visible, "晴天不披")
+	Weather.today = was
+
+
 func test_two_npcs_chat_face_each_other_then_go_back() -> void:
 	GameClock.running = true
 	var a := _npc(&"ahe", Vector2i(2, 2))

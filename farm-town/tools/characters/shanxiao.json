@@ -1,0 +1,40 @@
+{
+	"name": "shanxiao",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"rub",
+		"squat"
+	],
+	"scale": 0.9,
+	"bulk": 1.18,
+	"stoop": 9,
+	"hat": false,
+	"hair": "shaggy",
+	"outfit": "tunic",
+	"muzzle": true,
+	"parts": {
+		"skin": [
+			"#6f8fb4",
+			"#516d90"
+		],
+		"hair": [
+			"#4a4a55",
+			"#33333d"
+		],
+		"shirt": [
+			"#4a4a55",
+			"#33333d"
+		],
+		"blue": [
+			"#4a4a55",
+			"#33333d"
+		],
+		"boot": [
+			"#33333d",
+			"#25252d"
+		],
+		"band": "red"
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"name": "shanliren",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": "headband",
+	"hair": "short",
+	"outfit": "tunic",
+	"beard": true,
+	"bulk": 1.1,
+	"pack": "basket",
+	"parts": {
+		"shirt": "green",
+		"blue": "leather",
+		"band": "ochre",
+		"hair": "hair_brown",
+		"boot": "charcoal",
+		"skin": "skin_tan",
+		"wood": "hair_tan"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "flat",
+		"jaw": "square",
+		"crop": true
+	}
+}

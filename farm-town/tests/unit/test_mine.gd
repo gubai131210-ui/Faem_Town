@@ -1,4 +1,4 @@
-extends GutTest
+﻿extends GutTest
 ## M5 第一批：沉灯井的楼层生成、镐子敲石头、梯子和井灯、井口地图。
 
 var _banners: Array[String] = []
@@ -271,7 +271,7 @@ func test_wellhead_gives_pickaxe_then_leads_down() -> void:
 	var well := _map(&"wellhead")
 	assert_false(well.blocked(well.spawn_position(&"from_town")))
 	assert_false(well.blocked(well.spawn_position(&"from_mine")))
-	assert_eq(well.trigger_at(Vector2i(12, 19)).get("map"), &"town")
+	assert_eq(well.trigger_at(Vector2i(12, 39)).get("map"), &"town")
 	var mouth := Vector2i(12, 6)
 	assert_eq(well.query_use(null, mouth, GameMap.Facing.UP), &"interact")
 	well.perform(&"interact", null, mouth)

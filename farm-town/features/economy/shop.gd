@@ -17,8 +17,10 @@ const UPGRADE_MATERIALS: Array = [
 const PICKAXE_NOTES: Array[String] = ["带矿的石头也一下敲开。", "每一镐只花 1 点体力。", "敲开矿石多掉一份的机会更大。"]
 const GROCERY := &"grocery"
 const SMITH := &"smith"
+## 青竹的木匠铺：家具、墙纸、地板（决策 148）。只在她这儿卖，不和别家合在一起。
+const CARPENTER := &"carpenter"
 ## 货单的标题
-const COUNTER_NAMES: Dictionary[StringName, String] = {GROCERY: "阿禾杂货铺", SMITH: "石叔铁匠铺"}
+const COUNTER_NAMES: Dictionary[StringName, String] = {GROCERY: "阿禾杂货铺", SMITH: "石叔铁匠铺", CARPENTER: "青竹木匠铺"}
 
 
 ## 这个季节在卖的种子，按价格从低到高。
@@ -50,6 +52,8 @@ static func full_shelves() -> bool:
 ## 一家铺子的货单。counter 为空时两家的合在一起。
 static func entries(season: StringName, counter: StringName = &"") -> Array[ShopEntry]:
 	var out: Array[ShopEntry] = []
+	if counter == CARPENTER:
+		return _furniture()
 	if counter != SMITH:
 		out.append_array(_goods(season))
 	if counter != GROCERY:
@@ -76,6 +80,8 @@ static func _goods(season: StringName) -> Array[ShopEntry]:
 		if def.power > 1 and not full_shelves():
 			continue
 		out.append(_item_entry(def))
+	# 钓具、饲料不跟整架货走，各看各的本事；稻草人跟乌鸦，仍要广场灯
+	_append_supplies(out)
 	if not full_shelves():
 		return out
 	var saplings: Array[ItemDef] = []
@@ -92,19 +98,36 @@ static func _goods(season: StringName) -> Array[ShopEntry]:
 			var e := _item_entry(def)
 			e.once = true
 			out.append(e)
-	# 钓具：鱼饵和蟹笼随便买，浮漂只卖一个
-	var gear: Array[ItemDef] = []
+	return out
+
+
+## 钓具跟着钓鱼（广场灯，或和老周熟了），饲料跟着养鸡鸭（河灯，或和阿牧熟了），稻草人跟着乌鸦。
+static func _supply_open(def: ItemDef) -> bool:
+	if def.id == &"scarecrow":
+		return full_shelves()
+	# 栅栏一开始就卖：田想围多大围多大
+	if def.id == &"fence":
+		return true
+	if def.kind == &"feed":
+		return Residents.opened("lamp_river", "amu")
+	return Residents.opened("lamp_plaza", "laozhou")
+
+
+static func _append_supplies(out: Array[ShopEntry]) -> void:
+	var list: Array[ItemDef] = []
 	for id: StringName in Database.items:
-		if Database.items[id].kind == &"gear" or Database.items[id].kind == &"feed":
-			gear.append(Database.items[id])
-	gear.sort_custom(_by_price)
-	for def in gear:
+		var def: ItemDef = Database.items[id]
+		if def.kind == &"gear" or def.kind == &"feed":
+			list.append(def)
+	list.sort_custom(_by_price)
+	for def in list:
+		if not _supply_open(def):
+			continue
 		if def.stack == 1 and GameState.inventory.count_of(def.id) > 0:
 			continue
 		var e := _item_entry(def)
 		e.once = def.stack == 1
 		out.append(e)
-	return out
 
 
 static func _upgrades() -> Array[ShopEntry]:
@@ -203,6 +226,19 @@ static func _machines() -> Array[ShopEntry]:
 		e.desc = def.desc
 		e.icon = "machine:" + String(def.id)
 		out.append(e)
+	return out
+
+
+## 青竹铺子里的摆设，按价格从低到高。
+static func _furniture() -> Array[ShopEntry]:
+	var list: Array[ItemDef] = []
+	for id: StringName in Database.items:
+		if Database.items[id].kind == &"decor":
+			list.append(Database.items[id])
+	list.sort_custom(_by_price)
+	var out: Array[ShopEntry] = []
+	for def in list:
+		out.append(_item_entry(def))
 	return out
 
 

@@ -15,6 +15,9 @@ if Residents.owes_thanks("shishu")
 	do Residents.thanked("shishu")
 elif Residents.away("shishu") >= 4
 	石叔: 有日子没来了。家伙还趁手？
+elif Residents.weather_is("fog")
+	% 石叔: 雾。炉子看着远。
+	% 石叔: 你刚才说要打什么？再说一遍。
 elif Residents.weather_is("rain") or Residents.weather_is("storm")
 	% 石叔: 雨天炉子不好烧。活照做。
 	% 石叔: 站里头点，别淋着。
@@ -61,6 +64,8 @@ else
 if Residents.owes_thanks("shishu")
 	石叔: 上回的{{Residents.gift_name("shishu")}}。……谢了。
 	do Residents.thanked("shishu")
+elif Residents.weather_is("fog")
+	石叔: 雾里看不清路。早点回去。
 elif Residents.at("shishu", "bench")
 	% 石叔: 收工了。坐会儿。
 	% 石叔: 胳膊酸。老了。
@@ -141,4 +146,16 @@ else
 石叔: 柄上四行字。热、看、敲、停。
 石叔: 最后一道是停。我以前总多敲一下。 [#sad]
 石叔: 行了。以后你的工具，我按这四行收口。矿石少要一块，算师父的。
+=> END
+
+~ trade_mine_1
+石叔: 井下到过第五层。梯子还在，人得自己下。
+=> END
+
+~ trade_mine_2
+石叔: 工具升过，井也深了。锤子认你的手。
+=> END
+
+~ trade_mine_3
+石叔: 井下到过三十层，镐子也跟得上。
 => END

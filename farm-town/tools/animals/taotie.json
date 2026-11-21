@@ -1,0 +1,57 @@
+{
+	"name": "taotie",
+	"body": "quadruped",
+	"scale": 1.3,
+	"cell": 48,
+	"foot_row": 40,
+	"quad": {
+		"body": [
+			0.31,
+			0.4,
+			0.28
+		],
+		"leg": 0.15,
+		"leg_r": 0.075,
+		"neck": 0.06,
+		"neck_up": 0.1,
+		"head": [
+			0.3,
+			0.27,
+			0.26
+		],
+		"snout": 0.15,
+		"ears": "side",
+		"horns": "goat",
+		"tusks": true,
+		"tail": "short",
+		"stripes": 3,
+		"stripe_w": 0.11
+	},
+	"parts": {
+		"body": [
+			"#7f9a72",
+			"#5f7a56"
+		],
+		"head": [
+			"#7f9a72",
+			"#5f7a56"
+		],
+		"leg": [
+			"#5f7a56",
+			"#465c40"
+		],
+		"ear": [
+			"#5f7a56",
+			"#465c40"
+		],
+		"tail": [
+			"#5f7a56",
+			"#465c40"
+		],
+		"stripe": "ochre",
+		"snout": "ochre",
+		"horn": "ochre",
+		"tusk": "white",
+		"hoof": "charcoal"
+	}
+}

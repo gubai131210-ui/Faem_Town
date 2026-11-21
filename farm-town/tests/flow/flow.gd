@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 ## 自动化流程：从标题画面开始真实地玩一遍，沿途截图并检查关键状态。
 ## 运行：godot --path . res://tests/flow/flow.tscn；加 --headless 不开窗口、只跑检查不截图
 ## 截图在 _preview/ 下；全部通过时最后一行输出 FLOW PASS，否则 FLOW FAIL 并以非零码退出。
@@ -47,9 +47,15 @@ func _run() -> void:
 	await _wait(1.6)
 	var game := get_tree().current_scene
 	_check(game != null and game.name == "Game", "进入游戏场景")
+	var opening: Node = game.get(&"cutscene")
+	if opening != null and bool(opening.get(&"playing")):
+		opening.call(&"skip")
+		await _wait(0.3)
+	_check(opening == null or not bool(opening.get(&"playing")), "开场能跳过")
 	var player: Player = game.get(&"player")
 	await _shot("02_farm_start")
 	_check(GameState.inventory.count_of(&"white_radish_seed") == 12, "开局有 12 颗种子")
+	_check(Guide.line().contains("信箱"), "第一天先提示去看信箱")
 	# 天气是随机的，流程里固定成晴天，不然“过夜后土地变干”这类检查会时灵时不灵
 	Weather.tomorrow = Weather.SUNNY
 	_check(Weather.today == Weather.SUNNY, "第一天是晴天")
@@ -345,7 +351,7 @@ func _run() -> void:
 
 	# ---- 南边的路通到南溪
 	GameClock.minutes = 600.0
-	player.place(GameMap.tile_center(Vector2i(22, 26)), GameMap.Facing.DOWN)
+	player.place(GameMap.tile_center(Vector2i(22, 50)), GameMap.Facing.DOWN)
 	await _wait(0.4)
 	Input.action_press(&"move_down")
 	for i in 40:
@@ -398,13 +404,13 @@ func _run() -> void:
 	await _press(&"use")
 	await _wait(0.5)
 	_check(not Fishing.has_trap(&"nanxi", trap_tile), "空笼子收回来了")
-	# 鱼谱：翻到第三页
+	# 鱼谱：从名册往左翻，仍是最后一页
 	await _press(&"residents")
 	await _wait(0.3)
 	var roster2: ResidentsPanel = game.get(&"residents_panel")
 	await _press(&"move_left")
 	await _wait(0.2)
-	_check(roster2._page == 2, "名册往左翻一页是鱼谱")
+	_check(roster2._page == ResidentsPanel.PAGE_FISH, "名册往左翻一页是鱼谱")
 	await _shot("06i1_fishbook")
 	await _press(&"residents")
 	await _wait(0.2)
@@ -641,7 +647,7 @@ func _run() -> void:
 
 	# ---- 回农场
 	GameClock.minutes = 620.0
-	player.place(GameMap.tile_center(Vector2i(43, 18)) + Vector2(0, 8), GameMap.Facing.RIGHT)
+	player.place(GameMap.tile_center(Vector2i(80, 18)) + Vector2(0, 8), GameMap.Facing.RIGHT)
 	await _wait(0.3)
 	Input.action_press(&"move_right")
 	for i in 40:
@@ -876,6 +882,7 @@ func _run() -> void:
 	await _press(&"ui_accept")
 	await _wait(2.6)
 	_check(GameClock.day == 2, "睡到了第 2 天")
+	_check(Guide.line() == "", "睡过一晚，第一步的提示收起来了")
 	_check(SaveSystem.has_save(0), "睡觉时写了存档")
 	_check(Farming.state.crop_days_at(field) == 1, "浇过水的作物长了一天")
 	_check(not Farming.state.soil.get(field, true), "过夜后土地变干")
@@ -945,6 +952,17 @@ func _run() -> void:
 	await _shot("14d_fertilized")
 
 	# ---- 铁锹：从池塘边挖水渠，水渠边开垦出来的地是湿的，再放水成水田
+	# 这几格在池塘边上，灌木和野菜是随机落的。占着的时候锄头和铁锹落不下去。
+	var canal_map: OutdoorMap = game.get(&"map")
+	var canal_spots: Array[Vector2i] = [Vector2i(28, 14), Vector2i(28, 15), Vector2i(28, 16), Vector2i(28, 17)]
+	for canal_tile: Vector2i in canal_spots:
+		if Foraging.item_at(&"farm", canal_tile) != &"":
+			Foraging.take(&"farm", canal_tile)
+		canal_map._clear_decor(canal_tile)
+		var canal_solid := canal_map.solid
+		canal_solid[canal_map.idx(canal_tile)] = 0
+		canal_map.solid = canal_solid
+		canal_map.occupied.erase(canal_tile)
 	GameState.inventory.add(&"shovel")
 	_hold(&"shovel")
 	player.place(GameMap.tile_center(Vector2i(28, 16)), GameMap.Facing.DOWN)
@@ -1249,6 +1267,10 @@ func _run() -> void:
 	await _press(&"use")
 	await _wait(0.3)
 	_check(GameState.inventory.count_of(&"radish_soup") == soup_before + 1, "做了一碗萝卜汤")
+	var cook_show: CookShow = game.get(&"cook_show")
+	if cook_show != null and cook_show.is_open():
+		await _press(&"ui_cancel")
+		await _wait(0.2)
 	await _press(&"inventory")
 	await _wait(0.3)
 	_check(not cook_panel.is_open(), "菜谱能关上")
@@ -1310,7 +1332,9 @@ func _run() -> void:
 	# ---- 第三幕：牧野灯亮了北边的雾还在；老秦给钥匙，点井口灯，雾才散
 	GameState.set_flag(&"lamp_pasture")
 	GameState.energy = GameState.max_energy
-	GameClock.minutes = 990.0
+	# 这一段落在冬天（上面四季循环停在第 80 天）。冬天出门晚一小时、回家早一小时，
+	# 灯亮前老秦只在茶馆门口站到 17:30，16:30 已经不在了。
+	GameClock.minutes = 17 * 60.0
 	game.call(&"_load_map", &"town", &"from_farm")
 	await _wait(0.6)
 	town = game.map
@@ -1669,14 +1693,22 @@ func _run() -> void:
 	await _shot("18o2_mine_dark_low_oil")
 	GameState.inventory.add(&"lamp_oil", 1)
 	_hold(&"lamp_oil")
-	for dir: GameMap.Facing in [GameMap.Facing.DOWN, GameMap.Facing.RIGHT, GameMap.Facing.LEFT, GameMap.Facing.UP]:
+	var cook_show_now: Node = game.get(&"cook_show")
+	if cook_show_now != null and cook_show_now.has_method(&"is_open") and bool(cook_show_now.call(&"is_open")):
+		cook_show_now.call(&"close")
+		await _wait(0.1)
+	for attempt in 12:
+		if attempt > 0 and attempt % 4 == 0:
+			player.place(player.position + Vector2(GameMap.TS, 0), GameMap.Facing.DOWN)
+		var dir: GameMap.Facing = attempt % 4
 		player.place(player.position, dir)
-		if game.map.query_use(GameState.selected_item(), player.target_tile(), player.facing) == &"":
+		if game.map.query_use(GameState.selected_item(), player.target_tile(), player.facing) != &"":
+			continue
+		await _until_use_released()
+		await _press(&"use")
+		await _wait(0.25)
+		if Mine.oil > 60.0:
 			break
-	await _wait(0.1)
-	await _until_use_released()
-	await _press(&"use")
-	await _wait(0.3)
 	_check(Mine.oil > 60.0 and GameState.inventory.count_of(&"lamp_oil") == 0, "拿着灯油按使用键添了油（现在 %d）" % int(Mine.oil))
 	# 第 40 层：岚之影的考验。灯灭了从头再走；走到灯座就算完
 	Mine.enter(40, 1)
@@ -1811,7 +1843,7 @@ func _run() -> void:
 	await _shot("19e_east_lamp_lit")
 	_check(not bank.blocked(GameMap.tile_center(Vector2i(42, 16))), "东滩灯亮了，往东的雾散了")
 	GameClock.minutes = 600.0
-	player.place(GameMap.tile_center(Vector2i(41, 16)) + Vector2(0, 8), GameMap.Facing.RIGHT)
+	player.place(GameMap.tile_center(Vector2i(72, 16)) + Vector2(0, 8), GameMap.Facing.RIGHT)
 	await _wait(0.3)
 	Input.action_press(&"move_right")
 	for i in 40:
@@ -1850,12 +1882,15 @@ func _run() -> void:
 	player.place(GameMap.tile_center(Vector2i(12, 11)), GameMap.Facing.UP)
 	await _wait(0.5)
 	await _shot("19j_studio")
-	var pier_end: Vector2i = (beach.get(&"_pier") as Array)[-1]
-	player.place(GameMap.tile_center(pier_end), GameMap.Facing.RIGHT)
-	_hold(&"rod")
-	await _wait(0.5)
-	_check(beach.query_use(GameState.selected_item(), player.target_tile(), player.facing) == &"cast", "站在栈桥头上能往海里甩竿")
-	await _shot("19k_pier")
+	var pier_raw: Variant = beach.get(&"_pier")
+	_check(pier_raw is Array and (pier_raw as Array).size() > 0, "东滩有栈桥")
+	if pier_raw is Array and (pier_raw as Array).size() > 0:
+		var pier_end: Vector2i = (pier_raw as Array)[-1]
+		player.place(GameMap.tile_center(pier_end), GameMap.Facing.RIGHT)
+		_hold(&"rod")
+		await _wait(0.5)
+		_check(beach.query_use(GameState.selected_item(), player.target_tile(), player.facing) == &"cast", "站在栈桥头上能往海里甩竿")
+		await _shot("19k_pier")
 	Foraging.pending[&"dongtan"] = 5
 	game.call(&"_load_map", &"dongtan", &"from_riverbank")
 	await _wait(0.5)
@@ -2073,7 +2108,8 @@ func _run() -> void:
 			fin_buttons[1 if fin_round == 0 else 0].grab_focus()
 		await _wait(0.15)
 		await _press(&"ui_accept")
-		for i in 100:
+		# 结局先演五段再念旁白。一段大约 2.6 秒，加上淡出，等到旁白打开要二十秒上下。
+		for i in 240:
 			if fin_screen.is_open() and fin_balloon.is_open():
 				break
 			await _wait(0.1)
@@ -2278,6 +2314,124 @@ func _run() -> void:
 	await _wait(0.8)
 	await _shot("22m_new_year_morning")
 
+	# ---- 厨艺这条：称号、长桌上的菜、墙上的牌。
+	# 前面饺子宴交的是馅，长桌还是蒸笼；除夕也没往桌上摆。这里把做过的菜拿出来走一遍。
+	var cook_game: Node = get_tree().current_scene
+	var cook_player: Player = cook_game.get(&"player")
+	var cook_balloon: DialogueBalloon = cook_game.get(&"balloon")
+	for cook_id: StringName in Database.recipes:
+		if Crafting.made_dishes.size() >= 6:
+			break
+		var cook_def: RecipeDef = Database.recipes[cook_id]
+		if cook_def.from == &"start":
+			Crafting.mark_cooked(cook_id)
+	_check(Crafting.pending_rank() == &"helper", "开局会的菜做过 6 道，下一档是帮厨（实际 %s）" % Crafting.pending_rank())
+	GameState.selected_slot = 0
+	GameClock.minutes = 540.0
+	Weather.today = Weather.SUNNY
+	cook_game.call(&"_load_map", &"town", &"from_farm")
+	await _wait(0.9)
+	var cook_map: Node = cook_game.get(&"map")
+	var cook_npc: Npc = cook_map.call(&"_npc_of", &"yunniang")
+	_check(cook_npc != null, "立春上午，茶馆门口找得到云娘")
+	if cook_npc != null:
+		cook_player.place(GameMap.tile_center(cook_npc.tile() + Vector2i(0, 1)), GameMap.Facing.UP)
+		await _wait(0.4)
+		await _press(&"use")
+		await _wait(2.2)
+	var cook_line: DialogueLine = cook_balloon.get(&"_line")
+	var cook_text := "" if cook_line == null else cook_line.text
+	_check(cook_balloon.is_open() and cook_text.contains("帮厨"), "云娘当面叫你帮厨（%s）" % cook_text)
+	# 人贴在门口时草帽盖住云娘。再退一格再拍，门口能看见她整个人。
+	if cook_npc != null:
+		cook_player.place(GameMap.tile_center(cook_npc.tile() + Vector2i(0, 3)), GameMap.Facing.UP)
+		await _wait(0.35)
+	await _shot("24a_rank")
+	await _close_talk()
+	_check(Crafting.rank == &"helper", "称呼记下了：帮厨")
+
+	# 冬至：手里两道菜，对着长桌摆上。人先站在桌南边按使用，再退开，免得草帽挡住盘子。
+	await _festival_day(85, 1020.0, &"town")
+	cook_player = cook_game.get(&"player")
+	cook_map = cook_game.get(&"map")
+	_make_room(2)
+	GameState.inventory.add(&"radish_soup", 1, 2)
+	GameState.inventory.add(&"strawberry_bowl", 1, 2)
+	cook_player.place(GameMap.tile_center(Vector2i(22, 13)), GameMap.Facing.UP)
+	await _wait(0.3)
+	_hold(&"radish_soup")
+	await _press(&"use")
+	await _wait(0.35)
+	_hold(&"strawberry_bowl")
+	await _press(&"use")
+	await _wait(0.35)
+	_check(Crafting.table_dishes.size() == 2, "饺子宴的长桌上摆了两道菜（实际 %d）" % Crafting.table_dishes.size())
+	cook_player.place(GameMap.tile_center(Vector2i(22, 16)), GameMap.Facing.UP)
+	await _wait(0.5)
+	var cook_table: Node = cook_map.get(&"_fest_table")
+	_check(cook_table != null and cook_table.get_child_count() >= 2, "红桌上能看见这两道菜")
+	await _shot("24b_dumpling_dishes")
+
+	# 除夕：同一桌菜跟着到南边那张红桌布上。
+	await _festival_day(96, 1170.0, &"town")
+	cook_player = cook_game.get(&"player")
+	cook_map = cook_game.get(&"map")
+	_check(Crafting.table_dishes.size() == 2, "除夕长桌上还是这两道")
+	cook_player.place(GameMap.tile_center(Vector2i(22, 20)), GameMap.Facing.UP)
+	await _wait(0.5)
+	cook_table = cook_map.get(&"_fest_table")
+	_check(cook_table != null and cook_table.get_child_count() >= 2, "除夕的红桌布上能看见这两道菜")
+	await _shot("24c_newyear_dishes")
+
+	# 农舍：再摆六道优品，凑满八席；节气菜和忆里的菜记成做过，三块牌挂上。
+	cook_game.call(&"_load_map", &"farmhouse", &"door")
+	await _wait(0.8)
+	cook_player = cook_game.get(&"player")
+	cook_map = cook_game.get(&"map")
+	cook_player.place(GameMap.tile_center(Vector2i(7, 5)), GameMap.Facing.UP)
+	var cook_extra := 0
+	for cook_id: StringName in Database.recipes:
+		if cook_extra >= 6:
+			break
+		if cook_id == Crafting.ODD_BOWL or Crafting.table_dishes.has(cook_id):
+			continue
+		_make_room(1)
+		GameState.inventory.add(cook_id, 1, 2)
+		_hold(cook_id)
+		await _press(&"use")
+		await _wait(0.3)
+		cook_extra += 1
+	for cook_id: StringName in Database.recipes:
+		var cook_made: RecipeDef = Database.recipes[cook_id]
+		if cook_made.term != &"" or cook_made.from == &"memory":
+			Crafting.mark_cooked(cook_id)
+	_check(Crafting.table_dishes.size() == 8, "农舍桌上八道都摆上了（实际 %d）" % Crafting.table_dishes.size())
+	_check(Crafting.has_set(&"terms") and Crafting.has_set(&"homes") and Crafting.has_set(&"fine"), "节气牌、人家牌、优席牌都挂上了")
+	await _wait(2.6)
+	cook_player.place(GameMap.tile_center(Vector2i(5, 7)), GameMap.Facing.UP)
+	await _wait(0.4)
+	_check((cook_map.get(&"_plaques") as Array).size() == 3, "窗下看得见三块牌")
+	await _shot("24d_plaques")
+	await _press(&"residents")
+	await _wait(0.2)
+	await _press(&"move_right")
+	await _wait(0.15)
+	await _press(&"move_right")
+	await _wait(0.15)
+	await _press(&"move_down")
+	await _wait(0.1)
+	await _press(&"move_down")
+	await _wait(0.1)
+	await _press(&"move_down")
+	await _wait(0.3)
+	var cook_roster: ResidentsPanel = cook_game.get(&"residents_panel")
+	var cook_journal := Journal.page_text(3)
+	_check(cook_roster.is_open() and cook_roster._page == ResidentsPanel.PAGE_JOURNAL and cook_roster._journal_cursor == 3, "手账翻到了灶这一页")
+	_check(cook_journal.contains("帮厨") and cook_journal.contains("节气牌") and cook_journal.contains("人家牌") and cook_journal.contains("优席牌"), "灶页记下了称呼和三块牌")
+	await _shot("24e_journal")
+	await _press(&"residents")
+	await _wait(0.2)
+
 	# ---- 第五批：二到五级的忆，和忆满以后才打开的几处
 	var mem_game: Node = get_tree().current_scene
 	var mem_player: Player = mem_game.get(&"player")
@@ -2352,6 +2506,9 @@ func _run() -> void:
 ## 把日子拨到这一年的第 day 天（已经过了就拨到明年的）、几点，天晴，然后进这张地图。
 func _festival_day(day: int, minutes: float, map_id: StringName) -> void:
 	var game: Node = get_tree().current_scene
+	var hud: Hud = game.get(&"hud")
+	if hud != null:
+		hud.dismiss_toasts()
 	var target := (GameClock.day - 1) / 96 * 96 + day
 	if target < GameClock.day:
 		target += 96
@@ -2360,6 +2517,11 @@ func _festival_day(day: int, minutes: float, map_id: StringName) -> void:
 	Weather.today = Weather.SUNNY
 	game.call(&"_load_map", map_id, &"from_farm" if map_id == &"town" else &"from_town")
 	await _wait(0.9)
+	var fes_cut: Node = game.get(&"cutscene")
+	for i in 30:
+		if fes_cut == null or not bool(fes_cut.get(&"playing")):
+			break
+		await _wait(0.1)
 
 
 ## 按使用键把对话往下翻，直到出现选项，选第 index 个。follow 表示选完会接着开下一段对话，等它开出来。

@@ -1,8 +1,8 @@
-extends GutTest
+﻿extends GutTest
 ## M6 第一批：第四幕（遗落层的铁盒、姜婆婆认出相片、东滩灯）、东滩地图、赶海、白鹭的画室。
 
 const EAST_FOG := Vector2i(42, 16)
-const EAST_EDGE := Vector2i(43, 16)
+const EAST_EDGE := Vector2i(75, 16)
 const EAST_LAMP := Vector2i(39, 15)
 
 var _banners: Array[String] = []

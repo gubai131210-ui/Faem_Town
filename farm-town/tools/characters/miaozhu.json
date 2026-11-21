@@ -1,0 +1,33 @@
+{
+	"name": "miaozhu",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": false,
+	"hair": "bun",
+	"outfit": "robe",
+	"beard": true,
+	"stoop": 6,
+	"parts": {
+		"shirt": "ochre",
+		"band": "charcoal",
+		"hair": "hair_white",
+		"boot": "charcoal",
+		"blue": "charcoal"
+	},
+	"face": {
+		"age": "old",
+		"eyes": "narrow",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "neutral",
+		"jaw": "soft"
+	}
+}

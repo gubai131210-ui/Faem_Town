@@ -1,6 +1,12 @@
 extends GutTest
 ## M6 第五批：二到五级忆、岚的五段、忆满以后打开的那些事。
 
+## 小满没有忆。六位新居民各三段，不走五级那条，也不进归名。
+const NO_MEMORY: Array[StringName] = [&"xiaoman"]
+const THREE: Array[StringName] = [
+	&"shuoshu", &"jiangyuan", &"huolang", &"chuanniang", &"miaozhu", &"shanliren",
+]
+
 
 func before_each() -> void:
 	SaveSystem.reset_all()
@@ -15,8 +21,19 @@ func after_each() -> void:
 func test_every_resident_has_five_memories_and_lan_does_too() -> void:
 	assert_eq(Database.validate().size(), 0, "%s" % Database.validate())
 	for id: StringName in Database.npcs:
-		if id == &"xiaoman":
-			assert_null(Database.memory(id, 1), "小满没有忆")
+		if NO_MEMORY.has(id):
+			assert_null(Database.memory(id, 1), "%s 没有忆" % id)
+			continue
+		if THREE.has(id):
+			for level in range(1, 4):
+				var side := Database.memory(id, level)
+				assert_not_null(side, "%s 第 %d 级" % [id, level])
+				assert_eq(Database.relic(side.relic).level, level)
+				var side_res: Resource = load(Residents.dialogue_path(id))
+				var side_line: Variant = await DialogueManager.get_next_dialogue_line(side_res, "memory_%d" % level)
+				assert_not_null(side_line, "%s 的 memory_%d 有话说" % [id, level])
+			assert_null(Database.memory(id, 4), "%s 只有三段" % id)
+			assert_false(Story.unfinished().has(id), "%s 不进归名" % id)
 			continue
 		for level in range(1, 6):
 			var m := Database.memory(id, level)

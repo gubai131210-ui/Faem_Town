@@ -1,0 +1,18 @@
+config_version=5
+
+[application]
+config/name="一口小灶"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+run/main_scene="res://kitchen.tscn"
+
+[display]
+window/size/viewport_width=1200
+window/size/viewport_height=750
+window/size/window_width_override=1200
+window/size/window_height_override=750
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.068, 0.090, 0.082, 1)

@@ -1,6 +1,6 @@
 {
- "voice": "zh-CN-XiaoxiaoNeural",
- "rate": "-5%",
+ "voice": "code",
+ "rate": "",
  "today": "今天，{term}。",
  "tomorrow": "明天，",
  "weather": {

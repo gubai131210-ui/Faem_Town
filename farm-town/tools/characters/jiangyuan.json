@@ -1,0 +1,34 @@
+{
+	"name": "jiangyuan",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": false,
+	"hair": "short",
+	"outfit": "apron",
+	"bulk": 1.24,
+	"parts": {
+		"shirt": "cream",
+		"apron": "indigo",
+		"blue": "leather",
+		"hair": "hair_black",
+		"boot": "charcoal"
+	},
+	"face": {
+		"age": "adult",
+		"eyes": "calm",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "smile",
+		"jaw": "soft",
+		"crop": true,
+		"moustache": true
+	}
+}

@@ -15,8 +15,12 @@ const DAYS_PER_SEASON := 24
 const SEASONS_PER_YEAR := 4
 const DAYS_PER_TERM := 4
 const SEASON_NAMES: Array[String] = ["春", "夏", "秋", "冬"]
-## 现实一秒对应的游戏分钟数；一天约 14 分钟
+## 现实一秒对应的游戏分钟数；一天约 14 分钟。暂停菜单里调慢时再乘 pace
 const MINUTES_PER_SECOND := 1.4
+## 把一天调慢时用的倍率。平常是 1
+const PACE_SLOW := 0.5
+## 夏至天黑推迟、冬至天黑提前的分钟数（两小时）
+const SOLSTICE_SHIFT := 120.0
 
 ## 每日结算的固定顺序，数字小的先执行
 const ORDER_WEATHER := 10
@@ -32,6 +36,8 @@ var day := 1
 var minutes := DAY_START
 ## 为假时时间不流动（菜单、对话、转场）
 var running := false
+## 一天走多快。1 是平常，PACE_SLOW 是慢。跟着时钟存档
+var pace := 1.0
 
 var _daily: Array[Dictionary] = []
 var _last_shown := -1
@@ -45,7 +51,7 @@ func _process(delta: float) -> void:
 	if not running:
 		return
 	# 卡顿时限制单帧步长，避免一下跳过很多时间
-	minutes += minf(delta, 0.05) * MINUTES_PER_SECOND
+	minutes += minf(delta, 0.05) * MINUTES_PER_SECOND * pace
 	if minutes >= DAY_END:
 		minutes = DAY_END
 		running = false
@@ -97,6 +103,38 @@ func term_name() -> String:
 	return def.name if def != null else ""
 
 
+## 黄昏相对平常挪多少分钟：夏至推迟两小时、冬至提前两小时，别的节气不挪。
+## 只挪天黑这一头，不挪天亮，所以夏至夜最短、冬至夜最长。
+## 天色的明暗、灯、窗、萤火虫、夜行的鱼和夜晚的曲子都按这个挪；
+## 居民作息和动物进舍按钟点走，不跟着挪。
+func dusk_shift() -> float:
+	var id := term_id()
+	if id == &"xiazhi":
+		return SOLSTICE_SHIFT
+	if id == &"dongzhi":
+		return -SOLSTICE_SHIFT
+	return 0.0
+
+
+## 试玩用的四段日子。只在调试运行里用 F9 跳，正式版没有这个键。
+## day 是一年里的第几天（立春是 1），minutes 是当天的钟点。
+const LOOK_STOPS: Array[Dictionary] = [
+	{"day": 41, "minutes": 13 * 60, "term": &"xiaoshu", "map": &"town", "spawn": &"from_farm",
+		"text": "小暑中午。人要走一会儿才到阴凉处摇扇。别睡觉，Shift+F9 回到原来的日子。"},
+	{"day": 73, "minutes": 10 * 60, "term": &"lidong", "map": &"farm", "spawn": &"house_door",
+		"hay": true,
+		"text": "立冬。家畜整天在舍里，背包里放了干草。别睡觉，Shift+F9 回去。"},
+	{"day": 81, "minutes": 10 * 60, "term": &"daxue", "map": &"shanci", "spawn": &"steps",
+		"text": "大雪。往上走到山顶湖，银鱼只在这四天咬钩。别睡觉，Shift+F9 回去。"},
+	{"day": 77, "minutes": 15 * 60, "term": &"xiaoxue", "map": &"town", "spawn": &"from_farm",
+		"text": "冬天午后。站着的人搓手、呵白气，茶馆门口人多。别睡觉，Shift+F9 回去。"},
+	{"day": 1, "minutes": 11 * 60, "term": &"lichun", "map": &"town", "spawn": &"from_farm", "today": &"fog",
+		"text": "雾天。人走得慢、出门晚，柏先生在家，白鹭在画画。别睡觉，Shift+F9 回去。"},
+	{"day": 49, "minutes": 10 * 60 + 30, "term": &"liqiu", "map": &"town", "spawn": &"from_farm", "today": &"wind",
+		"text": "大风。云娘这会儿在街上追幌子，阿禾下午收摊。别睡觉，Shift+F9 回去。"},
+]
+
+
 func date_text() -> String:
 	return "%s %d日" % [SEASON_NAMES[season()], day_of_season()]
 
@@ -128,13 +166,22 @@ func advance_day() -> void:
 	day_started.emit(day)
 
 
+func is_slow() -> bool:
+	return pace < 0.75
+
+
+func set_slow_day(on: bool) -> void:
+	pace = PACE_SLOW if on else 1.0
+
+
 func save_data() -> Dictionary:
-	return {"day": day, "minutes": minutes}
+	return {"day": day, "minutes": minutes, "pace": pace}
 
 
 func load_data(data: Dictionary) -> void:
 	day = maxi(1, int(data.get("day", 1)))
 	minutes = clampf(float(data.get("minutes", DAY_START)), DAY_START, DAY_END)
+	pace = PACE_SLOW if float(data.get("pace", 1.0)) < 0.75 else 1.0
 	_last_shown = -1
 	time_changed.emit()
 
@@ -142,6 +189,7 @@ func load_data(data: Dictionary) -> void:
 func reset_data() -> void:
 	day = 1
 	minutes = DAY_START
+	pace = 1.0
 	running = false
 	_last_shown = -1
 	time_changed.emit()

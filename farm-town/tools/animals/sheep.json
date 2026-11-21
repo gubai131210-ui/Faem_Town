@@ -1,7 +1,7 @@
 {
 	"name": "sheep",
 	"body": "quadruped",
-	"scale": 0.95,
+	"scale": 1.08,
 	"quad": {
 		"body": [
 			0.27,
@@ -30,5 +30,9 @@
 		"tail": "cream",
 		"snout": "skin_tan",
 		"hoof": "leather"
-	}
+	},
+	"extra_anims": [
+		"lie",
+		"shake"
+	]
 }

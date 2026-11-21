@@ -3,12 +3,19 @@
 	"anims": [
 		"idle",
 		"walk",
-		"sit"
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat",
+		"stomp"
 	],
 	"hat": false,
 	"hair": "pigtails",
 	"outfit": "tunic",
 	"scale": 0.8,
+	"costume_detail": "child",
 	"parts": {
 		"shirt": "red",
 		"blue": "indigo",

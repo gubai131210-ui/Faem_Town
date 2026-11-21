@@ -1,0 +1,36 @@
+{
+	"name": "yutu",
+	"body": "quadruped",
+	"scale": 0.8,
+	"quad": {
+		"body": [
+			0.2,
+			0.27,
+			0.2
+		],
+		"leg": 0.09,
+		"neck": 0.06,
+		"neck_up": 0.16,
+		"head": [
+			0.18,
+			0.18,
+			0.17
+		],
+		"snout": 0.04,
+		"ears": "long",
+		"tail": "short"
+	},
+	"parts": {
+		"body": "white",
+		"head": "white",
+		"leg": "white",
+		"ear": "white",
+		"tail": "white",
+		"snout": "pink",
+		"hoof": "white",
+		"eye": [
+			"#c8483c",
+			"#c8483c"
+		]
+	}
+}

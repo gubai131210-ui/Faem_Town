@@ -9,10 +9,10 @@ signal title_requested
 const KEY_ROWS: Array = [
 	["走动", [&"move_up", &"move_left", &"move_down", &"move_right"]],
 	["使用、搭话（按住蓄力）", [&"use"]],
-	["翻滚（井里）", [&"roll"]],
+	["翻滚（井里、竹海、后山、雾岛）", [&"roll"]],
 	["换手里的东西", [&"slot1", &"slot8"]],
 	["背包", [&"inventory"]],
-	["名册和忆簿", [&"residents"]],
+	["名册和手账", [&"residents"]],
 	["音乐开关", [&"music"]],
 	["暂停", [&"pause"]],
 ]
@@ -27,6 +27,7 @@ var _panel: Control
 var _keys_panel: Control
 var _resume: Button
 var _music: Button
+var _pace: Button
 var _keys: Button
 var _back: Button
 
@@ -38,18 +39,18 @@ func _ready() -> void:
 	_root.add_child(UiKit.dim(0.55))
 
 	_panel = UiKit.window()
-	UiKit.center(_panel, Vector2(120, 134))
+	UiKit.center(_panel, Vector2(128, 168))
 	_root.add_child(_panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 3)
-	box.position = Vector2(12, 22)
-	box.size = Vector2(96, 104)
+	box.position = Vector2(16, 22)
+	box.size = Vector2(96, 136)
 	_panel.add_child(box)
 
 	var head := UiKit.label("暂停", 8)
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	head.position = Vector2(0, 5)
-	head.size = Vector2(120, 12)
+	head.size = Vector2(128, 12)
 	_panel.add_child(head)
 	_resume = UiKit.button("继续")
 	_resume.pressed.connect(close)
@@ -60,6 +61,9 @@ func _ready() -> void:
 	_music = UiKit.button("")
 	_music.pressed.connect(_on_music_pressed)
 	box.add_child(_music)
+	_pace = UiKit.button("")
+	_pace.pressed.connect(_on_pace_pressed)
+	box.add_child(_pace)
 	var title := UiKit.button("回到标题")
 	title.pressed.connect(_on_title_pressed)
 	box.add_child(title)
@@ -116,6 +120,7 @@ func open() -> void:
 	UiKit.pop(_panel)
 	_keys_panel.visible = false
 	_refresh_music()
+	_refresh_pace()
 	_resume.grab_focus()
 
 
@@ -185,6 +190,15 @@ func _refresh_music() -> void:
 func _on_music_pressed() -> void:
 	Audio.toggle_music()
 	_refresh_music()
+
+
+func _refresh_pace() -> void:
+	_pace.text = "一天：慢" if GameClock.is_slow() else "一天：平常"
+
+
+func _on_pace_pressed() -> void:
+	GameClock.set_slow_day(not GameClock.is_slow())
+	_refresh_pace()
 
 
 func _on_title_pressed() -> void:

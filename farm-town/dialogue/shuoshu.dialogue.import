@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://c0htwfofj8vue"
+path="res://.godot/imported/shuoshu.dialogue-d810b8663bfba22acb1d501a5a84aecd.tres"
+
+[deps]
+
+source_file="res://dialogue/shuoshu.dialogue"
+dest_files=["res://.godot/imported/shuoshu.dialogue-d810b8663bfba22acb1d501a5a84aecd.tres"]
+
+[params]
+
+defaults=true

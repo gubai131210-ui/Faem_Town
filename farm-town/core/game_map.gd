@@ -16,7 +16,7 @@ var indoor := false
 var player: Node2D
 ## 正在演一小段剧情（居民走过来说话）：玩家不能动，时间照走
 var cutscene := false
-## 这张地图上会打起来（井里）：能翻滚；拿着武器时 query_use 返回 &"attack"，
+## 这张地图上会打起来（井里、竹海、后山、雾岛）：能翻滚；拿着武器时 query_use 返回 &"attack"，
 ## 打到的那一帧 Game 调地图的 weapon_hit(weapon, step, skill)
 var combat := false
 

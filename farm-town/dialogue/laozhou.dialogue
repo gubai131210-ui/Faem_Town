@@ -9,8 +9,11 @@
 => daily
 
 ~ daily
-if Residents.lamp_lit("plaza") and not Residents.has_flag("got_rod")
-	老周: ……灯亮了。
+if not Residents.has_flag("got_rod") and Residents.opened("lamp_plaza", "laozhou")
+	if Residents.lamp_lit("plaza")
+		老周: ……灯亮了。
+	else
+		老周: 你常来码头。
 	老周: 你。会钓鱼吗？
 	if Residents.can_hold("rod")
 		老周: 船上多一根竿子。拿去。
@@ -28,6 +31,9 @@ if Residents.lamp_news("laozhou", "river")
 	=> river_lamp_news
 if Residents.has_flag("relic_river_lantern") and not Residents.has_flag("lantern_found")
 	=> lantern_found
+if Residents.weather_is("fog") and Residents.has_flag("got_rod")
+	老周: 下雾了。你刚才是不是跟我说过话。我记不清。
+	=> END
 if Residents.at("laozhou", "dock")
 	if Residents.has_flag("got_rod") and not Residents.has_flag("lantern_hint")
 		=> lantern_hint
@@ -170,4 +176,16 @@ do Residents.hand("crab_trap")
 老周: 阿海。我儿子。
 老周: 名字刻在竿子靠近握把的地方。我每天握着，还是忘了。 [#sad]
 老周: 海上的鱼我认得路。你到了东滩，竿子会自己找水。
+=> END
+
+~ trade_fish_1
+老周: 竿使得顺了。甩出去不那么费劲。
+=> END
+
+~ trade_fish_2
+老周: 鱼认得你的线。它们来得快一点。
+=> END
+
+~ trade_fish_3
+老周: 这河算你跑熟了。
 => END

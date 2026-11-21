@@ -10,14 +10,27 @@ const GAME_SCENE := "res://game/game.tscn"
 const MAPS: Dictionary[StringName, String] = {
 	&"farm": "res://maps/farm/farm.tscn",
 	&"farmhouse": "res://maps/farmhouse/farmhouse.tscn",
+	&"teahouse": "res://maps/teahouse/teahouse.tscn",
+	&"herbshop": "res://maps/herbshop/herbshop.tscn",
+	&"smithy": "res://maps/smithy/smithy.tscn",
+	&"hall": "res://maps/hall/hall.tscn",
 	&"town": "res://maps/town/town.tscn",
 	&"nanxi": "res://maps/nanxi/nanxi.tscn",
 	&"riverbank": "res://maps/riverbank/riverbank.tscn",
+	&"wharf": "res://maps/wharf/wharf.tscn",
+	&"zhuhai": "res://maps/zhuhai/zhuhai.tscn",
+	&"workshop": "res://maps/workshop/workshop.tscn",
 	&"pasture": "res://maps/pasture/pasture.tscn",
 	&"dongtan": "res://maps/dongtan/dongtan.tscn",
+	&"wudao": "res://maps/wudao/wudao.tscn",
 	&"shanci": "res://maps/shanci/shanci.tscn",
+	&"houshan": "res://maps/houshan/houshan.tscn",
 	&"wellhead": "res://maps/wellhead/wellhead.tscn",
+	&"lane": "res://maps/lane/lane.tscn",
 	&"mine": "res://maps/mine/mine_map.tscn",
+	&"chaling": "res://maps/chaling/chaling.tscn",
+	&"ouhua": "res://maps/ouhua/ouhua.tscn",
+	&"gulin": "res://maps/gulin/gulin.tscn",
 }
 
 var busy := false

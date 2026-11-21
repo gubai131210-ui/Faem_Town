@@ -1,10 +1,19 @@
-extends OutdoorMap
+extends WildMap
 ## 河岸：坐老周的船顺溪而下到的大河边。河灯亮了以后才来得了。
 ## 北边是一整条河（河钓的鱼都在这儿），南岸是老周的船屋和竹林；对着系船的木桩按使用键坐船回南溪。
 ## 船屋门前有一条往东的土路，东滩灯亮了以后顺着它走到头是东滩。
+## 同一条土路往西走到头是河埠。铺面在河埠上，不在这张岸上（决策 113）。
 
-const W := 44
-const H := 30
+## 老河岸是左上角 44×30；往东、往南扩到 76×48，老坐标一格不动（决策 152）。
+const OLD_W := 44
+const OLD_H := 30
+const W := 76
+const H := 48
+const NEW_TREES: Array[String] = ["round0", "willow0", "round1", "willow1", "round2", "pine0"]
+## 往南去渔村的土路占的两列
+const SOUTH_COLS: Array[int] = [56, 57]
+## 东边新栈桥
+const PIER_X := 62
 ## 河占的行：北边几行全是水，岸线弯弯曲曲
 const RIVER_BASE := 8
 ## 靠岸的小码头
@@ -32,11 +41,16 @@ var _east_fog: Array[Sprite2D] = []
 func _ready() -> void:
 	map_id = &"riverbank"
 	_rng.seed = 20261114
-	_setup_grid(W, H)
+	_scatter_cols = OLD_W
+	_scatter_rows = OLD_H
+	_setup_wild(W, H)
 	_layout()
+	_layout_new()
 	_build_ground()
 	_make_entities()
 	_place_objects()
+	_place_new()
+	_add_planks()
 	Foraging.settle(map_id, _forage_tiles(false), _forage_tiles(true))
 	Foraging.changed.connect(_sync_forage)
 	_sync_forage()
@@ -47,6 +61,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	super._exit_tree()
 	if Foraging.changed.is_connected(_sync_forage):
 		Foraging.changed.disconnect(_sync_forage)
 	if Fishing.changed.is_connected(_sync_traps):
@@ -56,16 +71,24 @@ func _exit_tree() -> void:
 func spawn_position(spawn: StringName) -> Vector2:
 	if spawn == &"from_dongtan":
 		return tile_center(Vector2i(W - 2, EAST_ROAD_ROWS[0])) + Vector2(0, 8)
+	if spawn == &"from_wharf":
+		return tile_center(Vector2i(1, EAST_ROAD_ROWS[0])) + Vector2(0, 8)
 	return tile_center(Vector2i(15, 10)) + Vector2(0, 2)
 
 
 func spawn_facing(spawn: StringName) -> Facing:
-	return Facing.LEFT if spawn == &"from_dongtan" else Facing.DOWN
+	if spawn == &"from_dongtan":
+		return Facing.LEFT
+	if spawn == &"from_wharf":
+		return Facing.RIGHT
+	return Facing.DOWN
 
 
 func trigger_at(tile: Vector2i) -> Dictionary:
 	if tile.x == W - 1 and EAST_ROAD_ROWS.has(tile.y) and not _east_closed():
 		return {"map": &"dongtan", "spawn": &"from_riverbank"}
+	if tile.x == 0 and EAST_ROAD_ROWS.has(tile.y):
+		return {"map": &"wharf", "spawn": &"from_riverbank"}
 	return {}
 
 
@@ -84,13 +107,13 @@ func _tile_blocked(t: Vector2i) -> bool:
 
 ## 河里全是河水；码头的木板不算。
 func fishing_water(tile: Vector2i) -> StringName:
-	if not _is_water(tile) or DOCK_TILES.has(tile):
+	if not _is_water(tile) or DOCK_TILES.has(tile) or planks.has(tile):
 		return &""
 	return &"river"
 
 
 func query_use(item: ItemDef, tile: Vector2i, _facing: Facing) -> StringName:
-	if npc_at(tile) != null or BOAT_TILES.has(tile) or _is_boathouse_wall(tile) or tile == EAST_LAMP_TILE or _in_fog(tile):
+	if npc_at(tile) != null or BOAT_TILES.has(tile) or _is_boathouse_wall(tile) or tile == EAST_LAMP_TILE or _in_fog(tile) or clue_at(tile) != "":
 		return &"interact"
 	if Foraging.item_at(map_id, tile) != &"":
 		return &"harvest"
@@ -118,6 +141,8 @@ func perform(action: StringName, item: ItemDef, tile: Vector2i, _quiet: bool = f
 					EventBus.lamp_requested.emit(EAST_LAMP)
 			elif _in_fog(tile):
 				EventBus.banner_requested.emit("雾太浓了，前面的路一步也看不清。风里有一点咸味")
+			elif clue_at(tile) != "":
+				EventBus.banner_requested.emit(clue_at(tile))
 		&"harvest":
 			_pick_forage(tile)
 		&"place_trap":
@@ -149,15 +174,15 @@ func _layout() -> void:
 	for x in range(15, BOATHOUSE_X + 1):
 		var y := 12 + (x - 15) / 3
 		_fill(x, y, x, y + 1, DIRT)
-	# 从船屋门前往东去东滩的土路
-	_fill(BOATHOUSE_X + BOATHOUSE_W - 1, EAST_ROAD_ROWS[0], W - 1, EAST_ROAD_ROWS[1], DIRT)
+	# 船屋门前的土路：往东去东滩，往西走到头是河埠
+	_fill(0, EAST_ROAD_ROWS[0], OLD_W - 1, EAST_ROAD_ROWS[1], DIRT)
 
 
 ## 采集物长在岸边和竹林里能走到的空草地。
 func _forage_tiles(shore: bool) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
-	for y in range(RIVER_BASE - 2, H - 2):
-		for x in range(2, W - 2):
+	for y in range(RIVER_BASE - 2, OLD_H - 2):
+		for x in range(2, OLD_W - 2):
 			var t := Vector2i(x, y)
 			if not _is_free(t):
 				continue
@@ -222,12 +247,13 @@ func _place_objects() -> void:
 	else:
 		_east_fog = _add_fog_bank(EAST_FOG, Vector2(1, 0))
 
-	_reserve(BOATHOUSE_X + BOATHOUSE_W, EAST_ROAD_ROWS[0] - 2, W - 1, EAST_ROAD_ROWS[1] + 1)
+	_reserve(0, EAST_ROAD_ROWS[0] - 1, OLD_W - 1, EAST_ROAD_ROWS[1] + 1)
 	_reserve(13, 9, 18, 13)
 	_reserve(BOATHOUSE_X - 1, BOATHOUSE_FRONT - 5, BOATHOUSE_X + BOATHOUSE_W, BOATHOUSE_FRONT + 2)
 	_scatter_trees(34)
 	_scatter_bushes(20)
 	_scatter_tufts(320)
+	_release_ghosts()
 
 
 ## 点灯的那一下：火光，往东的雾散开。
@@ -238,4 +264,70 @@ func on_lamp_lit(lamp_id: StringName) -> void:
 	_add_night_light(_east_lamp_sprite.position + Vector2(0, -16), 2.0)
 	Fx.burst(self, at, Color(1.0, 0.85, 0.45, 0.95), 18, 40.0, 0.7, 20.0)
 	Fx.burst(self, at, Color(1.0, 0.6, 0.25, 0.8), 10, 24.0, 0.9, 12.0)
-	_fade_fog(_east_fog)
+	_fade_fog(_east_fog, _east_lamp_sprite.position)
+
+
+func lamp_focus(lamp_id: StringName) -> Vector2:
+	if lamp_id == EAST_LAMP and _east_lamp_sprite != null:
+		return _east_lamp_sprite.global_position
+	return Vector2.INF
+
+
+# ---------------------------------------------------------------- 往东、往南扩出来的部分
+
+func _ghost_tree(t: Vector2i) -> bool:
+	return _legacy_edge(t, OLD_W, OLD_H)
+
+
+func _layout_new() -> void:
+	_fill(OLD_W, EAST_ROAD_ROWS[0], W - 1, EAST_ROAD_ROWS[1], DIRT)
+	_fill(SOUTH_COLS[0], EAST_ROAD_ROWS[1] + 1, SOUTH_COLS[1], 44, DIRT)
+	# 东边栈桥：从路上往北伸进河里
+	_fill(PIER_X, 12, PIER_X + 1, EAST_ROAD_ROWS[0] - 1, DIRT)
+	_walk([Vector2i(PIER_X, 11), Vector2i(PIER_X, 5)], 2, DIRT, false)
+	# 渔村前的小路和水塘
+	_fill(SOUTH_COLS[1] + 1, 33, 68, 34, DIRT)
+	_fill(46, 30, SOUTH_COLS[0] - 1, 31, DIRT)
+	_lake(Vector2(44, 40), 4.5, 3.0, 0.3, 5531)
+
+
+func _place_new() -> void:
+	_new_edge_trees(OLD_W, OLD_H, NEW_TREES)
+	# 北岸东段：栈桥和晒网
+	_clue(Vector2i(PIER_X, 5), "栈桥尽头的水特别深，桩子上有一圈圈水渍")
+	_clue(Vector2i(PIER_X + 1, 5), "栈桥尽头的水特别深，桩子上有一圈圈水渍")
+	_wide_prop("drying_rack", Vector2i(52, 13), 2, "架子上晾着一张补过很多次的网")
+	_wide_prop("bench", Vector2i(66, 13), 2, "长凳朝着河。扶手被磨得发白")
+	_lamp_post(Vector2i(60, 15))
+	_lamp_post(Vector2i(65, 15))
+	# 路南：渔村
+	_building("house", 60, 31, 4, 3, true)
+	_wall_clue(60, 31, 4, "渔家的屋子。门口的鞋摆得整整齐齐，一双小的挨着一双大的")
+	_building("house", 66, 33, 4, 3, true)
+	_wall_clue(66, 33, 4, "门前的缸里养着几条小鱼，等着长大")
+	_building("boathouse", 48, 29, 5, 3, true)
+	_wall_clue(48, 29, 5, "船屋空着。船桨靠在墙边，桨叶朝外")
+	_building("well", 58, 39, 2, 2, false)
+	_wall_clue(58, 39, 2, "村里的井。水桶上系着三种不同颜色的绳子")
+	_wide_prop("wood_pile", Vector2i(62, 38), 2, "柴垛上盖着一张旧渔网，防雨")
+	_wide_prop("drying_rack", Vector2i(70, 38), 2, "鱼干挂了三排，最底下一排只有一条")
+	_small_prop("jar_clay", Vector2i(64, 37), "腌鱼的坛子，盖子上压着石头")
+	_small_prop("scarecrow", Vector2i(52, 36), "稻草人披着一件蓑衣，看着像在等人")
+	_wide_prop("bench", Vector2i(44, 36), 2, "水塘边的长凳。能看到水里的云")
+	for t: Vector2i in [Vector2i(55, 20), Vector2i(55, 28), Vector2i(55, 42), Vector2i(59, 35)]:
+		if _is_free(t):
+			_lamp_post(t)
+	for t: Vector2i in [Vector2i(40, 38), Vector2i(48, 43), Vector2i(41, 43), Vector2i(48, 37)]:
+		if _is_free(t) and not _is_water(t):
+			_tree("willow%d" % (t.x % 2), t)
+	for t: Vector2i in [Vector2i(70, 28), Vector2i(36, 46)]:
+		if _is_free(t):
+			_small_prop("rock_%d" % (t.x % 2), t)
+	_grove(Rect2i(OLD_W, 10, W - OLD_W, 5), 14, NEW_TREES)
+	_grove(Rect2i(OLD_W, 18, 11, 12), 22, NEW_TREES)
+	_grove(Rect2i(0, OLD_H, 38, H - OLD_H), 24, NEW_TREES)
+	_grove(Rect2i(58, 20, 18, 8), 20, NEW_TREES)
+	_grove(Rect2i(66, 40, 10, 8), 24, NEW_TREES)
+	_grove(Rect2i(38, 44, 38, 4), 24, NEW_TREES)
+	_sprinkle_grass(Rect2i(OLD_W, 9, W - OLD_W, 21), 51)
+	_sprinkle_grass(Rect2i(0, OLD_H, W, H - OLD_H), 52)

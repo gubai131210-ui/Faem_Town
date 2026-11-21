@@ -84,12 +84,17 @@ func test_tables_are_valid() -> void:
 	assert_false(Database.item(&"feed").sellable(), "饲料不往出货箱里放")
 
 
-func test_grocery_sells_feed_after_the_lamp() -> void:
+func test_grocery_sells_feed_with_the_chickens() -> void:
 	var found := false
 	for e in Shop.entries(&"spring", Shop.GROCERY):
 		found = found or e.item_id == &"feed"
-	assert_false(found, "广场灯没亮货架上没有饲料")
+	assert_false(found, "还不能养鸡的时候没有饲料")
 	GameState.set_flag(&"lamp_plaza")
+	found = false
+	for e in Shop.entries(&"spring", Shop.GROCERY):
+		found = found or e.item_id == &"feed"
+	assert_false(found, "广场灯不带饲料，饲料跟着养鸡走")
+	GameState.set_flag(&"lamp_river")
 	for e in Shop.entries(&"spring", Shop.GROCERY):
 		found = found or e.item_id == &"feed"
 	assert_true(found)

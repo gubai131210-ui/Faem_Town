@@ -16,9 +16,9 @@ const DIRS4: Array[Vector2i] = [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1),
 
 ## 已开垦的格子 -> 今天是否浇过水
 var soil: Dictionary[Vector2i, bool] = {}
-## 有作物的格子 -> {"crop": StringName, "days": int, "dead": bool, "bonus": int, "wilt": bool}
+## 有作物的格子 -> {"crop": StringName, "days": int, "dead": bool, "bonus": int, "wilt": bool, "cover": bool}
 ## days 是已经生长的天数；dead 表示枯死了，要清掉才能再种；
-## bonus 是播种时得到的品质加分（春分）；wilt 表示高温天没浇水蔫了
+## bonus 是播种时得到的品质加分（春分）；wilt 表示高温天没浇水蔫了；cover 是盖了稻草
 var crops: Dictionary[Vector2i, Dictionary] = {}
 ## 施过肥的格子 -> 肥力（1 普通肥，2 精制肥）。作物拔掉时肥料一起用完。
 var fert: Dictionary[Vector2i, int] = {}
@@ -224,6 +224,22 @@ func is_giant(t: Vector2i) -> bool:
 	return giant
 
 
+## 这格庄稼盖着稻草。盖着的时候，霜冻不着，收到或铲掉才揭开。
+func is_covered(t: Vector2i) -> bool:
+	if not crops.has(t):
+		return false
+	return bool(crops[t].get("cover", false))
+
+
+## 给还活着、还没盖的庄稼盖上稻草。
+func cover(t: Vector2i) -> bool:
+	if not crops.has(t) or is_dead(t) or is_covered(t):
+		return false
+	crops[t]["cover"] = true
+	changed.emit()
+	return true
+
+
 func giant_count() -> int:
 	var n := 0
 	for t: Vector2i in crops:
@@ -253,13 +269,20 @@ func is_ripe(t: Vector2i) -> bool:
 	return Database.crop(crop_id_at(t)).is_ripe(crop_days_at(t))
 
 
-## 这一格成熟的作物会收到几个：roll 是 [0, 1) 的随机数，小于多收概率时多得一个。
+## 这一格成熟的作物会收到几个。roll 是 [0, 1) 的随机数，小于多收概率时多得一个。
+## 见过当康的当天，这个数再加一。巨型不加，没熟仍是 0。
 func yield_at(t: Vector2i, roll: float) -> int:
 	if not is_ripe(t):
 		return 0
 	if is_giant(t):
 		return GIANT_YIELD
-	return 2 if roll < Database.crop(crop_id_at(t)).extra_chance else 1
+	var count := 1
+	if roll < Database.crop(crop_id_at(t)).extra_chance:
+		count = 2
+	# 只加在玩家这份耕地上。账本另造一份耕地把一年逐天演过去，不吃这一天的加成。
+	if self == Farming.state and Farming.dangkang_today():
+		count += 1
+	return count
 
 
 ## 这一格的品质分数：肥力、播种时的加分，在水渠旁边再加一分。
@@ -296,6 +319,7 @@ func harvest(t: Vector2i) -> StringName:
 	if def.regrow_days > 0:
 		crops[t]["days"] = def.total_days() - def.regrow_days
 		crops[t]["giant"] = false
+		crops[t]["cover"] = false
 	else:
 		crops.erase(t)
 		fert.erase(t)
@@ -368,7 +392,7 @@ func advance_day(season: StringName = &"", past_weather: StringName = &"", wet_t
 					crop["giant"] = true
 		if season != &"" and not def.grows_in(season):
 			crop["dead"] = true
-		if frost and not def.hardy:
+		if frost and not def.hardy and not bool(crop.get("cover", false)):
 			crop["dead"] = true
 	for t: Vector2i in soil:
 		soil[t] = wet_today or _irrigated.has(t)
@@ -392,7 +416,7 @@ func to_dict() -> Dictionary:
 	var crop_list: Array = []
 	for t: Vector2i in crops:
 		crop_list.append([t.x, t.y, String(crop_id_at(t)), crop_days_at(t), is_dead(t),
-			int(crops[t].get("bonus", 0)), is_wilted(t), is_giant(t)])
+			int(crops[t].get("bonus", 0)), is_wilted(t), is_giant(t), is_covered(t)])
 	var fert_list: Array = []
 	for t: Vector2i in fert:
 		fert_list.append([t.x, t.y, fert[t]])
@@ -430,6 +454,7 @@ func from_dict(data: Dictionary) -> void:
 					"bonus": int(e[5]) if e.size() >= 6 else 0,
 					"wilt": e.size() >= 7 and bool(e[6]),
 					"giant": e.size() >= 8 and bool(e[7]),
+					"cover": e.size() >= 9 and bool(e[8]),
 				}
 	var fert_list: Array = data.get("fert", [])
 	for entry: Variant in fert_list:

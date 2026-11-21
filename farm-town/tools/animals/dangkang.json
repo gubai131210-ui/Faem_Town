@@ -1,0 +1,56 @@
+{
+	"name": "dangkang",
+	"body": "quadruped",
+	"scale": 0.9,
+	"quad": {
+		"body": [
+			0.25,
+			0.34,
+			0.23
+		],
+		"leg": 0.11,
+		"neck": 0.1,
+		"neck_up": 0.07,
+		"head": [
+			0.19,
+			0.2,
+			0.18
+		],
+		"snout": 0.12,
+		"ears": "point",
+		"tail": "short",
+		"tusks": true,
+		"stripes": 3,
+		"stripe_w": 0.13,
+		"tusk_size": 2.3
+	},
+	"parts": {
+		"body": [
+			"#d8a67c",
+			"#b4825c"
+		],
+		"head": [
+			"#d8a67c",
+			"#b4825c"
+		],
+		"leg": [
+			"#b4825c",
+			"#8e6444"
+		],
+		"ear": [
+			"#b4825c",
+			"#8e6444"
+		],
+		"tail": [
+			"#b4825c",
+			"#8e6444"
+		],
+		"stripe": [
+			"#7a4a2c",
+			"#57331e"
+		],
+		"snout": "pink",
+		"tusk": "white",
+		"hoof": "leather"
+	}
+}

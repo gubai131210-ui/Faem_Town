@@ -1,0 +1,44 @@
+{
+	"name": "nian",
+	"body": "quadruped",
+	"scale": 1.32,
+	"cell": 48,
+	"foot_row": 40,
+	"quad": {
+		"body": [
+			0.3,
+			0.46,
+			0.28
+		],
+		"leg": 0.2,
+		"leg_r": 0.075,
+		"neck": 0.14,
+		"neck_up": 0.2,
+		"head": [
+			0.26,
+			0.26,
+			0.24
+		],
+		"snout": 0.13,
+		"ears": "none",
+		"horns": "single",
+		"mane": true,
+		"tusks": true,
+		"tail": "bushy"
+	},
+	"parts": {
+		"body": "indigo",
+		"head": "indigo",
+		"leg": "indigo",
+		"mane": "ochre",
+		"tail": "ochre",
+		"tailtip": "orange",
+		"snout": [
+			"#5a6a9a",
+			"#444e7a"
+		],
+		"horn": "cream",
+		"tusk": "white",
+		"hoof": "charcoal"
+	}
+}

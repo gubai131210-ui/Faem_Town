@@ -1,4 +1,12 @@
 {
+	"alley_gate": {
+		"anchor": [
+			28,
+			53
+		],
+		"h": 54,
+		"w": 56
+	},
 	"apiary": {
 		"anchor": [
 			24,
@@ -47,6 +55,30 @@
 		"h": 96,
 		"w": 82
 	},
+	"boatyard": {
+		"anchor": [
+			29,
+			47
+		],
+		"h": 55,
+		"w": 67
+	},
+	"bonsai": {
+		"anchor": [
+			7,
+			26
+		],
+		"h": 24,
+		"w": 14
+	},
+	"bookshelf": {
+		"anchor": [
+			16,
+			42
+		],
+		"h": 42,
+		"w": 32
+	},
 	"bridge": {
 		"anchor": [
 			16,
@@ -79,6 +111,14 @@
 		"h": 45,
 		"w": 32
 	},
+	"charcoal_kiln": {
+		"anchor": [
+			29,
+			51
+		],
+		"h": 62,
+		"w": 64
+	},
 	"cheese_rack": {
 		"anchor": [
 			8,
@@ -94,6 +134,30 @@
 		],
 		"h": 82,
 		"w": 80
+	},
+	"drying_rack": {
+		"anchor": [
+			17,
+			38
+		],
+		"h": 37,
+		"w": 34
+	},
+	"duck_shed": {
+		"anchor": [
+			33,
+			53
+		],
+		"h": 64,
+		"w": 66
+	},
+	"earth_shrine": {
+		"anchor": [
+			19,
+			44
+		],
+		"h": 51,
+		"w": 38
 	},
 	"fence_0": {
 		"anchor": [
@@ -223,6 +287,70 @@
 		"h": 24,
 		"w": 12
 	},
+	"fish_bowl": {
+		"anchor": [
+			8,
+			23
+		],
+		"h": 21,
+		"w": 16
+	},
+	"fish_market": {
+		"anchor": [
+			27,
+			47
+		],
+		"h": 59,
+		"w": 54
+	},
+	"floor_lamp": {
+		"anchor": [
+			5,
+			40
+		],
+		"h": 37,
+		"w": 10
+	},
+	"folding_screen": {
+		"anchor": [
+			16,
+			37
+		],
+		"h": 31,
+		"w": 32
+	},
+	"hall_room_day": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
+	},
+	"hall_room_night": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
+	},
+	"herb_room_day": {
+		"anchor": [
+			1,
+			153
+		],
+		"h": 156,
+		"w": 194
+	},
+	"herb_room_night": {
+		"anchor": [
+			1,
+			153
+		],
+		"h": 156,
+		"w": 194
+	},
 	"house": {
 		"anchor": [
 			64,
@@ -230,6 +358,30 @@
 		],
 		"h": 106,
 		"w": 128
+	},
+	"house_wing_e": {
+		"anchor": [
+			40,
+			86
+		],
+		"h": 94,
+		"w": 80
+	},
+	"house_wing_w": {
+		"anchor": [
+			40,
+			82
+		],
+		"h": 83,
+		"w": 80
+	},
+	"hunter_cabin": {
+		"anchor": [
+			40,
+			99
+		],
+		"h": 112,
+		"w": 80
 	},
 	"jar_clay": {
 		"anchor": [
@@ -247,6 +399,14 @@
 		"h": 19,
 		"w": 14
 	},
+	"lotus_boat": {
+		"anchor": [
+			26,
+			14
+		],
+		"h": 21,
+		"w": 71
+	},
 	"mailbox": {
 		"anchor": [
 			9,
@@ -255,6 +415,14 @@
 		"h": 31,
 		"w": 18
 	},
+	"mill": {
+		"anchor": [
+			48,
+			88
+		],
+		"h": 106,
+		"w": 96
+	},
 	"millstone": {
 		"anchor": [
 			8,
@@ -262,6 +430,22 @@
 		],
 		"h": 26,
 		"w": 22
+	},
+	"miner_house": {
+		"anchor": [
+			40,
+			78
+		],
+		"h": 86,
+		"w": 80
+	},
+	"mountain_gate": {
+		"anchor": [
+			31,
+			47
+		],
+		"h": 48,
+		"w": 62
 	},
 	"notice_board": {
 		"anchor": [
@@ -278,6 +462,14 @@
 		],
 		"h": 25,
 		"w": 18
+	},
+	"pavilion": {
+		"anchor": [
+			36,
+			86
+		],
+		"h": 93,
+		"w": 72
 	},
 	"pickle_vat": {
 		"anchor": [
@@ -302,6 +494,14 @@
 		],
 		"h": 58,
 		"w": 20
+	},
+	"relay_ruin": {
+		"anchor": [
+			42,
+			78
+		],
+		"h": 94,
+		"w": 83
 	},
 	"rock_0": {
 		"anchor": [
@@ -335,6 +535,22 @@
 		"h": 154,
 		"w": 194
 	},
+	"rug": {
+		"anchor": [
+			24,
+			32
+		],
+		"h": 32,
+		"w": 48
+	},
+	"sauce_vat": {
+		"anchor": [
+			9,
+			26
+		],
+		"h": 27,
+		"w": 18
+	},
 	"scaffold": {
 		"anchor": [
 			33,
@@ -367,6 +583,22 @@
 		"h": 33,
 		"w": 26
 	},
+	"schoolhouse": {
+		"anchor": [
+			48,
+			86
+		],
+		"h": 94,
+		"w": 96
+	},
+	"shop_carpenter": {
+		"anchor": [
+			42,
+			76
+		],
+		"h": 93,
+		"w": 84
+	},
 	"shop_grocery": {
 		"anchor": [
 			56,
@@ -382,6 +614,22 @@
 		],
 		"h": 107,
 		"w": 112
+	},
+	"shop_soy": {
+		"anchor": [
+			42,
+			76
+		],
+		"h": 98,
+		"w": 84
+	},
+	"shop_teastall": {
+		"anchor": [
+			24,
+			51
+		],
+		"h": 48,
+		"w": 49
 	},
 	"silk_house": {
 		"anchor": [
@@ -406,6 +654,46 @@
 		],
 		"h": 123,
 		"w": 112
+	},
+	"smithy_room_day": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
+	},
+	"smithy_room_night": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
+	},
+	"stage": {
+		"anchor": [
+			35,
+			62
+		],
+		"h": 65,
+		"w": 70
+	},
+	"stilt_house": {
+		"anchor": [
+			48,
+			88
+		],
+		"h": 109,
+		"w": 96
+	},
+	"stone_arch": {
+		"anchor": [
+			43,
+			66
+		],
+		"h": 69,
+		"w": 86
 	},
 	"stone_lamp": {
 		"anchor": [
@@ -439,6 +727,22 @@
 		"h": 33,
 		"w": 34
 	},
+	"tea_factory": {
+		"anchor": [
+			64,
+			91
+		],
+		"h": 112,
+		"w": 128
+	},
+	"tea_hut": {
+		"anchor": [
+			45,
+			82
+		],
+		"h": 95,
+		"w": 86
+	},
 	"tea_roaster": {
 		"anchor": [
 			8,
@@ -446,6 +750,14 @@
 		],
 		"h": 22,
 		"w": 19
+	},
+	"tea_table": {
+		"anchor": [
+			16,
+			23
+		],
+		"h": 22,
+		"w": 32
 	},
 	"teahouse": {
 		"anchor": [
@@ -462,5 +774,69 @@
 		],
 		"h": 125,
 		"w": 144
+	},
+	"wall_fu": {
+		"anchor": [
+			8,
+			15
+		],
+		"h": 16,
+		"w": 16
+	},
+	"wall_scroll": {
+		"anchor": [
+			9,
+			22
+		],
+		"h": 24,
+		"w": 18
+	},
+	"wardrobe": {
+		"anchor": [
+			16,
+			50
+		],
+		"h": 51,
+		"w": 32
+	},
+	"well": {
+		"anchor": [
+			15,
+			36
+		],
+		"h": 39,
+		"w": 30
+	},
+	"wine_jar": {
+		"anchor": [
+			7,
+			27
+		],
+		"h": 26,
+		"w": 14
+	},
+	"wood_pile": {
+		"anchor": [
+			17,
+			29
+		],
+		"h": 32,
+		"w": 34
+	},
+	"workshop_day": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
+	},
+	"workshop_night": {
+		"anchor": [
+			1,
+			151
+		],
+		"h": 154,
+		"w": 194
 	}
 }

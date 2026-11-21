@@ -1,0 +1,44 @@
+{
+	"name": "chenghuang",
+	"body": "quadruped",
+	"scale": 1.0,
+	"quad": {
+		"body": [
+			0.18,
+			0.34,
+			0.17
+		],
+		"leg": 0.2,
+		"neck": 0.12,
+		"neck_up": 0.2,
+		"head": [
+			0.16,
+			0.17,
+			0.15
+		],
+		"snout": 0.14,
+		"ears": "point",
+		"tail": "bushy",
+		"back_horns": true
+	},
+	"parts": {
+		"body": "ochre",
+		"head": "ochre",
+		"leg": [
+			"#8a6a4e",
+			"#664c38"
+		],
+		"ear": [
+			"#8a6a4e",
+			"#664c38"
+		],
+		"tail": "ochre",
+		"tailtip": "white",
+		"snout": "white",
+		"horn": [
+			"#f1ead6",
+			"#cbbfa3"
+		],
+		"hoof": "hair_brown"
+	}
+}

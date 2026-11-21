@@ -130,7 +130,7 @@ if GameState.has_flag("relic_cowbell") and not GameState.has_flag("lamp_pasture"
 	阿牧: 铃你拿着，灯座上刻着要它。灯要是肯亮……花花它们就不用站在雾里等了。
 	do Residents.mark("amu_bell")
 	=> END
-if GameState.has_flag("lamp_river") and Animals.total() >= 2 and Animals.happiest() >= 70 and not Residents.has_flag("bell_hint")
+if Animals.total() >= 2 and Animals.happiest() >= 70 and not Residents.has_flag("bell_hint")
 	阿牧: 那个……我能不能跟你说件事。你把它们养得好，我、我才敢说。
 	阿牧: 花花昨晚又往西边的雾里走了。今早自己回来的，脖子上的铃没了。
 	阿牧: 那只铃是我爷爷挂上去的。它在雾里头还响，我站在路口听得见，就是不敢进去找。 [#sad]
@@ -139,8 +139,8 @@ if GameState.has_flag("lamp_river") and Animals.total() >= 2 and Animals.happies
 	=> END
 if Animals.any_for_sale()
 	=> sell
-if GameState.has_flag("lamp_river") and Animals.building_state("coop") != 0 and not Residents.has_flag("amu_chicks")
-	阿牧: 那个……河那边的雾散了以后，小路通了一截。小鸡小鸭我能带过来了。
+if Residents.opened("lamp_river", "amu") and Animals.building_state("coop") != 0 and not Residents.has_flag("amu_chicks")
+	阿牧: 小鸡小鸭我能分给你了。
 	阿牧: 可你得先有地方养。找青竹盖一间鸡舍，盖好了来找我。
 	do Residents.mark("amu_chicks")
 	=> END
@@ -152,6 +152,9 @@ if Residents.owes_thanks("amu")
 	do Residents.thanked("amu")
 elif Residents.away("amu") >= 4
 	阿牧: 啊，是你。好几天没碰上了。我还跟花花说起你来着。
+if Residents.weather_is("fog")
+	阿牧: 雾、雾天牛会朝一个方向看。我拉着，它们没走丢。……你刚才说什么来着。
+	=> END
 if Residents.at("amu", "teahouse")
 	% 阿牧: 我给云娘送奶。她每回都要留我喝茶，我、我不知道怎么推。
 	% 阿牧: 云娘说要拿我的奶做一道菜，叫什么“玉露”……我没记住。
@@ -254,4 +257,16 @@ else
 阿牧: 大黄。
 阿牧: 不是花花。是更早的那条。雾来的那天早上它还在桩子边上，后来没有再回来。 [#sad]
 阿牧: 牲口你要是养烦了送回来，我按原价收。名字我记住了，价就不能亏你。
+=> END
+
+~ trade_herd_1
+阿牧: 牲口认你的手。摸的时候多给一点。
+=> END
+
+~ trade_herd_2
+阿牧: 养过这么几种，棚里有你的位子。
+=> END
+
+~ trade_herd_3
+阿牧: 这摊畜生算你的家业了。
 => END

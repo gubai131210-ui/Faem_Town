@@ -1,0 +1,35 @@
+{
+	"name": "huolang",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": "straw",
+	"hair": "short",
+	"outfit": "tunic",
+	"pack": "box",
+	"parts": {
+		"shirt": "ochre",
+		"blue": "indigo",
+		"band": "red",
+		"hair": "hair_brown",
+		"boot": "leather",
+		"skin": "skin_tan",
+		"wood": "leather"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "big",
+		"brow": "thick",
+		"fringe": "short",
+		"mouth": "smile",
+		"jaw": "soft",
+		"crop": true
+	}
+}

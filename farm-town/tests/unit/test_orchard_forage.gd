@@ -249,6 +249,26 @@ func test_pick_follows_weights() -> void:
 	assert_eq(Foraging.pick(empty, 0.5), &"")
 
 
+func test_hanlu_grows_lots_of_mushrooms() -> void:
+	var hanlu := -1
+	for i in 24:
+		if Database.term(i).id == &"hanlu":
+			hanlu = i
+	assert_gt(hanlu, 0)
+	var def: ForageDef = null
+	for f in Database.forage:
+		if f.item == &"wild_mushroom":
+			def = f
+	assert_not_null(def)
+	assert_gt(def.boost_weight, def.weight)
+	assert_eq(def.weight_at(hanlu), def.boost_weight, "寒露蘑菇权重换成加成")
+	assert_eq(def.weight_at(hanlu - 1), def.weight, "别的节气照常")
+	assert_eq(def.weight_at(-1), def.weight)
+	var list := Foraging.options(&"autumn", hanlu, false)
+	assert_eq(Foraging.pick(list, 0.8, hanlu), &"wild_mushroom", "寒露这一抽落在蘑菇上")
+	assert_eq(Foraging.pick(list, 0.8), &"hawthorn", "平常这一抽是山楂")
+
+
 func test_settle_places_pending_on_free_tiles() -> void:
 	GameClock.day = 1
 	var land: Array[Vector2i] = []

@@ -531,6 +531,12 @@
 			"frames": 4,
 			"loop": true,
 			"fps": 13.0
+		},
+		"cook": {
+			"row": 64,
+			"frames": 8,
+			"loop": true,
+			"fps": 10.0
 		}
 	}
 }

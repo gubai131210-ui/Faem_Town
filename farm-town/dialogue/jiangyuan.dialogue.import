@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://f3tala2vbn2m"
+path="res://.godot/imported/jiangyuan.dialogue-f54b5978db8edcab025f27e11c0a161d.tres"
+
+[deps]
+
+source_file="res://dialogue/jiangyuan.dialogue"
+dest_files=["res://.godot/imported/jiangyuan.dialogue-f54b5978db8edcab025f27e11c0a161d.tres"]
+
+[params]
+
+defaults=true

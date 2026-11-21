@@ -23,6 +23,7 @@ var _floor: MineFloor
 var _rock_sprites: Dictionary[Vector2i, Sprite2D] = {}
 var _lamp_sprite: Sprite2D
 var _lamp_light: PointLight2D
+var _lamp_t := 0.0
 var _views: Dictionary[MineMonster, MonsterView] = {}
 var _shot_sprites: Dictionary[MineShot, Sprite2D] = {}
 var _boss_bar: CanvasLayer
@@ -91,6 +92,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_lamp_t += delta
+	if _lamp_light != null:
+		_lamp_light.energy = 0.7 * Glow.flicker(_lamp_t, 0.4)
 	# 开着菜单、转场的时候忘形也停下
 	if GameClock.running and player is Player:
 		tick(minf(delta, 0.05))
@@ -520,6 +524,8 @@ func _use_altar() -> void:
 		if Story.can_choose():
 			# 终幕：龛里那盏最初的灯，点还是不点
 			EventBus.dialogue_requested.emit(Story.DIALOGUE, "first_lamp")
+		elif Story.can_name():
+			EventBus.dialogue_requested.emit(Story.DIALOGUE, "name_later")
 		elif Story.lamp_lit():
 			EventBus.banner_requested.emit("两盏灯都亮着。龛里那盏的提梁上，二十八个名字一个一个看得清了")
 		else:
@@ -761,7 +767,8 @@ func _strike(tile: Vector2i) -> void:
 		_rock_sprites[tile].queue_free()
 		_rock_sprites.erase(tile)
 	var item: StringName = res["item"]
-	Fx.pop_icon(self, c + Vector2(0, -10), Px.tex(PixelArt.icon(Database.item(item).icon)))
+	# 敲开的矿石弹起来、落地、扬一点灰
+	Fx.pop_land(self, c + Vector2(0, -10), Px.tex(PixelArt.icon(Database.item(item).icon)))
 	if item != &"stone":
 		Audio.play("harvest", 0.0, -6.0)
 	if bool(res["ladder"]):

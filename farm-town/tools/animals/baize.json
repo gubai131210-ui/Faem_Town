@@ -1,0 +1,53 @@
+{
+	"name": "baize",
+	"body": "quadruped",
+	"scale": 1.22,
+	"cell": 48,
+	"foot_row": 40,
+	"quad": {
+		"body": [
+			0.27,
+			0.44,
+			0.25
+		],
+		"leg": 0.24,
+		"leg_r": 0.06,
+		"neck": 0.16,
+		"neck_up": 0.24,
+		"head": [
+			0.2,
+			0.21,
+			0.19
+		],
+		"snout": 0.1,
+		"ears": "side",
+		"horns": "goat",
+		"mane": true,
+		"beard": true,
+		"tail": "bushy"
+	},
+	"parts": {
+		"body": "white",
+		"head": "white",
+		"leg": "white",
+		"ear": "white",
+		"mane": [
+			"#cfe0e6",
+			"#a4bcc8"
+		],
+		"tail": "white",
+		"tailtip": [
+			"#cfe0e6",
+			"#a4bcc8"
+		],
+		"snout": "cream",
+		"horn": [
+			"#f7dc80",
+			"#e2b84e"
+		],
+		"hoof": [
+			"#e2b84e",
+			"#b08a34"
+		]
+	}
+}

@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://dfix5gae36kyi"
+path="res://.godot/imported/chuanniang.dialogue-3a3154981de56c560c23d76faa594987.tres"
+
+[deps]
+
+source_file="res://dialogue/chuanniang.dialogue"
+dest_files=["res://.godot/imported/chuanniang.dialogue-3a3154981de56c560c23d76faa594987.tres"]
+
+[params]
+
+defaults=true

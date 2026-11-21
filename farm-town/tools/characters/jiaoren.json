@@ -1,0 +1,33 @@
+{
+	"name": "jiaoren",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"rub",
+		"squat"
+	],
+	"hat": false,
+	"hair": "long",
+	"outfit": "tunic",
+	"legs": "fishtail",
+	"parts": {
+		"skin": "skin_pale",
+		"hair": [
+			"#3f8f8a",
+			"#2d6c69"
+		],
+		"shirt": [
+			"#cfe6ee",
+			"#9cc0cc"
+		],
+		"blue": [
+			"#4f8fc0",
+			"#386c96"
+		],
+		"band": [
+			"#9fdccf",
+			"#6fb4a8"
+		]
+	}
+}

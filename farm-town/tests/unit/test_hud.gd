@@ -1,5 +1,5 @@
 extends GutTest
-## 常驻界面：增益那一小条、左上角的提示条。
+## 常驻界面：增益那一小条、左上角的提示条、手里这件东西的名字。
 
 
 func before_each() -> void:
@@ -95,11 +95,84 @@ func test_banner_after_a_line_break_is_a_smaller_note() -> void:
 	assert_lt((labels[1] as Label).get_theme_font_size(&"font_size"), (labels[0] as Label).get_theme_font_size(&"font_size"))
 
 
+func test_dismiss_toasts_takes_down_what_is_still_up() -> void:
+	var hud := _hud()
+	hud.show_banner("两盏灯都亮着。龛里那盏的提梁上，二十八个名字一个一个看得清了")
+	assert_eq(hud.toast_count(), 1)
+	hud.dismiss_toasts()
+	await wait_frames(2)
+	assert_eq(hud.toast_count(), 0, "收掉以后不再占着左上角")
+
+
 func test_toast_fades_and_goes_away() -> void:
 	var hud := _hud()
 	hud.show_banner("收了")
 	await wait_seconds(Hud.banner_hold("收了") + 0.9)
 	assert_eq(hud.toast_count(), 0)
+
+
+func test_the_bar_names_what_is_in_hand() -> void:
+	var hud := _hud()
+	assert_eq(hud.held_name(), GameState.display_name(Database.item(&"hoe")))
+	var at := -1
+	for i in GameState.HOTBAR_SIZE:
+		if GameState.inventory.is_empty_slot(i):
+			at = i
+			break
+	GameState.inventory.add(&"white_radish", 2, 2)
+	assert_eq(GameState.inventory.id_at(at), &"white_radish")
+	GameState.selected_slot = at
+	var titled := Database.item(&"white_radish").name + "（优）"
+	assert_eq(hud.held_name(), titled)
+	GameState.selected_slot = 7
+	assert_eq(hud.held_name(), "", "空格不写名字")
+
+
+func test_gaining_an_item_sends_an_icon_to_the_bar() -> void:
+	var hud := _hud()
+	await wait_frames(2)
+	assert_eq(hud.fly_count(), 0)
+	GameState.inventory.add(&"white_radish", 1)
+	await wait_frames(2)
+	assert_eq(hud.fly_count(), 1, "物品进背包后飞一个图标（等一帧排好格子再定位）")
+	await wait_seconds(0.8)
+	assert_eq(hud.fly_count(), 0, "落到格子就收走")
+
+
+func test_money_rolls_and_lands_on_the_exact_number() -> void:
+	var hud := _hud()
+	var label: Label = hud.get(&"_money")
+	GameState.money += 137
+	await wait_frames(2)
+	assert_ne(label.text, "%d 文" % GameState.money, "刚变钱还在滚，不是直接跳到终值")
+	await wait_seconds(0.7)
+	assert_eq(label.text, "%d 文" % GameState.money, "滚完正好是新的钱数")
+
+
+func test_tidying_and_removing_do_not_fly_icons() -> void:
+	var hud := _hud()
+	await wait_frames(2)
+	GameState.inventory.add(&"white_radish", 3)
+	await wait_seconds(0.8)
+	assert_eq(hud.fly_count(), 0, "飞完收走")
+	GameState.inventory.tidy()
+	GameState.inventory.remove(&"white_radish", 1)
+	GameState.inventory.swap(0, 1)
+	await wait_frames(3)
+	assert_eq(hud.fly_count(), 0, "整理、取走、交换都不飞图标")
+
+
+func test_season_card_lights_up_the_season_and_term() -> void:
+	var hud := _hud()
+	var card: Control = hud.get(&"_season_card")
+	assert_false(card.visible)
+	hud.show_season_card("入秋 · 立秋")
+	assert_true(card.visible)
+	assert_eq((hud.get(&"_season_label") as Label).text, "入秋 · 立秋")
+	await wait_seconds(0.6)
+	assert_gt(card.modulate.a, 0.8, "名牌真的亮起来了，不是透明地占着位")
+	await wait_seconds(UiMotion.SEASON_CARD_TIME + 0.3)
+	assert_false(card.visible, "亮一下就收起来")
 
 
 func test_silence_stops_every_sound() -> void:

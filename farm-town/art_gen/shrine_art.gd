@@ -161,40 +161,54 @@ static func osmanthus(season: int = 0) -> Image:
 	return Px.outline(img)
 
 
-## 岚：一头白鹿，48×46，朝右，比人高一头。身子发白发青，四条腿往下淡成雾，外面一圈淡青的边
-## （不描黑边：它不是实的；可没有边在雪地和雾里就看不见了）。frame 0 抬着头，1 耳朵动一下、头低一点。
+## 岚：一头白鹿，48×46，朝右，比人高一头。身子发白发青，外面一圈淡青的边
+## （不描黑边：它不是实的；可没有边在雪地和雾里就看不见了）。
+## 站着的两帧：frame 0 抬着头，1 耳朵动一下、头低一点；四条腿站直，蹄子落在地上。
 ## 锚点在 (22, 45)。
 static func deer(frame: int = 0) -> Image:
+	return _deer_img(0.0, false, frame == 1)
+
+
+## 走路的八帧：四拍步，后左、前左、后右、前右依次抬起迈出，一条腿在空中，其余三条踩地；
+## 每条腿分大腿和小腿，膝盖弯着，抬起来再落下。身子随步子一上一下，头跟着轻轻点。frame 取 0..7。
+## 锚点同站着的鹿，(22, 45)。
+static func deer_walk(frame: int) -> Image:
+	return _deer_img(float(posmod(frame, 8)) / 8.0, true, false)
+
+
+static func _deer_img(phase: float, walking: bool, low: bool) -> Image:
 	var img := Px.new_img(48, 46)
 	var white := Color.html("f6fbff")
 	var pale := Color.html("d5e6f1")
 	var shade := Color.html("a9c6da")
 	var horn := Color.html("6f95b3")
-	var dip := 1 if frame == 1 else 0
-	# 四条腿：后腿在膝盖那儿往后弯一点；越往下越淡。远处的两条暗一档
-	var legs: Array = [[11, 0, true], [15, -1, false], [28, 0, true], [32, 0, false]]
-	for leg: Array in legs:
-		var lx: int = leg[0]
-		var far: bool = leg[2]
-		for k in 15:
-			var a := clampf(1.15 - k / 13.0, 0.0, 1.0)
-			var x := lx + (int(leg[1]) if k > 6 else 0)
-			var c := shade if far else pale
-			Px.px(img, x, 28 + k, Color(c.r, c.g, c.b, a))
-			if k < 9:
-				var c2 := shade if not far else Color.html("93b4cb")
-				Px.px(img, x + 1, 28 + k, Color(c2.r, c2.g, c2.b, a))
+	var bob := 0
+	var nod := 1 if low else 0
+	if walking:
+		bob = -1 if cos(phase * TAU * 2.0) > 0.45 else 0
+		nod = 1 if sin(phase * TAU * 2.0 + 0.6) > 0.5 else 0
+	var hip_y := 27 + bob
+	# 远处的两条腿先画，暗一档
+	_deer_leg(img, 14, hip_y, phase + 0.5, walking, -1, shade, Color.html("93b4cb"))
+	_deer_leg(img, 31, hip_y, phase + 0.75, walking, 1, shade, Color.html("93b4cb"))
 	# 屁股、身子、胸口
-	_oval(img, 12.5, 23.5, 5.0, 5.0, white, pale, shade)
-	_oval(img, 21.0, 24.5, 10.5, 4.0, white, pale, shade)
-	_oval(img, 30.0, 23.0, 4.5, 6.0, white, pale, shade)
-	# 尾巴
-	Px.rect(img, 6, 19, 2, 3, white)
-	Px.px(img, 6, 22, pale)
+	_oval(img, 12.5, 23.5 + bob, 5.0, 5.0, white, pale, shade)
+	_oval(img, 21.0, 24.5 + bob, 10.5, 4.0, white, pale, shade)
+	_oval(img, 30.0, 23.0 + bob, 4.5, 6.0, white, pale, shade)
+	# 尾巴：走的时候轻轻甩
+	var wag := 0
+	if walking:
+		wag = int(round(sin(phase * TAU) * 1.0))
+	Px.rect(img, 6 + wag, 19 + bob, 2, 3, white)
+	Px.px(img, 6 + wag, 22 + bob, pale)
+	# 近处的两条腿盖在身子上
+	_deer_leg(img, 12, hip_y, phase, walking, -1, white, pale)
+	_deer_leg(img, 29, hip_y, phase + 0.25, walking, 1, white, pale)
 	# 脖子：从胸口斜着往上
+	var dip := nod + bob
 	for i in 11:
 		var nx := 30 + int(i * 0.5)
-		var ny := 19 - i + dip
+		var ny := 19 - i + dip + (bob if i < 4 else 0)
 		Px.rect(img, nx, ny, 4, 1, white)
 		Px.px(img, nx, ny, pale)
 		Px.px(img, nx + 3, ny, pale if i > 2 else shade)
@@ -206,14 +220,14 @@ static func deer(frame: int = 0) -> Image:
 	Px.px(img, 45, 8 + dip, Color.html("7f9cb4"))
 	Px.px(img, 39, 8 + dip, Color.html("2f4f6e"))
 	# 耳朵
-	if frame == 1:
+	if low:
 		Px.rect(img, 32, 7 + dip, 3, 1, pale)
 		Px.px(img, 31, 7 + dip, shade)
 	else:
-		Px.px(img, 34, 6, pale)
-		Px.px(img, 33, 5, pale)
-		Px.px(img, 32, 4, shade)
-	# 外面一圈淡青的边
+		Px.px(img, 34, 6 + dip, pale)
+		Px.px(img, 33, 5 + dip, pale)
+		Px.px(img, 32, 4 + dip, shade)
+	# 外面一圈淡青的边；蹄子以下才淡掉
 	var edge := Color.html("86a9c4")
 	var solid: Array[Vector2i] = []
 	for y in 46:
@@ -226,23 +240,52 @@ static func deer(frame: int = 0) -> Image:
 			if n.x < 0 or n.y < 0 or n.x >= 48 or n.y >= 46:
 				continue
 			if img.get_pixel(n.x, n.y).a == 0.0:
-				var fade := clampf(1.0 - (n.y - 30) / 12.0, 0.0, 1.0) if n.y > 30 else 1.0
+				var fade := clampf(1.0 - (n.y - 43) / 3.0, 0.0, 1.0)
 				img.set_pixel(n.x, n.y, Color(edge.r, edge.g, edge.b, 0.85 * fade))
 	# 角：两枝，往后上方伸，各分一叉。放在描边之后画，细线再描边就糊了
-	# 远的一枝往后仰，近的一枝直着往上、朝前分一叉
 	Px.line(img, Vector2i(36, 5 + dip), Vector2i(31, 1 + dip), edge)
 	Px.line(img, Vector2i(33, 3 + dip), Vector2i(33, dip), edge)
 	Px.line(img, Vector2i(38, 5 + dip), Vector2i(37, dip), horn)
 	Px.line(img, Vector2i(38, 3 + dip), Vector2i(41, 1 + dip), horn)
-	# 脚下的一小团雾
+	# 脚下一层很薄的雾：只在地面那一行，不盖住蹄子
 	for x in range(4, 40):
-		var a := 0.4 - absf(x - 22.0) / 45.0
+		var a := 0.3 - absf(x - 22.0) / 55.0
 		if a > 0.0:
-			for y in range(42, 46):
-				var old := img.get_pixel(x, y)
-				if old.a < a:
-					img.set_pixel(x, y, Color(1, 1, 1, a * (1.0 if y < 45 else 0.5)))
+			var old := img.get_pixel(x, 45)
+			if old.a < a:
+				img.set_pixel(x, 45, Color(1, 1, 1, a))
 	return img
+
+
+## 一条腿：大腿、膝盖、小腿、蹄。hip 是腿根，ph 是这条腿在步子里走到哪（0..1）。
+## 0 到 0.62 踩在地上往后蹬，之后抬起来往前迈，迈到最高膝盖朝前顶。
+## knee_dir：前腿膝盖朝前弯（1），后腿的踝朝后弯（-1）。站着时四条腿直立，只有后腿微微带一点弯。
+static func _deer_leg(img: Image, hx: int, hy: int, ph: float, walking: bool, knee_dir: int, col: Color, col2: Color) -> void:
+	var u := fposmod(ph, 1.0)
+	var fx := 0.0
+	var lift := 0.0
+	if walking:
+		if u < 0.62:
+			fx = 4.5 - 9.0 * (u / 0.62)
+		else:
+			var s := (u - 0.62) / 0.38
+			fx = -4.5 + 9.0 * s
+			lift = 5.0 * sin(PI * s)
+	var foot := Vector2i(hx + roundi(fx), 43 - roundi(lift))
+	var bend := knee_dir * (1 + roundi(lift * 0.5)) if walking else (-1 if knee_dir < 0 else 0)
+	var knee := Vector2i(hx + roundi(fx * 0.5) + bend, (hy + foot.y) / 2 - roundi(lift * 0.3))
+	for dx in 2:
+		var c := col if dx == 0 else col2
+		Px.line(img, Vector2i(hx + dx, hy), Vector2i(knee.x + dx, knee.y), c)
+		Px.line(img, Vector2i(knee.x + dx, knee.y), Vector2i(foot.x + dx, foot.y - 1), c)
+	# 大腿根粗一点
+	Px.px(img, hx - 1, hy, col)
+	Px.px(img, hx + 2, hy, col2)
+	Px.px(img, hx - 1, hy + 1, col)
+	Px.px(img, hx + 2, hy + 1, col2)
+	# 蹄
+	var hoof := Color.html("7f9cb4")
+	Px.rect(img, foot.x, foot.y - 1, 2, 2, hoof)
 
 
 ## 一个上亮下暗的椭圆：里面三档颜色。

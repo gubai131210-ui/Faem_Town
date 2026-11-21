@@ -335,3 +335,23 @@ func test_heat_only_counts_during_xiaoshu() -> void:
 	Weather.tomorrow = Weather.SUNNY
 	GameClock.advance_day()
 	assert_true(Farming.state.is_wilted(T), "小暑第一天没浇水就蔫")
+
+
+func test_xiaohan_makes_tools_cost_more_energy() -> void:
+	# 小寒：天冷干活更费力，基础消耗 ×1.5 向上取整
+	assert_eq(GameState.tool_cost(2, &"hoe", 0, &"xiaohan", false), 3)
+	assert_eq(GameState.tool_cost(1, &"water", 0, &"xiaohan", false), 2)
+	assert_eq(GameState.tool_cost(2, &"hoe", 1, &"xiaohan", false), 6, "蓄力一档翻倍")
+	# 别的节气不涨（浇水不受立春开垦减半影响）
+	assert_eq(GameState.tool_cost(1, &"water", 0, &"lichun", false), 1)
+
+
+func test_tool_cost_keeps_hearty_and_lichun_halves() -> void:
+	# 吃饱了减半，至少 1
+	assert_eq(GameState.tool_cost(2, &"hoe", 0, &"", true), 1)
+	assert_eq(GameState.tool_cost(1, &"water", 0, &"", true), 1, "1 不再减")
+	# 立春只减开垦
+	assert_eq(GameState.tool_cost(2, &"hoe", 0, &"lichun", false), 1)
+	assert_eq(GameState.tool_cost(2, &"dig", 0, &"lichun", false), 2, "立春不减别的动作")
+	# 小寒涨了以后再吃饱，还是减半
+	assert_eq(GameState.tool_cost(2, &"hoe", 0, &"xiaohan", true), 1)

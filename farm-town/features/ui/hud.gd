@@ -1,6 +1,6 @@
 class_name Hud
 extends CanvasLayer
-## 游戏中常驻的界面：物品栏、日期和节气、时间和天气、金钱、体力、屏幕左上角的提示条。
+## 游戏中常驻的界面：物品栏、手里这件东西的名字、日期和节气、时间和天气、金钱、体力、屏幕左上角的提示条。
 
 const ENERGY_H := 40.0
 ## 提示条里一行字最宽多少像素，超过就折行
@@ -23,6 +23,16 @@ var _health_fill: ColorRect
 var _toasts: VBoxContainer
 var _buff_box: Control
 var _buff: Label
+var _guide: NinePatchRect
+var _guide_label: Label
+var _held_name: Label
+var _fly_layer: Node2D
+var _season_card: Control
+var _season_label: Label
+var _season_tween: Tween
+var _money_tween: Tween
+var _shown_money := 0
+var _money_first := true
 
 
 func _ready() -> void:
@@ -45,6 +55,21 @@ func _ready() -> void:
 		slot.clicked.connect(_on_slot_clicked)
 		bar.add_child(slot)
 		_slots.append(slot)
+
+	# 手里这件东西的名字，贴在物品栏正上方；空格就不写
+	_held_name = UiKit.label("", 8, UiKit.TEXT_LIGHT, true)
+	_held_name.anchor_left = 0.5
+	_held_name.anchor_right = 0.5
+	_held_name.anchor_top = 1.0
+	_held_name.anchor_bottom = 1.0
+	_held_name.offset_left = -80.0
+	_held_name.offset_right = 80.0
+	_held_name.offset_top = -40.0
+	_held_name.offset_bottom = -28.0
+	_held_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_held_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_held_name.clip_text = true
+	root.add_child(_held_name)
 
 	var clock := UiKit.panel()
 	clock.anchor_left = 1.0
@@ -113,6 +138,23 @@ func _ready() -> void:
 	_health_fill.color = Color("d8504a")
 	_health_box.add_child(_health_fill)
 
+	# 第一天的下一步，贴在左下角、物品栏左边
+	_guide = UiKit.panel()
+	_guide.anchor_top = 1.0
+	_guide.anchor_bottom = 1.0
+	_guide.offset_left = 4.0
+	_guide.offset_top = -48.0
+	_guide.offset_right = 108.0
+	_guide.offset_bottom = -28.0
+	_guide.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_guide.visible = false
+	root.add_child(_guide)
+	_guide_label = UiKit.label("", 6, UiKit.TEXT_DARK)
+	_guide_label.position = Vector2(6, 4)
+	_guide_label.size = Vector2(92, 14)
+	_guide_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_guide.add_child(_guide_label)
+
 	# 提示条摞在左上角，不挡屏幕中间
 	_toasts = VBoxContainer.new()
 	_toasts.add_theme_constant_override(&"separation", 2)
@@ -120,7 +162,29 @@ func _ready() -> void:
 	_toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_toasts)
 
+	# 换季那天早上在上半屏亮一下，避开左上角的提示条，也不压到画面中间
+	_season_card = UiKit.panel()
+	_season_card.anchor_left = 0.5
+	_season_card.anchor_right = 0.5
+	_season_card.offset_left = -86.0
+	_season_card.offset_right = 86.0
+	_season_card.offset_top = 74.0
+	_season_card.offset_bottom = 104.0
+	_season_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_season_card.visible = false
+	root.add_child(_season_card)
+	_season_label = UiKit.label("", 10, UiKit.TEXT_LIGHT, true)
+	_season_label.position = Vector2(0, 6)
+	_season_label.size = Vector2(172, 16)
+	_season_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_season_card.add_child(_season_label)
+
+	# 飞向物品栏的图标单独放一层，压在界面上、跟着 Hud 一起换场景
+	_fly_layer = Node2D.new()
+	root.add_child(_fly_layer)
+
 	GameState.inventory.changed.connect(_refresh_items)
+	GameState.inventory.gained.connect(_on_item_gained)
 	GameState.selected_changed.connect(_refresh_selected)
 	GameState.money_changed.connect(_refresh_money)
 	GameState.energy_changed.connect(_refresh_energy)
@@ -130,6 +194,7 @@ func _ready() -> void:
 	GameClock.time_changed.connect(_refresh_clock)
 	Weather.changed.connect(_refresh_clock)
 	EventBus.banner_requested.connect(show_banner)
+	EventBus.season_card_requested.connect(show_season_card)
 	_refresh_items()
 	_refresh_selected()
 	_refresh_money()
@@ -140,6 +205,98 @@ func _ready() -> void:
 
 ## 在左上角出一条提示。头一行是正文，换行以后的是小一号的补充说明。
 ## 和正挂着的某一条一模一样就只把那一条重新亮起来，不重复摞。
+func _process(_delta: float) -> void:
+	var text := Guide.line()
+	_guide.visible = text != ""
+	if _guide_label.text != text:
+		_guide_label.text = text
+
+
+## 左下角现在写着的下一步；没有时是空的。
+func guide_text() -> String:
+	return _guide_label.text if _guide.visible else ""
+
+
+## 物品栏正上方现在写的名字；空手时是空的。和背包详情同一套叫法。
+func held_name() -> String:
+	return _held_name.text
+
+
+func _held_caption() -> String:
+	var inv := GameState.inventory
+	var id := inv.id_at(GameState.selected_slot)
+	if id == &"":
+		return ""
+	var title := GameState.display_name(Database.item(id))
+	var quality := inv.quality_at(GameState.selected_slot)
+	if quality > 0:
+		title += "（%s）" % ItemDef.QUALITY_NAMES[quality]
+	return title
+
+
+## 换季那天早上亮一下季节和节气；亮完自己收起来，不占着屏幕。
+func show_season_card(text: String) -> void:
+	if text == "":
+		return
+	_season_label.text = text
+	_season_card.visible = true
+	_season_card.modulate.a = 0.0
+	if _season_tween != null and _season_tween.is_valid():
+		_season_tween.kill()
+	var tw := _season_card.create_tween()
+	_season_tween = tw
+	tw.tween_method(_season_step.bind([_season_card]), 0.0, 1.0, UiMotion.SEASON_CARD_TIME)
+	tw.tween_callback(_season_hide.bind(_season_card))
+
+
+static func _season_step(t: float, args: Array) -> void:
+	var card: Control = args[0]
+	if is_instance_valid(card):
+		card.modulate.a = UiMotion.season_card_alpha(t * UiMotion.SEASON_CARD_TIME)
+
+
+static func _season_hide(card: Control) -> void:
+	if is_instance_valid(card):
+		card.visible = false
+
+
+## 现在正有几个图标在往物品栏飞。
+func fly_count() -> int:
+	return _fly_layer.get_child_count() if _fly_layer != null else 0
+
+
+## 收进一件东西就飞一个图标过去。落在超出物品栏的格子时，飞到最后一格。
+func _on_item_gained(id: StringName, slot: int) -> void:
+	var tex := UiKit.item_icon(id)
+	if tex == null or _fly_layer == null or _slots.is_empty():
+		return
+	# 读档站在井里、有欠着的首领掉落时，gained 会在建 Hud 的同一帧触发，
+	# 那时格子还没排序、落点是 (0,0)；等一帧排好版再取落点
+	await get_tree().process_frame
+	if not is_instance_valid(self) or _fly_layer == null or _slots.is_empty():
+		return
+	var target := clampi(slot, 0, _slots.size() - 1)
+	var to := _slots[target].global_position + Vector2(ItemSlot.SIZE / 2.0, ItemSlot.SIZE / 2.0)
+	var vp := get_viewport().get_visible_rect().size
+	var from := Vector2(vp.x * 0.5, vp.y * 0.62)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.centered = true
+	s.position = from
+	_fly_layer.add_child(s)
+	# tween 挂在图标自己身上：换场景时跟着一起停，不会回头找已释放的节点
+	var tw := s.create_tween()
+	tw.tween_method(_fly_step.bind([s, from, to]), 0.0, 1.0, 0.5)
+	tw.tween_property(s, "modulate:a", 0.0, 0.12)
+	tw.tween_callback(s.queue_free)
+
+
+static func _fly_step(t: float, args: Array) -> void:
+	var s: Sprite2D = args[0]
+	if is_instance_valid(s):
+		s.position = UiMotion.fly_pos(args[1], args[2], t)
+
+
 func show_banner(text: String) -> void:
 	if text == "":
 		return
@@ -155,6 +312,16 @@ func show_banner(text: String) -> void:
 	toast.modulate.a = 0.0
 	_toasts.add_child(toast)
 	_arm(toast, text)
+
+
+## 把还挂着的提示收掉。换日子、换地方时，上一幕的句子不该跟着过去。
+func dismiss_toasts() -> void:
+	for t in _toasts.get_children():
+		if t.has_meta(&"tween"):
+			var old: Variant = t.get_meta(&"tween")
+			if old is Tween:
+				(old as Tween).kill()
+		t.queue_free()
 
 
 ## 现在挂着几条提示。
@@ -241,15 +408,43 @@ func _refresh_items() -> void:
 	var inv := GameState.inventory
 	for i in _slots.size():
 		_slots[i].show_item(inv.id_at(i), inv.count_at(i), inv.quality_at(i))
+	_held_name.text = _held_caption()
 
 
 func _refresh_selected() -> void:
 	for i in _slots.size():
 		_slots[i].set_selected(i == GameState.selected_slot)
+	_held_name.text = _held_caption()
 
 
+## 钱变了就滚过去，先快后慢，落点一定是准确的数。第一次刷新不滚，
+## 免得开局从 0 滚到手里的钱。
 func _refresh_money() -> void:
-	_money.text = "%d 文" % GameState.money
+	var to := GameState.money
+	if _money_first:
+		_money_first = false
+		_shown_money = to
+		_money.text = "%d 文" % to
+		return
+	var from := _shown_money
+	if from == to:
+		return
+	if _money_tween != null and _money_tween.is_valid():
+		_money_tween.kill()
+	var tw := _money.create_tween()
+	_money_tween = tw
+	tw.tween_method(_money_step.bind([from, to]), 0.0, 1.0, 0.45)
+	tw.tween_callback(_money_land.bind(to))
+
+
+func _money_step(t: float, args: Array) -> void:
+	_shown_money = UiMotion.money_shown(int(args[0]), int(args[1]), t)
+	_money.text = "%d 文" % _shown_money
+
+
+func _money_land(to: int) -> void:
+	_shown_money = to
+	_money.text = "%d 文" % to
 
 
 func _refresh_energy() -> void:
@@ -262,7 +457,7 @@ func _refresh_energy() -> void:
 
 ## 生命条现在该不该露出来。
 func health_shown() -> bool:
-	return GameState.health < GameState.max_health or GameState.map_id == &"mine" or GameState.map_id == &"wellhead"
+	return GameState.health < GameState.max_health or GameState.map_id == &"mine" or GameState.map_id == &"wellhead" or GameState.map_id == &"zhuhai" or GameState.map_id == &"houshan" or GameState.map_id == &"wudao"
 
 
 func _refresh_health() -> void:

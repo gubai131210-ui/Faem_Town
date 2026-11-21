@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://bobw146mwpd4f"
+path="res://.godot/imported/shanliren.dialogue-dd7ecf89e9accb4676f2c9f84cc6fa48.tres"
+
+[deps]
+
+source_file="res://dialogue/shanliren.dialogue"
+dest_files=["res://.godot/imported/shanliren.dialogue-dd7ecf89e9accb4676f2c9f84cc6fa48.tres"]
+
+[params]
+
+defaults=true

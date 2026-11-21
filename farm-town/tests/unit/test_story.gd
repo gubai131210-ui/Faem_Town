@@ -18,7 +18,7 @@ func after_each() -> void:
 func test_story_tables_validate() -> void:
 	assert_eq(Database.validate().size(), 0, "\n".join(Database.validate()))
 	assert_gt(Database.relics.size(), 10)
-	assert_eq(Database.memories.size(), 60, "十一位居民各五级，岚也有五段")
+	assert_eq(Database.memories.size(), 78, "十一位各五级，岚五段，六位新居民各三段")
 	assert_true(Database.quests.size() >= 8)
 	assert_true(Database.lamps.has(&"plaza"))
 

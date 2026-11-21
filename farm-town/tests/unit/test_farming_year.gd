@@ -244,15 +244,16 @@ func test_every_crop_has_art_and_icons() -> void:
 
 func test_shipping_pays_next_morning() -> void:
 	GameState.money = 100
+	var each := Database.item(&"white_radish").price
 	assert_true(Shipping.add(&"white_radish", 3))
 	assert_false(Shipping.add(&"hoe", 1), "工具不能卖")
 	assert_false(Shipping.add(&"white_radish_seed", 1), "种子不收")
-	assert_eq(Shipping.pending_value(), 105)
+	assert_eq(Shipping.pending_value(), each * 3)
 	assert_eq(GameState.money, 100, "当天不到账")
 	Weather.tomorrow = Weather.SUNNY
 	GameClock.advance_day()
-	assert_eq(GameState.money, 205)
-	assert_eq(Shipping.last_income, 105)
+	assert_eq(GameState.money, 100 + each * 3)
+	assert_eq(Shipping.last_income, each * 3)
 	assert_eq(Shipping.pending_value(), 0)
 	GameClock.advance_day()
 	assert_eq(Shipping.last_income, 0, "没出货的那天收入归零")

@@ -6,7 +6,7 @@
 	{"item": "water_caltrop", "season": "summer", "weight": 3, "shore": true},
 	{"item": "mint", "season": "summer", "weight": 3},
 	{"item": "chestnut", "season": "autumn", "weight": 3},
-	{"item": "wild_mushroom", "season": "autumn", "weight": 3},
+	{"item": "wild_mushroom", "season": "autumn", "weight": 3, "boost_term": "hanlu", "boost_weight": 12},
 	{"item": "hawthorn", "season": "autumn", "weight": 2},
 	{"item": "winter_bamboo_shoot", "season": "winter", "weight": 3, "from_term": "xiaoxue"},
 	{"item": "pine_cone", "season": "winter", "weight": 4},

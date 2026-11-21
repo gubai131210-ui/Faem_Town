@@ -1,0 +1,50 @@
+{
+	"name": "goose",
+	"body": "flyer",
+	"scale": 1.0,
+	"cell": 32,
+	"foot_row": 26,
+	"flyer": {
+		"body": [
+			0.11,
+			0.25,
+			0.1
+		],
+		"neck": 0.2,
+		"neck_up": 0.02,
+		"head": 0.075,
+		"wing": 0.5,
+		"chord": 0.24,
+		"sweep": 0.45,
+		"tail": "fan",
+		"tail_len": 0.1,
+		"dark_neck": true,
+		"bill_len": 1.3,
+		"flap_up": 46.0,
+		"flap_down": -30.0,
+		"fps": 6.0
+	},
+	"parts": {
+		"body": [
+			"#b0a08a",
+			"#8a7b68"
+		],
+		"wing": [
+			"#84735f",
+			"#625547"
+		],
+		"head": [
+			"#84735f",
+			"#625547"
+		],
+		"throat": [
+			"#84735f",
+			"#625547"
+		],
+		"belly": [
+			"#e6dcc8",
+			"#c4b8a2"
+		],
+		"beak": "orange"
+	}
+}

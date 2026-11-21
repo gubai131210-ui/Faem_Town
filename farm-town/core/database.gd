@@ -10,6 +10,7 @@ const NPCS_PATH := "res://data/npcs.json"
 const RELICS_PATH := "res://data/relics.json"
 const MEMORIES_PATH := "res://data/memories.json"
 const QUESTS_PATH := "res://data/quests.json"
+const ERRANDS_PATH := "res://data/errands.json"
 const LAMPS_PATH := "res://data/lamps.json"
 const FESTIVALS_PATH := "res://data/festivals.json"
 const FISH_PATH := "res://data/fish.json"
@@ -40,6 +41,8 @@ var relics: Dictionary[StringName, RelicDef] = {}
 var memories: Array[MemoryDef] = []
 ## 公告栏的委托，按表里的顺序
 var quests: Dictionary[StringName, QuestDef] = {}
+## 八张正事做完以后轮换的小事，按表里的顺序
+var errands: Array[QuestDef] = []
 ## 主线石灯
 var lamps: Dictionary[StringName, LampDef] = {}
 ## 节日，按一年里的先后
@@ -76,6 +79,7 @@ func reload() -> void:
 	relics.clear()
 	memories.clear()
 	quests.clear()
+	errands.clear()
 	lamps.clear()
 	festivals.clear()
 	fish.clear()
@@ -148,6 +152,9 @@ func reload() -> void:
 		if entry is Dictionary:
 			var def := QuestDef.from_dict(entry)
 			quests[def.id] = def
+	for entry: Variant in JsonFile.read_array(ERRANDS_PATH):
+		if entry is Dictionary:
+			errands.append(QuestDef.from_dict(entry))
 	for entry: Variant in JsonFile.read_array(LAMPS_PATH):
 		if entry is Dictionary:
 			var def := LampDef.from_dict(entry)
@@ -173,7 +180,30 @@ func reload() -> void:
 			for i in terms.size():
 				if def.from_term != &"" and terms[i].id == def.from_term:
 					def.from_term_index = i
+				if def.boost_term != &"" and terms[i].id == def.boost_term:
+					def.boost_term_index = i
 			forage.append(def)
+	_register_scraps()
+
+
+## 有残页的菜各登记左右两张。不进物品表，id 由菜谱推出来。
+func _register_scraps() -> void:
+	for id: StringName in recipes:
+		var rec: RecipeDef = recipes[id]
+		if rec.scrap.size() != 2:
+			continue
+		var word := str(RecipeDef.SCRAP_WORD.get(id, "旧"))
+		for half in 2:
+			var hid := RecipeDef.scrap_item(id, half)
+			var item := ItemDef.new()
+			item.id = hid
+			item.name = "%s残页·%s" % [word, "左" if half == 0 else "右"]
+			item.kind = &"misc"
+			item.icon = "scrap:%s:%d" % [id, half]
+			item.stack = 1
+			item.price = 0
+			item.desc = "半张旧菜谱，墨是%s的。要另一半才看得懂。" % word
+			items[hid] = item
 
 
 func item(id: StringName) -> ItemDef:
@@ -237,6 +267,14 @@ func relic(id: StringName) -> RelicDef:
 
 func has_relic(id: StringName) -> bool:
 	return relics.has(id)
+
+
+## 这位居民一共有几段忆。没有忆的是 0。
+func memory_cap(npc_id: StringName) -> int:
+	var n := 0
+	while memory(npc_id, n + 1) != null:
+		n += 1
+	return n
 
 
 ## 这位居民第 level 级的忆；没有返回 null。
@@ -459,6 +497,10 @@ func validate() -> PackedStringArray:
 			errors.append("采集物 %s 的权重必须大于 0" % f.item)
 		if f.from_term != &"" and f.from_term_index < 0:
 			errors.append("采集物 %s 的起始节气不存在：%s" % [f.item, f.from_term])
+		if f.boost_term != &"" and f.boost_term_index < 0:
+			errors.append("采集物 %s 的加成节气不存在：%s" % [f.item, f.boost_term])
+		if f.boost_term != &"" and f.boost_weight < 1:
+			errors.append("采集物 %s 写了加成节气就要给加成权重" % f.item)
 	for id: StringName in npcs:
 		errors.append_array(validate_npc(npcs[id]))
 	errors.append_array(_validate_story())
@@ -570,6 +612,11 @@ func _validate_mine() -> PackedStringArray:
 	return errors
 
 
+## 编辑器里源文件还在。导出来以后 png 只剩导入后的贴图，按文件找会说没有，按资源仍找得到。
+func _art_exists(path: String) -> bool:
+	return FileAccess.file_exists(path) or ResourceLoader.exists(path)
+
+
 func _validate_crafting() -> PackedStringArray:
 	var errors := PackedStringArray()
 	for id: StringName in machines:
@@ -578,7 +625,7 @@ func _validate_crafting() -> PackedStringArray:
 			errors.append("设备 id 必须是小写下划线：'%s'" % id)
 		if m.name.is_empty() or m.price <= 0:
 			errors.append("设备 %s 缺名称或价钱" % id)
-		if not FileAccess.file_exists("res://art/props/%s.png" % m.prop):
+		if not _art_exists("res://art/props/%s.png" % m.prop):
 			errors.append("设备 %s 的物件不存在：%s（先运行 tools/props.py）" % [id, m.prop])
 		if m.recipes.is_empty():
 			errors.append("设备 %s 什么都做不了" % id)
@@ -605,6 +652,22 @@ func _validate_crafting() -> PackedStringArray:
 			errors.append("菜谱 %s 要的忆等级无效" % id)
 		if rec.ingredients.is_empty():
 			errors.append("菜谱 %s 没有材料" % id)
+		if not RecipeDef.METHODS.has(rec.method):
+			errors.append("菜谱 %s 的做法无效：%s" % [id, rec.method])
+		if rec.scrap.size() != 0 and rec.scrap.size() != 2:
+			errors.append("菜谱 %s 的残页要正好两半" % id)
+		for place: StringName in rec.scrap:
+			if not RecipeDef.SCRAP_PLACES.has(place):
+				errors.append("菜谱 %s 的残页地方无效：%s" % [id, place])
+		if rec.scrap.size() == 2:
+			for half in 2:
+				if not items.has(RecipeDef.scrap_item(id, half)):
+					errors.append("菜谱 %s 的残页没有登记" % id)
+		if rec.season != &"" and not SEASON_IDS.has(rec.season):
+			errors.append("菜谱 %s 的季节无效：%s" % [id, rec.season])
+		if rec.term != &"" and term_index_of_id(rec.term) < 0:
+			errors.append("菜谱 %s 的节气不存在：%s" % [id, rec.term])
+		errors.append_array(recipe_season_errors(rec))
 		for item_id: StringName in rec.ingredients:
 			if not items.has(item_id):
 				errors.append("菜谱 %s 的材料不存在：%s" % [id, item_id])
@@ -621,6 +684,28 @@ func _validate_crafting() -> PackedStringArray:
 		if not recipes.has(id):
 			errors.append("食物 %s 没有菜谱" % id)
 	return errors
+
+
+## 当季的菜、鱼才能写进这道菜。存着的干货（kept）不要求作物当季；鱼有季节就仍然要对上。
+func recipe_season_errors(rec: RecipeDef) -> PackedStringArray:
+	var errors := PackedStringArray()
+	if rec.season == &"":
+		return errors
+	for item_id: StringName in rec.ingredients:
+		var crop := _crop_of(item_id)
+		if crop != null and not rec.kept and not crop.seasons.has(rec.season):
+			errors.append("菜谱 %s 的 %s 不是 %s 的收成" % [rec.id, item_id, rec.season])
+		if fish.has(item_id) and not fish[item_id].seasons.is_empty() and not fish[item_id].seasons.has(rec.season):
+			errors.append("菜谱 %s 的 %s 不是 %s 的鱼" % [rec.id, item_id, rec.season])
+	return errors
+
+
+func _crop_of(item_id: StringName) -> CropDef:
+	for crop_id: StringName in crops:
+		var crop: CropDef = crops[crop_id]
+		if crop.produce == item_id:
+			return crop
+	return null
 
 
 ## 检查建筑和动物。
@@ -642,7 +727,7 @@ func _validate_ranch() -> PackedStringArray:
 			errors.append("建筑 %s 住动物却没有院子" % id)
 		if b.requires != &"" and not buildings.has(b.requires):
 			errors.append("建筑 %s 的前置建筑不存在：%s" % [id, b.requires])
-		if not FileAccess.file_exists("res://art/props/%s.png" % b.prop):
+		if not _art_exists("res://art/props/%s.png" % b.prop):
 			errors.append("建筑 %s 的物件不存在：%s（先运行 tools/props.py）" % [id, b.prop])
 	for id: StringName in animals:
 		var a: AnimalDef = animals[id]
@@ -726,6 +811,21 @@ func _validate_story() -> PackedStringArray:
 			errors.append("委托 %s 给的遗物不存在：%s" % [id, q.relic])
 		if q.title.is_empty():
 			errors.append("委托 %s 没有标题" % id)
+	var errand_ids: Dictionary[StringName, bool] = {}
+	for slip in errands:
+		if String(slip.id) != String(slip.id).to_snake_case() or String(slip.id).is_empty():
+			errors.append("小事 id 必须是小写下划线：'%s'" % slip.id)
+		if quests.has(slip.id) or errand_ids.has(slip.id):
+			errors.append("小事 id 和别的委托撞了：%s" % slip.id)
+		errand_ids[slip.id] = true
+		if not npcs.has(slip.npc):
+			errors.append("小事 %s 来自不存在的居民：%s" % [slip.id, slip.npc])
+		if not items.has(slip.item):
+			errors.append("小事 %s 要的东西不存在：%s" % [slip.id, slip.item])
+		if slip.count < 1:
+			errors.append("小事 %s 要的数量必须大于 0" % slip.id)
+		if slip.title.is_empty():
+			errors.append("小事 %s 没有标题" % slip.id)
 	for id: StringName in lamps:
 		var l: LampDef = lamps[id]
 		if not SceneRouter.MAPS.has(l.map):
@@ -854,7 +954,7 @@ func validate_npc(def: NpcDef) -> PackedStringArray:
 		errors.append("居民 %s 的铺子无效：%s" % [def.id, def.service])
 	if not FileAccess.file_exists(SHEET_DIR + def.sheet + ".json"):
 		errors.append("居民 %s 的序列帧不存在：%s（先运行 tools/character.py）" % [def.id, def.sheet])
-	if not FileAccess.file_exists(SHEET_DIR + def.sheet + "_face.png"):
+	if not _art_exists(SHEET_DIR + def.sheet + "_face.png"):
 		errors.append("居民 %s 的头像不存在：%s_face.png（先运行 tools/portraits.py）" % [def.id, def.sheet])
 	var seen: Dictionary[StringName, bool] = {}
 	for list: Array[StringName] in [def.loves, def.likes, def.dislikes]:
@@ -871,7 +971,10 @@ func validate_npc(def: NpcDef) -> PackedStringArray:
 			errors.append("居民 %s 的出入口在不存在的地图上：%s" % [def.id, map_id])
 	if def.early_until != &"" and def.early_schedule.is_empty():
 		errors.append("居民 %s 写了 early_until，但没有 early_schedule" % def.id)
-	for plan: Array[Dictionary] in [def.schedule, def.rain_schedule, def.early_schedule, def.early_rain_schedule]:
+	var plans: Array[Array] = [def.schedule, def.rain_schedule, def.early_schedule, def.early_rain_schedule]
+	for ex: Dictionary in def.exceptions:
+		plans.append(ex["plan"])
+	for plan: Array[Dictionary] in plans:
 		var last := -1
 		for entry in plan:
 			var from: int = entry["from"]
@@ -885,4 +988,30 @@ func validate_npc(def: NpcDef) -> PackedStringArray:
 				errors.append("居民 %s 的日程指向不存在的地图：%s" % [def.id, where])
 			elif not def.enter.has(where):
 				errors.append("居民 %s 会去 %s，但没写从哪一格进出" % [def.id, where])
+	for ex: Dictionary in def.exceptions:
+		var lo: int = ex["from"]
+		var hi: int = ex["to"]
+		if lo < 0 or hi <= lo:
+			errors.append("居民 %s 的例外时间段不对：%d–%d" % [def.id, lo, hi])
+		var season: StringName = ex["season"]
+		if season != &"" and not SEASON_IDS.has(season):
+			errors.append("居民 %s 的例外写了不存在的季节：%s" % [def.id, season])
+		var term: StringName = ex["term"]
+		if term != &"" and not _has_term_id(term):
+			errors.append("居民 %s 的例外写了不存在的节气：%s" % [def.id, term])
+		var weather: StringName = ex["weather"]
+		if weather != &"" and not Weather.NAMES.has(weather):
+			errors.append("居民 %s 的例外写了不存在的天气：%s" % [def.id, weather])
+		for entry: Dictionary in ex["plan"]:
+			var from: int = entry["from"]
+			if from < lo or from >= hi:
+				errors.append("居民 %s 的例外去处要落在 %d–%d 里：第 %d 分钟" % [def.id, lo, hi, from])
 	return errors
+
+
+## 节气表里有没有这个 id。
+func _has_term_id(id: StringName) -> bool:
+	for t: TermDef in terms:
+		if t.id == id:
+			return true
+	return false

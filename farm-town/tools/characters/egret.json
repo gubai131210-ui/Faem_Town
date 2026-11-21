@@ -3,7 +3,13 @@
 	"anims": [
 		"idle",
 		"walk",
-		"sit"
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat",
+		"paint"
 	],
 	"hat": "beret",
 	"hair": "long",

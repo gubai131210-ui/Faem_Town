@@ -1,7 +1,7 @@
 {
 	"name": "goat",
 	"body": "quadruped",
-	"scale": 0.95,
+	"scale": 0.9,
 	"quad": {
 		"body": [
 			0.25,
@@ -34,5 +34,9 @@
 			"K"
 		],
 		"hoof": "leather"
-	}
+	},
+	"extra_anims": [
+		"lie",
+		"shake"
+	]
 }

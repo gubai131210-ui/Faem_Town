@@ -89,6 +89,12 @@ static func field(crop_id: StringName, stage: int, dead: bool = false) -> Image:
 	if stage <= 0:
 		_rows(img, SEEDED, G - 3, Palette.colors())
 		return img
+	var painted_row := PAINTED_CROPS.find(crop_id)
+	if painted_row >= 0:
+		if _painted == null:
+			_painted = PAINTED_ATLAS.get_image()
+		if _painted != null and not _painted.is_empty():
+			return _painted.get_region(Rect2i((clampi(stage, 1, 3) - 1) * W, painted_row * H, W, H))
 	var art := _art(crop_id)
 	var leaf := ramp(_col(art, "leaf", "7cc74f"))
 	var fruit := ramp(_col(art, "fruit", "f6efe6"))
@@ -110,6 +116,12 @@ static func field(crop_id: StringName, stage: int, dead: bool = false) -> Image:
 		_:
 			_root(img, stage, leaf, fruit, crop_id)
 	return Px.outline(img)
+
+
+# 这六种作物由 tools/paint_kitchen_crops.py 在同一像素宽度下单独绘制。
+const PAINTED_ATLAS := preload("res://art/crops/kitchen_crops.png")
+const PAINTED_CROPS: Array[StringName] = [&"white_radish", &"bok_choy", &"rapeseed", &"tomato", &"chili", &"strawberry"]
+static var _painted: Image
 
 
 ## 巨型的瓜，32×32，根部在第 28 行。
@@ -362,9 +374,12 @@ static func _bush(img: Image, stage: int, leaf: Array, fruit: Array, art: Dictio
 				Px.px(img, p.x, p.y, fruit[1])
 				Px.px(img, p.x + 1, p.y + 1, fruit[1])
 			"long":
-				Px.px(img, p.x, p.y - 1, fruit[0])
-				Px.px(img, p.x, p.y, fruit[1])
-				Px.px(img, p.x, p.y + 1, fruit[2])
+				# 辣椒：两像素宽、往下收尖的一条，顶上一点绿蒂
+				Px.px(img, p.x, p.y - 2, leaf[2])
+				Px.rect(img, p.x - 1, p.y - 1, 2, 2, fruit[1])
+				Px.px(img, p.x - 1, p.y - 1, fruit[0])
+				Px.px(img, p.x, p.y + 1, fruit[1])
+				Px.px(img, p.x, p.y + 2, fruit[2])
 			"bloom":
 				# 一朵小花：十字形的花瓣加花心
 				var center := _col(art, "center", "d88a1e")
@@ -373,6 +388,21 @@ static func _bush(img: Image, stage: int, leaf: Array, fruit: Array, art: Dictio
 				Px.px(img, p.x + 1, p.y, fruit[1])
 				Px.px(img, p.x, p.y + 1, fruit[2])
 				Px.px(img, p.x, p.y, center)
+			_ when str(art.get("icon", "")) == "round":
+				# 番茄：三像素的圆果，左上一点高光，比叶子里的小点显眼
+				Px.rect(img, p.x - 1, p.y - 1, 3, 3, fruit[1])
+				Px.px(img, p.x - 1, p.y - 1, leaf[1])
+				Px.px(img, p.x + 1, p.y - 1, leaf[1])
+				Px.px(img, p.x, p.y - 1, fruit[0])
+				Px.px(img, p.x + 1, p.y + 1, fruit[2])
+				Px.px(img, p.x, p.y - 2, leaf[2])
+			_ when str(art.get("icon", "")) == "berry":
+				# 草莓：上宽下尖，顶上一点绿萼
+				Px.rect(img, p.x - 1, p.y - 1, 3, 1, fruit[1])
+				Px.px(img, p.x, p.y - 2, leaf[2])
+				Px.px(img, p.x - 1, p.y - 1, fruit[0])
+				Px.px(img, p.x, p.y, fruit[1])
+				Px.px(img, p.x + 1, p.y, fruit[2])
 			_:
 				Px.rect(img, p.x, p.y - 1, 2, 2, fruit[1])
 				Px.px(img, p.x, p.y - 1, fruit[0])

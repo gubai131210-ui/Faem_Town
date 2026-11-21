@@ -1,4 +1,4 @@
-extends GutTest
+﻿extends GutTest
 ## M6 第二批：第五幕（雾里的白鹿、柏先生坦白、山祠灯）、山祠地图、岚、无光层要等山祠灯。
 
 const HILL_FOG := Vector2i(24, 1)
@@ -276,8 +276,8 @@ func test_shanci_has_steps_a_shrine_and_a_lake() -> void:
 	var from := Vector2i(21, 28)
 	assert_false(hill.blocked(hill.spawn_position(&"from_pasture")))
 	assert_eq(hill.spawn_facing(&"from_pasture"), GameMap.Facing.UP)
-	assert_eq(hill.trigger_at(Vector2i(21, 29)).get("map"), &"pasture")
-	assert_eq(hill.trigger_at(Vector2i(22, 29)).get("spawn"), &"from_shanci")
+	assert_eq(hill.trigger_at(Vector2i(21, 47)).get("map"), &"pasture")
+	assert_eq(hill.trigger_at(Vector2i(22, 47)).get("spawn"), &"from_shanci")
 	assert_false(hill.find_path(from, Vector2i(21, 10)).is_empty(), "走得到祠门口")
 	assert_true(hill.blocked(GameMap.tile_center(Vector2i(21, 8))), "古祠挡路")
 	assert_eq(hill.query_use(null, Vector2i(21, 9), GameMap.Facing.UP), &"interact")

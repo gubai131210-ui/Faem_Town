@@ -1,0 +1,24 @@
+{
+	"name": "dragonfly",
+	"body": "insect",
+	"scale": 1.0,
+	"cell": 32,
+	"foot_row": 24,
+	"elev": 52,
+	"insect": {
+		"length": 0.62,
+		"wing": 0.24,
+		"wing_w": 0.06
+	},
+	"parts": {
+		"body": "red",
+		"head": [
+			"#a83e36",
+			"#7a2c28"
+		],
+		"wing": [
+			"#dff3f6",
+			"#a9cbd4"
+		]
+	}
+}

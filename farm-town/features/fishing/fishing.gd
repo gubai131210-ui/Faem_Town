@@ -27,6 +27,10 @@ const RELIC_CHANCE := 0.2
 ## 对着沉着剧情遗物的水钓，每口有这么大的机会钩上它
 const SUNKEN_CHANCE := 0.35
 const RELIC_TERM := &"qingming"
+## 小满那几天：河水上涨，鱼咬钩更快、长得更大
+const XIAOMAN := &"xiaoman"
+const XIAOMAN_WAIT_MULT := 0.6
+const XIAOMAN_SIZE_BIAS := 0.3
 
 ## 每种鱼的记录：{"count": 钓到几条, "best": 最长多少厘米}
 var records: Dictionary[StringName, Dictionary] = {}
@@ -41,15 +45,16 @@ func _ready() -> void:
 	GameClock.register_daily(GameClock.ORDER_FORAGE, _on_new_day)
 
 
-## 现在算不算夜里（夜行的鱼看这个）。
-static func is_night(minutes: float) -> bool:
-	return minutes >= NIGHT_FROM or minutes < NIGHT_TO
+## 现在算不算夜里（夜行的鱼看这个）。dusk_shift 只挪天黑那一头（夏至推迟、冬至提前），
+## 天亮 NIGHT_TO 不挪，所以夏至夜最短、冬至夜最长。
+static func is_night(minutes: float, dusk_shift: float = 0.0) -> bool:
+	return minutes >= NIGHT_FROM + dusk_shift or minutes < NIGHT_TO
 
 
 ## 这片水现在咬钩的鱼。
 func pool(water: StringName) -> Array[FishDef]:
 	var out: Array[FishDef] = []
-	var night := is_night(GameClock.minutes)
+	var night := is_night(GameClock.minutes, GameClock.dusk_shift())
 	for id: StringName in Database.fish:
 		var f: FishDef = Database.fish[id]
 		if f.bites(water, GameClock.season_id(), night, Weather.today, GameClock.term_id()):
@@ -87,6 +92,8 @@ func effective_rod(water: StringName) -> int:
 func bite_wait(rod_level: int, roll: float, baited: bool = false) -> float:
 	var top := maxf(WAIT_MIN + 0.5, WAIT_MAX - WAIT_PER_LEVEL * rod_level)
 	var t := lerpf(WAIT_MIN, top, roll)
+	if GameClock.term_id() == XIAOMAN:
+		t *= XIAOMAN_WAIT_MULT
 	return t * BAIT_WAIT_MULT if baited else t
 
 
@@ -224,9 +231,11 @@ func _settle_trap(trap: Dictionary, roll: float) -> bool:
 	return true
 
 
-## 这条鱼这次多长；roll 是 0 到 1 的随机数，偏向小的。
-static func roll_size(def: FishDef, roll: float) -> int:
+## 这条鱼这次多长；roll 是 0 到 1 的随机数，偏向小的。小满河水上涨，鱼整体偏大。
+static func roll_size(def: FishDef, roll: float, term: StringName = &"") -> int:
 	var k := roll * roll * 0.7 + roll * 0.3
+	if term == XIAOMAN:
+		k = clampf(k + XIAOMAN_SIZE_BIAS, 0.0, 1.0)
 	return clampi(roundi(lerpf(def.min_size, def.max_size, k)), def.min_size, def.max_size)
 
 

@@ -1,7 +1,7 @@
 {
 	"name": "dog",
 	"body": "quadruped",
-	"scale": 1.0,
+	"scale": 1.08,
 	"quad": {
 		"body": [
 			0.2,
@@ -28,5 +28,9 @@
 		"tail": "hair_tan",
 		"snout": "cream",
 		"hoof": "cream"
-	}
+	},
+	"extra_anims": [
+		"lie",
+		"shake"
+	]
 }

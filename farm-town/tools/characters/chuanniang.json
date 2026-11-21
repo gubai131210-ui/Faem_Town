@@ -1,0 +1,32 @@
+{
+	"name": "chuanniang",
+	"anims": [
+		"idle",
+		"walk",
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
+	],
+	"hat": "cone",
+	"hair": "long",
+	"outfit": "tunic",
+	"parts": {
+		"shirt": "teal",
+		"blue": "charcoal",
+		"hair": "hair_black",
+		"boot": "leather",
+		"skin": "skin_tan"
+	},
+	"face": {
+		"age": "young",
+		"eyes": "calm",
+		"brow": "thin",
+		"fringe": "part",
+		"mouth": "neutral",
+		"jaw": "soft",
+		"blush": true
+	}
+}

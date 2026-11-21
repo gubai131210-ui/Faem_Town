@@ -92,6 +92,25 @@ static func crop(crop_id: StringName, stage: int, dead: bool = false) -> Image:
 
 ## 图标。"crop:作物id" 和 "seeds:作物id" 交给 CropArt 画，"wild:物品id" 交给 ItemArt，
 ## "sapling:果树id" 交给 TreeArt，其余是这里的固定图标。
+## Blender 画的家具缩成 16×16 的图标，按最近邻缩，居中贴底。
+static func prop_icon(prop: String) -> Image:
+	var out := Px.new_img(16, 16)
+	var tex := PropArt.texture(prop)
+	if tex == null:
+		return out
+	var img := tex.get_image()
+	img.decompress()
+	var used := img.get_used_rect()
+	if used.size.x <= 0:
+		return out
+	img = img.get_region(used)
+	var k := minf(1.0, 15.0 / maxf(img.get_width(), img.get_height()))
+	img.convert(Image.FORMAT_RGBA8)
+	img.resize(maxi(1, roundi(img.get_width() * k)), maxi(1, roundi(img.get_height() * k)), Image.INTERPOLATE_NEAREST)
+	Px.blit(out, img, (16 - img.get_width()) / 2, 15 - img.get_height())
+	return out
+
+
 static func icon(n: String) -> Image:
 	if n.begins_with("crop:"):
 		return CropArt.icon(StringName(n.substr(5)))
@@ -118,8 +137,19 @@ static func icon(n: String) -> Image:
 		return MineArt.weapon_icon(StringName(n.substr(7)))
 	if n.begins_with("machine:"):
 		return ItemArt.machine(StringName(n.substr(8)))
+	if n.begins_with("prop:"):
+		return prop_icon(n.substr(5))
+	if n.begins_with("paper:"):
+		return RoomArt.swatch("paper", n.substr(6))
+	if n.begins_with("floor:"):
+		return RoomArt.swatch("floor", n.substr(6))
 	if n.begins_with("product:"):
 		return ItemArt.product(StringName(n.substr(8)))
+	if n.begins_with("scrap:"):
+		var scrap_bits := n.substr(6).split(":")
+		var scrap_id := StringName(scrap_bits[0]) if scrap_bits.size() > 0 else &""
+		var scrap_half := int(scrap_bits[1]) if scrap_bits.size() > 1 else 0
+		return ItemArt.scrap(scrap_id, scrap_half)
 	if n.begins_with("sapling:"):
 		return TreeArt.sapling_icon(StringName(n.substr(8)))
 	if n == "sun" or n == "cloud" or n == "rain" or n == "storm" or n == "fog" or n == "wind" \

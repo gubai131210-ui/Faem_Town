@@ -9,6 +9,8 @@ var bin: Dictionary[StringName, Array] = {}
 var last_income := 0
 ## 今年出货一共收入多少（除夕的年度总结用）。开春第一天早上结的是去年最后一天的货，算进新的一年
 var year_income := 0
+## 出过优品的作物。结算时记下，卖完也还在（决策 131）。
+var gold_crops: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -53,6 +55,7 @@ func pending_value() -> int:
 ## 每日结算：把钱给玩家，清空箱子。
 func settle() -> void:
 	last_income = pending_value()
+	_note_gold()
 	if GameClock.season() == 0 and GameClock.day_of_season() == 1:
 		year_income = 0
 	year_income += last_income
@@ -66,7 +69,10 @@ func save_data() -> Dictionary:
 	var out := {}
 	for id: StringName in bin:
 		out[String(id)] = [count_of(id, 0), count_of(id, 1), count_of(id, 2)]
-	return {"bin": out, "last_income": last_income, "year_income": year_income}
+	var gold: Array[String] = []
+	for id: StringName in gold_crops:
+		gold.append(String(id))
+	return {"bin": out, "last_income": last_income, "year_income": year_income, "gold_crops": gold}
 
 
 func load_data(data: Dictionary) -> void:
@@ -89,6 +95,12 @@ func load_data(data: Dictionary) -> void:
 			bin[id] = counts
 	last_income = int(data.get("last_income", 0))
 	year_income = int(data.get("year_income", 0))
+	gold_crops.clear()
+	var saved_gold: Array = data.get("gold_crops", [])
+	for key: Variant in saved_gold:
+		var id := StringName(str(key))
+		if Database.has_item(id) and Database.item(id).kind == &"crop" and not gold_crops.has(id):
+			gold_crops.append(id)
 	changed.emit()
 
 
@@ -96,4 +108,14 @@ func reset_data() -> void:
 	bin.clear()
 	last_income = 0
 	year_income = 0
+	gold_crops.clear()
 	changed.emit()
+
+
+func _note_gold() -> void:
+	for id: StringName in bin:
+		if count_of(id, 2) <= 0 or not Database.has_item(id):
+			continue
+		if Database.item(id).kind != &"crop" or gold_crops.has(id):
+			continue
+		gold_crops.append(id)

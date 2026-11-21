@@ -1,0 +1,41 @@
+{
+	"name": "swallow",
+	"body": "flyer",
+	"scale": 1.0,
+	"cell": 32,
+	"foot_row": 26,
+	"flyer": {
+		"body": [
+			0.085,
+			0.17,
+			0.09
+		],
+		"head": 0.085,
+		"wing": 0.4,
+		"chord": 0.14,
+		"sweep": 1.3,
+		"tail": "fork",
+		"tail_len": 0.3,
+		"throat": true,
+		"bill_len": 0.9,
+		"fps": 9.0,
+		"flap_down": -28.0
+	},
+	"parts": {
+		"body": [
+			"#46527e",
+			"#2f3758"
+		],
+		"wing": [
+			"#3b4670",
+			"#272e4c"
+		],
+		"head": [
+			"#46527e",
+			"#2f3758"
+		],
+		"belly": "white",
+		"throat": "red",
+		"beak": "charcoal"
+	}
+}

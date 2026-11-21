@@ -1,0 +1,54 @@
+{
+	"name": "feifei",
+	"body": "quadruped",
+	"scale": 0.95,
+	"quad": {
+		"body": [
+			0.19,
+			0.3,
+			0.17
+		],
+		"leg": 0.14,
+		"neck": 0.08,
+		"neck_up": 0.18,
+		"head": [
+			0.18,
+			0.16,
+			0.16
+		],
+		"snout": 0.07,
+		"ears": "point",
+		"tail": "bushy",
+		"stripes": 3,
+		"stripe_w": 0.13
+	},
+	"parts": {
+		"body": [
+			"#a8947c",
+			"#82705c"
+		],
+		"head": [
+			"#a8947c",
+			"#82705c"
+		],
+		"leg": [
+			"#82705c",
+			"#62523f"
+		],
+		"ear": [
+			"#82705c",
+			"#62523f"
+		],
+		"stripe": [
+			"#5a4636",
+			"#3e3026"
+		],
+		"tail": "white",
+		"tailtip": "white",
+		"snout": "cream",
+		"hoof": [
+			"#62523f",
+			"#4a3d2f"
+		]
+	}
+}

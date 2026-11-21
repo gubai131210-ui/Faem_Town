@@ -4,35 +4,70 @@
 		"from": "start",
 		"ingredients": {
 			"white_radish": 2
-		}
+		},
+		"season": "spring",
+		"method": "stew"
 	},
 	{
 		"id": "stir_greens",
 		"from": "start",
 		"ingredients": {
 			"bok_choy": 2
-		}
+		},
+		"season": "spring",
+		"method": "stir"
 	},
 	{
 		"id": "roast_sweet_potato",
 		"from": "start",
 		"ingredients": {
 			"sweet_potato": 1
-		}
+		},
+		"season": "autumn",
+		"method": "roast"
 	},
 	{
 		"id": "fried_egg",
 		"from": "start",
 		"ingredients": {
 			"egg": 1
-		}
+		},
+		"method": "stir"
 	},
 	{
 		"id": "rice_bowl",
 		"from": "start",
 		"ingredients": {
 			"white_rice": 1
-		}
+		},
+		"method": "steam"
+	},
+	{
+		"id": "tomato_egg",
+		"from": "start",
+		"ingredients": {
+			"tomato": 1,
+			"egg": 1
+		},
+		"season": "summer",
+		"method": "stir"
+	},
+	{
+		"id": "oil_shrimp",
+		"from": "start",
+		"ingredients": {
+			"river_shrimp": 2
+		},
+		"method": "fry"
+	},
+	{
+		"id": "steamed_crab",
+		"from": "start",
+		"ingredients": {
+			"crab": 1
+		},
+		"season": "autumn",
+		"method": "steam"
 	},
 	{
 		"id": "fish_soup",
@@ -40,7 +75,9 @@
 		"ingredients": {
 			"crucian": 1,
 			"white_radish": 1
-		}
+		},
+		"season": "spring",
+		"method": "boil"
 	},
 	{
 		"id": "plain_noodles",
@@ -48,7 +85,9 @@
 		"ingredients": {
 			"flour": 1,
 			"bok_choy": 1
-		}
+		},
+		"season": "spring",
+		"method": "boil"
 	},
 	{
 		"id": "tea_egg",
@@ -56,7 +95,8 @@
 		"ingredients": {
 			"egg": 2,
 			"dried_tea": 1
-		}
+		},
+		"method": "boil"
 	},
 	{
 		"id": "egg_fried_rice",
@@ -65,7 +105,8 @@
 			"white_rice": 1,
 			"egg": 1,
 			"cooking_oil": 1
-		}
+		},
+		"method": "stir"
 	},
 	{
 		"id": "pumpkin_porridge",
@@ -73,7 +114,9 @@
 		"ingredients": {
 			"pumpkin": 1,
 			"white_rice": 1
-		}
+		},
+		"season": "autumn",
+		"method": "boil"
 	},
 	{
 		"id": "milk_cake",
@@ -82,7 +125,8 @@
 			"cheese": 1,
 			"flour": 1,
 			"egg": 1
-		}
+		},
+		"method": "steam"
 	},
 	{
 		"id": "osmanthus_cake",
@@ -91,36 +135,592 @@
 			"osmanthus": 2,
 			"white_rice": 1,
 			"honey_wild": 1
+		},
+		"season": "autumn",
+		"method": "steam"
+	},
+	{
+		"id": "pea_egg",
+		"from": "yunniang",
+		"ingredients": {
+			"pea": 1,
+			"egg": 1
+		},
+		"season": "spring",
+		"term": "jingzhe",
+		"method": "stir"
+	},
+	{
+		"id": "strawberry_bowl",
+		"from": "yunniang",
+		"ingredients": {
+			"strawberry": 2,
+			"goat_milk": 1
+		},
+		"season": "spring",
+		"term": "chunfen",
+		"method": "mix"
+	},
+	{
+		"id": "qingming_tea",
+		"from": "yunniang",
+		"ingredients": {
+			"tea_leaf": 1
+		},
+		"season": "spring",
+		"term": "qingming",
+		"method": "boil"
+	},
+	{
+		"id": "mandarin_steam",
+		"from": "yunniang",
+		"ingredients": {
+			"mandarin_fish": 1
+		},
+		"season": "spring",
+		"term": "chunfen",
+		"method": "steam"
+	},
+	{
+		"id": "peach_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"peach_fish": 1
+		},
+		"season": "spring",
+		"term": "yushui",
+		"method": "boil"
+	},
+	{
+		"id": "lixia_egg",
+		"from": "yunniang",
+		"ingredients": {
+			"duck_egg": 1
+		},
+		"season": "summer",
+		"term": "lixia",
+		"method": "boil"
+	},
+	{
+		"id": "cold_noodles",
+		"from": "yunniang",
+		"ingredients": {
+			"flour": 1,
+			"cooking_oil": 1
+		},
+		"season": "summer",
+		"term": "xiazhi",
+		"method": "mix"
+	},
+	{
+		"id": "lotus_slices",
+		"from": "yunniang",
+		"ingredients": {
+			"lotus_root": 1,
+			"honey_wild": 1
+		},
+		"season": "summer",
+		"term": "dashu",
+		"method": "cut"
+	},
+	{
+		"id": "corn_cob",
+		"from": "yunniang",
+		"ingredients": {
+			"corn": 1
+		},
+		"season": "autumn",
+		"term": "chushu",
+		"method": "boil"
+	},
+	{
+		"id": "perch_steam",
+		"from": "yunniang",
+		"ingredients": {
+			"perch": 1
+		},
+		"season": "autumn",
+		"term": "qiufen",
+		"method": "steam"
+	},
+	{
+		"id": "napa_pot",
+		"from": "yunniang",
+		"ingredients": {
+			"napa_cabbage": 1
+		},
+		"season": "autumn",
+		"term": "hanlu",
+		"method": "stew"
+	},
+	{
+		"id": "mustard_fry",
+		"from": "yunniang",
+		"ingredients": {
+			"potherb_mustard": 1
+		},
+		"season": "winter",
+		"term": "xiaoxue",
+		"method": "stir"
+	},
+	{
+		"id": "silver_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"ice_fish": 1
+		},
+		"season": "winter",
+		"term": "daxue",
+		"method": "boil"
+	},
+	{
+		"id": "winter_balls",
+		"from": "yunniang",
+		"ingredients": {
+			"white_rice": 1,
+			"honey_wild": 1
+		},
+		"season": "winter",
+		"term": "dongzhi",
+		"method": "boil"
+	},
+	{
+		"id": "laba_porridge",
+		"from": "yunniang",
+		"ingredients": {
+			"white_rice": 1,
+			"soybean": 1
+		},
+		"season": "winter",
+		"term": "xiaohan",
+		"kept": true,
+		"method": "boil"
+	},
+	{
+		"id": "eight_treasure",
+		"from": "yunniang",
+		"ingredients": {
+			"white_rice": 1,
+			"osmanthus": 1,
+			"honey_osmanthus": 1
+		},
+		"season": "winter",
+		"term": "dahan",
+		"kept": true,
+		"method": "steam"
+	},
+	{
+		"id": "soy_greens",
+		"from": "yunniang",
+		"season": "spring",
+		"method": "stir",
+		"scrap": ["mine", "wild"],
+		"ingredients": {
+			"bok_choy": 1,
+			"soy_sauce": 1
+		}
+	},
+	{
+		"id": "vinegar_napa",
+		"from": "yunniang",
+		"season": "autumn",
+		"method": "stir",
+		"scrap": ["wild", "fog"],
+		"ingredients": {
+			"napa_cabbage": 1,
+			"rice_vinegar": 1
+		}
+	},
+	{
+		"id": "wine_perch",
+		"from": "yunniang",
+		"season": "autumn",
+		"method": "steam",
+		"scrap": ["mine", "fog"],
+		"ingredients": {
+			"perch": 1,
+			"rice_wine": 1
+		}
+	},
+	{
+		"id": "sugar_roast",
+		"from": "yunniang",
+		"season": "autumn",
+		"method": "roast",
+		"scrap": ["fog", "wild"],
+		"ingredients": {
+			"sweet_potato": 1,
+			"malt_sugar": 1
 		}
 	},
 	{
 		"id": "herb_tea",
 		"from": "memory",
-		"teacher": "jiang",
-		"need": 3,
 		"ingredients": {
 			"fog_bell": 1,
 			"dried_tea": 1
-		}
+		},
+		"teacher": "jiang",
+		"need": 3,
+		"method": "boil"
 	},
 	{
 		"id": "fog_tonic",
 		"from": "memory",
-		"teacher": "luyuan",
-		"need": 4,
 		"ingredients": {
 			"fog_bell": 2,
 			"dried_tea": 1
-		}
+		},
+		"teacher": "luyuan",
+		"need": 4,
+		"method": "boil"
 	},
 	{
 		"id": "farewell_noodles",
 		"from": "memory",
-		"teacher": "yunniang",
-		"need": 5,
 		"ingredients": {
 			"flour": 1,
 			"bok_choy": 1,
+			"egg": 1
+		},
+		"season": "spring",
+		"teacher": "yunniang",
+		"need": 5,
+		"method": "boil"
+	},
+	{
+		"id": "bamboo_stir",
+		"from": "yunniang",
+		"ingredients": {
+			"spring_bamboo_shoot": 1,
+			"cooking_oil": 1
+		},
+		"season": "spring",
+		"term": "lichun",
+		"method": "stir"
+	},
+	{
+		"id": "fern_salad",
+		"from": "yunniang",
+		"ingredients": {
+			"fern": 1,
+			"rice_vinegar": 1
+		},
+		"season": "spring",
+		"term": "guyu",
+		"method": "mix"
+	},
+	{
+		"id": "bayberry_drink",
+		"from": "yunniang",
+		"ingredients": {
+			"bayberry": 2,
+			"honey_wild": 1
+		},
+		"season": "summer",
+		"term": "xiaoman",
+		"method": "boil"
+	},
+	{
+		"id": "wheat_rice",
+		"from": "yunniang",
+		"ingredients": {
+			"winter_wheat": 2
+		},
+		"season": "summer",
+		"term": "mangzhong",
+		"method": "steam"
+	},
+	{
+		"id": "mint_drink",
+		"from": "yunniang",
+		"ingredients": {
+			"mint": 1,
+			"honey_wild": 1
+		},
+		"season": "summer",
+		"term": "xiaoshu",
+		"method": "mix"
+	},
+	{
+		"id": "chestnut_porridge",
+		"from": "yunniang",
+		"ingredients": {
+			"chestnut": 1,
+			"white_rice": 1
+		},
+		"season": "autumn",
+		"term": "liqiu",
+		"method": "boil"
+	},
+	{
+		"id": "salted_soybean",
+		"from": "yunniang",
+		"ingredients": {
+			"soybean": 2
+		},
+		"season": "autumn",
+		"term": "bailu",
+		"method": "boil"
+	},
+	{
+		"id": "baked_persimmon",
+		"from": "yunniang",
+		"ingredients": {
+			"persimmon": 2
+		},
+		"season": "autumn",
+		"term": "shuangjiang",
+		"method": "roast"
+	},
+	{
+		"id": "oyster_egg",
+		"from": "yunniang",
+		"ingredients": {
+			"oyster": 1,
+			"egg": 1
+		},
+		"season": "winter",
+		"term": "lidong",
+		"method": "stir"
+	},
+	{
+		"id": "scallion_cake",
+		"from": "yunniang",
+		"ingredients": {
+			"flour": 1,
+			"cooking_oil": 1
+		},
+		"method": "fry"
+	},
+	{
+		"id": "wine_balls",
+		"from": "yunniang",
+		"ingredients": {
+			"rice_wine": 1,
+			"flour": 1
+		},
+		"method": "boil"
+	},
+	{
+		"id": "stir_purse",
+		"from": "yunniang",
+		"ingredients": {
+			"shepherds_purse": 1,
+			"cooking_oil": 1
+		},
+		"season": "spring",
+		"method": "stir"
+	},
+	{
+		"id": "roast_mushroom",
+		"from": "yunniang",
+		"ingredients": {
+			"wild_mushroom": 2
+		},
+		"season": "autumn",
+		"method": "roast"
+	},
+	{
+		"id": "loquat_honey",
+		"from": "yunniang",
+		"ingredients": {
+			"loquat": 2,
+			"honey_wild": 1
+		},
+		"season": "spring",
+		"method": "mix"
+	},
+	{
+		"id": "watermelon_cup",
+		"from": "yunniang",
+		"ingredients": {
+			"watermelon": 1,
+			"honey_wild": 1
+		},
+		"season": "summer",
+		"method": "cut"
+	},
+	{
+		"id": "wintersweet_tea",
+		"from": "yunniang",
+		"ingredients": {
+			"wintersweet": 1,
+			"dried_tea": 1
+		},
+		"season": "winter",
+		"method": "boil"
+	},
+	{
+		"id": "sesame_pumpkin",
+		"from": "yunniang",
+		"ingredients": {
+			"pumpkin": 1,
+			"sesame": 1,
+			"flour": 1
+		},
+		"season": "autumn",
+		"method": "fry"
+	},
+	{
+		"id": "chestnut_yam",
+		"from": "yunniang",
+		"ingredients": {
+			"chestnut": 1,
+			"sweet_potato": 1
+		},
+		"season": "autumn",
+		"method": "roast"
+	},
+	{
+		"id": "pan_loach",
+		"from": "yunniang",
+		"ingredients": {
+			"loach": 1,
+			"cooking_oil": 1
+		},
+		"method": "fry"
+	},
+	{
+		"id": "vinegar_carp",
+		"from": "yunniang",
+		"ingredients": {
+			"carp": 1,
+			"rice_vinegar": 1
+		},
+		"method": "stir"
+	},
+	{
+		"id": "steam_grass_carp",
+		"from": "yunniang",
+		"ingredients": {
+			"grass_carp": 1
+		},
+		"method": "steam"
+	},
+	{
+		"id": "steam_sharpbelly",
+		"from": "yunniang",
+		"ingredients": {
+			"sharpbelly": 1
+		},
+		"method": "steam"
+	},
+	{
+		"id": "clam_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"clam": 1,
+			"white_radish": 1
+		},
+		"season": "spring",
+		"method": "boil"
+	},
+	{
+		"id": "winter_shoot",
+		"from": "yunniang",
+		"ingredients": {
+			"winter_bamboo_shoot": 1,
+			"cooking_oil": 1
+		},
+		"season": "winter",
+		"method": "stir"
+	},
+	{
+		"id": "chili_potato",
+		"from": "yunniang",
+		"ingredients": {
+			"chili": 1,
+			"potato": 1
+		},
+		"method": "stir"
+	},
+	{
+		"id": "pickle_rice",
+		"from": "yunniang",
+		"ingredients": {
+			"pickles": 1,
+			"white_rice": 1,
+			"egg": 1
+		},
+		"method": "stir"
+	},
+	{
+		"id": "caltrop_porridge",
+		"from": "yunniang",
+		"ingredients": {
+			"water_caltrop": 1,
+			"white_rice": 1
+		},
+		"method": "boil"
+	},
+	{
+		"id": "hawthorn_cake",
+		"from": "yunniang",
+		"ingredients": {
+			"hawthorn": 1,
+			"malt_sugar": 1
+		},
+		"method": "steam"
+	},
+	{
+		"id": "kelp_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"kelp": 1
+		},
+		"method": "boil"
+	},
+	{
+		"id": "chrys_tea",
+		"from": "yunniang",
+		"ingredients": {
+			"chrysanthemum": 1,
+			"dried_tea": 1
+		},
+		"season": "autumn",
+		"method": "boil"
+	},
+	{
+		"id": "steam_fog_carp",
+		"from": "yunniang",
+		"ingredients": {
+			"fog_carp_king": 1
+		},
+		"method": "steam"
+	},
+	{
+		"id": "catfish_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"old_well_catfish": 1,
+			"white_radish": 1
+		},
+		"method": "boil"
+	},
+	{
+		"id": "tide_soup",
+		"from": "yunniang",
+		"ingredients": {
+			"tide_born": 1
+		},
+		"season": "winter",
+		"method": "boil"
+	},
+	{
+		"id": "giant_melon",
+		"from": "yunniang",
+		"ingredients": {
+			"watermelon": 4
+		},
+		"season": "summer",
+		"method": "cut"
+	},
+	{
+		"id": "odd_bowl",
+		"from": "odd",
+		"method": "boil",
+		"ingredients": {
 			"egg": 1
 		}
 	}

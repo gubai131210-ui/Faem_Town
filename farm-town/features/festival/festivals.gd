@@ -116,10 +116,21 @@ static func morning_note() -> String:
 
 
 ## 这一年做没做过某件事的标记名。
-static func flag(key: String, day: int = -1) -> StringName:
+static func year_of(day: int = -1) -> int:
 	var d := GameClock.day if day < 0 else day
-	var year := (d - 1) / (GameClock.DAYS_PER_SEASON * GameClock.SEASONS_PER_YEAR) + 1
-	return StringName("fest_%s_y%d" % [key, year])
+	return (d - 1) / (GameClock.DAYS_PER_SEASON * GameClock.SEASONS_PER_YEAR) + 1
+
+
+static func flag(key: String, day: int = -1) -> StringName:
+	return StringName("fest_%s_y%d" % [key, year_of(day)])
+
+
+## 今年这场节日的开场还没演过时，返回过场 id。不是节日、还没开、已经散了，返回空。
+static func opening_id() -> StringName:
+	var def := today()
+	if def == null or not is_open():
+		return &""
+	return StringName("fest_%s_y%d" % [def.id, year_of()])
 
 
 static func done(key: String) -> bool:
@@ -386,6 +397,7 @@ static func _summary() -> Dictionary:
 		"year": str(GameClock.year()), "income": str(Shipping.year_income), "lamps": str(lit_count()),
 		"memories": str(Residents.recovered().size()), "fish": str(Fishing.records.size()),
 		"depth": str(Mine.deepest), "met": str(met), "lanterns": str(lantern_count()),
+		"trades": Livelihood.year_line(),
 	}
 	return {"title": "fest_newyear_summary", "join": false}
 

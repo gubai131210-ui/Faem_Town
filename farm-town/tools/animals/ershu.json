@@ -1,0 +1,44 @@
+{
+	"name": "ershu",
+	"body": "quadruped",
+	"scale": 0.72,
+	"quad": {
+		"body": [
+			0.2,
+			0.27,
+			0.19
+		],
+		"leg": 0.08,
+		"neck": 0.08,
+		"neck_up": 0.14,
+		"head": [
+			0.19,
+			0.18,
+			0.17
+		],
+		"snout": 0.05,
+		"ears": "round",
+		"tail": "fan"
+	},
+	"parts": {
+		"body": [
+			"#b4aca4",
+			"#8e8780"
+		],
+		"head": [
+			"#b4aca4",
+			"#8e8780"
+		],
+		"leg": [
+			"#8e8780",
+			"#6c6660"
+		],
+		"ear": "pink",
+		"tail": [
+			"#d8d0c8",
+			"#b0a8a0"
+		],
+		"snout": "pink",
+		"hoof": "pink"
+	}
+}

@@ -1,7 +1,7 @@
 {
 	"name": "cat",
 	"body": "quadruped",
-	"scale": 0.92,
+	"scale": 0.8,
 	"quad": {
 		"body": [
 			0.18,
@@ -17,6 +17,9 @@
 			0.16
 		],
 		"snout": 0.05,
+		"front_eyes": true,
+		"stripes": 3,
+		"stripe_w": 0.058,
 		"ears": "point",
 		"tail": "up"
 	},
@@ -26,7 +29,12 @@
 		"leg": "orange",
 		"ear": "orange",
 		"tail": "orange",
+		"stripe": ["#b87242", "#824b33"],
 		"snout": "cream",
 		"hoof": "cream"
-	}
+	},
+	"extra_anims": [
+		"lie",
+		"shake"
+	]
 }

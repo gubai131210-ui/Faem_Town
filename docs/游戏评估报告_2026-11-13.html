@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>雾隐青岚 · 游戏评估与优化建议（2026-11-13）</title>
+<style>
+  :root{
+    --bg:#f7f6f2; --paper:#ffffff; --ink:#242521; --muted:#5f5e5a; --line:#dedcd3;
+    --accent:#0f6e56; --accent-bg:#e1f5ee; --warn:#a32d2d; --warn-bg:#fcebeb;
+    --amber:#854f0b; --amber-bg:#faeeda; --blue:#185fa5; --blue-bg:#e6f1fb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Source Han Sans SC",system-ui,sans-serif;
+    font-size:15px;line-height:1.85}
+  .wrap{max-width:960px;margin:0 auto;padding:48px 40px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;color:var(--muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.35;margin:0 0 12px;font-weight:600}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  h2{font-size:21px;margin:52px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line);font-weight:600}
+  h3{font-size:16px;margin:30px 0 8px;font-weight:600}
+  h4{font-size:14px;margin:20px 0 4px;font-weight:600;color:var(--accent)}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0 10px 22px;padding:0}
+  li{margin:6px 0}
+  code{font-family:Consolas,Monaco,monospace;font-size:13px;background:#eeece5;padding:1px 5px;border-radius:3px}
+  .lead{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);
+    padding:18px 22px;margin:24px 0;border-radius:4px}
+  .lead p:first-child{margin-top:0}.lead p:last-child{margin-bottom:0}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--paper)}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#efeee8;font-weight:600}
+  td.num{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:10px;
+    border:1px solid currentColor;line-height:1.7;white-space:nowrap}
+  .t-red{color:var(--warn);background:var(--warn-bg)}
+  .t-amber{color:var(--amber);background:var(--amber-bg)}
+  .t-green{color:var(--accent);background:var(--accent-bg)}
+  .t-blue{color:var(--blue);background:var(--blue-bg)}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 20px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+  .metric{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+  .metric .k{font-size:12px;color:var(--muted);margin:0}
+  .metric .v{font-size:24px;font-weight:600;margin:4px 0 0;line-height:1.3}
+  .metric .n{font-size:12px;color:var(--muted);margin:2px 0 0}
+  .note{font-size:13px;color:var(--muted);border-left:3px solid var(--line);padding-left:14px;margin:14px 0}
+  .evidence{background:#f2f6f4;border:1px solid #c9e2d8;border-radius:5px;padding:12px 16px;margin:12px 0;font-size:13.5px}
+  .evidence b{color:var(--accent)}
+  .risk{background:var(--warn-bg);border:1px solid #eec4c4;border-radius:5px;padding:12px 16px;margin:12px 0;font-size:13.5px}
+  .risk b{color:var(--warn)}
+  .toc{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 24px;margin:24px 0;font-size:14px}
+  .toc ol{margin:6px 0 0 20px}
+  .toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+  @media print{body{background:#fff}.wrap{padding:0}h2{page-break-after:avoid}.card,.evidence,.risk,table{page-break-inside:avoid}}
+  @media (max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.wrap{padding:28px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">项目评估 · 静态取证版</p>
+  <h1>《雾隐青岚》游戏评估与优化建议</h1>
+  <p class="sub">评估日期：2026-11-13 ｜ 评估对象：M0–M7 已实现内容 + M8 前两批 + 《后续计划》M9–M16 ｜ 依据：项目文档、数据表、GDScript、自动流程截图</p>
+</header>
+
+<div class="lead">
+  <p><b>核心结论：这不是一个"功能还不够"的项目，而是一个"内容已经过量、玩家验证几乎为零"的项目。</b></p>
+  <p>从开局到三个结局的完整链路已经打通，内容规模达到 24 张数据表、约 4 万行 GDScript、2985 行对话、66 个测试脚本、642 项单元测试与 366 项自动流程检查。但同一份进度文档里记录着 23 处"待试玩"、88 条已知问题、44 个未提交文件，以及一个反复出现却未定位的带窗口流程丢键问题。因此<strong>当前最高优先级的动作不是继续加内容，而是建立"真实玩家 → 反馈 → 返工"的闭环</strong>。</p>
+  <p>《后续计划》自己也把"试玩积压"列为 M7 收尾的第一件事，但 M8 前两批（决策 067、068）已经开工完成。计划与执行之间已经出现偏差，这一点比计划里任何一条内容提案都更值得先处理。</p>
+</div>
+
+<div class="grid">
+  <div class="metric"><p class="k">可玩性（结构评估）</p><p class="v">6.5 / 10</p><p class="n">系统完整，路径单一</p></div>
+  <div class="metric"><p class="k">吸引性（概念评估）</p><p class="v">8.0 / 10</p><p class="n">题材稀缺，前期钩子弱</p></div>
+  <div class="metric"><p class="k">美术（截图评估）</p><p class="v">6.5 / 10</p><p class="n">头像出色，管线有接缝</p></div>
+  <div class="metric"><p class="k">后续计划（可执行性）</p><p class="v">6.0 / 10</p><p class="n">诊断准确，规模风险高</p></div>
+</div>
+<p class="note">评分说明：以上是基于文档、代码与静态截图作出的<strong>结构性评估</strong>，不含手感、动作、音效、音乐与动态观感，也不等价于玩家试玩评分。截图只能证明"画了什么、怎么排布"，不能证明"动起来好不好看"。</p>
+
+<div class="toc">
+  <b>报告目录</b>
+  <ol>
+    <li><a href="#s0">取证口径与判断边界</a></li>
+    <li><a href="#s1">可玩性：系统耦合强，目标结构弱</a></li>
+    <li><a href="#s2">吸引性：世界观是最强资产，但传达被稀释</a></li>
+    <li><a href="#s3">美术风格：三层精度落差与可读性问题</a></li>
+    <li><a href="#s4">后续开发计划：方向对，规模与顺序需要重排</a></li>
+    <li><a href="#s5">优化建议清单（按投入产出比排序）</a></li>
+    <li><a href="#s6">本次无法验证的部分</a></li>
+    <li><a href="#s7">附录：关键数据与证据索引</a></li>
+  </ol>
+</div>
+
+<h2 id="s0">1. 取证口径与判断边界</h2>
+<p>本报告只使用可复核的材料，不引用外部资料，也不对未实现内容作推测性评价。</p>
+<table>
+  <tr><th>类别</th><th>取证内容</th><th>用途</th></tr>
+  <tr><td>项目文档</td><td>设计文档、架构、决策记录（68 条）、进度、后续计划、AGENTS.md</td><td>设计意图、已定决策、已知问题、里程碑状态</td></tr>
+  <tr><td>数据表</td><td><code>data/*.json</code> 共 24 张，逐表统计条目与字段</td><td>内容规模、门槛数值、经济数值</td></tr>
+  <tr><td>代码</td><td>150 个 <code>.gd</code>、40375 行；重点核对 <code>game_clock.gd</code>、<code>residents.gd</code>、<code>fishing.gd</code></td><td>一天时长、熟悉度曲线、遗物概率</td></tr>
+  <tr><td>对话与测试</td><td>14 个对话文件 2985 行；66 个测试脚本</td><td>文本体量、验证覆盖方式</td></tr>
+  <tr><td>画面</td><td>12 张自动流程截图 + 头像/建筑/角色素材拼图</td><td>美术风格、UI 层级、可读性问题</td></tr>
+</table>
+<p><strong>没有执行的事</strong>：按项目规则，未运行单元测试、自动流程、构建或资源导入；未修改任何项目文件；未试玩。因此所有关于"好不好玩""顺不顺""好不好听"的结论都留白，由试玩判断。</p>
+
+<h2 id="s1">2. 可玩性：系统耦合强，目标结构弱</h2>
+
+<h3>2.1 做对的地方</h3>
+<p><strong>多时间尺度的循环是成立的。</strong>一天（6:00–次日 2:00，实现为 <code>MINUTES_PER_SECOND = 1.4</code>，即 1200 游戏分钟 / 1.4 ≈ 14.3 现实分钟）、一个节气（4 天）、一季（24 天）、一年（96 天），四层都有各自的目标与结算。每日结算按固定顺序由 <code>GameClock.register_daily</code> 调度，状态与画面分离，存档只在睡觉时进行——这套地基在架构上相当干净，也解释了为什么 40 层矿井、77 件遗物、60 段忆能叠上去而不散架。</p>
+<p><strong>供品表是全局最聪明的设计。</strong>六盏灯的供品分别要求作物、鱼、蛋、采集物、矿石，把种田、钓鱼、养殖、采集、矿井五个系统强制串成一张网。玩家为了点亮东滩灯，需要冬天种雪里蕻与腊梅、下到遗落层挖银矿石、钓鲤鱼——这不是"任务列表"，而是"世界要求的物证"。这一点明显优于常见的"交 10 个木头"式解锁。</p>
+<p><strong>负反馈有设计感。</strong>小暑不浇水会蔫、霜冻冻死不耐寒作物、雷劈、大风落果、乌鸦刨种、灯油烧尽全黑、晕倒丢一半所得——限制是"可预期的、有对策的"，不是随机惩罚。</p>
+
+<h3>2.2 结构性缺陷</h3>
+
+<h4>缺陷一：七盏灯是唯一的主干，玩家自选度低于品类基准</h4>
+<p>地方靠灯开、主线幕次靠灯推、部分能力靠灯给。M8 第一批（决策 067）把鱼竿、鸡舍、鸡鸭、蚕房改成"熟悉度 40 就给"，并放开了广场灯之后三盏灯的顺序，这是正确的改动，但它解的是<strong>本事</strong>，没解<strong>地方与主线</strong>：畜棚、羊牛蜂、下井、工具升金仍锁在灯后；进度文档明确记着"金矿石（工具升到金）和岚之影都排到了山祠灯之后，最早第二年春天"。也就是说，一名不点灯的玩家能种田、钓鱼、养鸡、做菜、过节，但看不到第四幕以后的任何内容，也拿不到高级工具。</p>
+<div class="evidence"><b>证据：</b><code>data/lamps.json</code> 六盏灯各需 3–4 样供品加一件关键遗物；设计文档 2.3 节按"序 / 一 / 二 / 三 / 四 / 五 / 终"七幕线性推进；<code>docs/进度.md</code> 已知问题第 413、421 条记录了 31–40 层需山祠灯、1–30 层无限制。</div>
+<p>结果是：游戏提供了十余个系统，但"今天想做什么"这个问题，在多数时段只有一个正确答案——去凑下一盏灯的供品。后续计划第 2 节自己写的"想做的事只有一条路"，判断准确。</p>
+
+<h4>缺陷二：反馈以文本为主，"世界变化"的可见度不足</h4>
+<p>点灯的回报是：雾散开、货架多几样、居民多一段话。结局是一张画加旁白（且对话框压在画面下方约四分之一）。镇广场截图里，除了一盏石灯、两张长凳和三名居民，46×30 的石板广场几乎没有任何生活痕迹；东滩与山祠地图同样空旷。<strong>玩家做了一件大事，世界却只回了一句话</strong>，长期驱动力会被消耗。</p>
+
+<h4>缺陷三：真结局的门槛是重复劳动，不是理解或技巧</h4>
+<p>归名结局要求十一位居民各 5 级忆 + 岚 5 段，共 60 段。代码里 <code>STEP = 100</code>、<code>familiarity_cap = (memory_level + 1) * 100</code>，即每位居民升到 5 级累计需要 100 + 200 + 300 + 400 + 500 = <strong>1500 点熟悉度</strong>，十一人合计 16500 点。每天每人的稳定来源只有"首次搭话 +8"和"一次送礼 +40（最爱）"约 58 点，且每一级的遗物必须按等级依次获得，来源是雾天地面、雾天/清明鱼钩（<code>RELIC_CHANCE = 0.2</code>）与家里的狗。</p>
+<div class="risk"><b>结论：</b>归名的实际门槛接近"每天固定巡一遍十一位居民送礼，持续数十个游戏日，并等待遗物随机出现"。这与后续计划第 2 节明确写下的"不做签到、每日任务"形成直接矛盾——虽然名义上没有每日任务，真结局却建立在每日打卡之上。更关键的是，60 段忆本身是本项目最动人的内容，却可能被重复劳动挡在大多数玩家之外。</div>
+
+<h4>缺陷四：数值全部是第一版，且没有收益模拟</h4>
+<p>进度文档反复出现"数值都是第一版，没有调过"：作物/种子售价、建筑与动物价格、武器伤害与首领血量、灯油消耗、节日比赛门槛、加工品售价。鱼价区间 20–1200 文，132 件物品有价格，但没有任何脚本回答"只钓鱼一天能挣多少 vs 只种田"这个基本问题。后续计划把这件事排到了 M16（最后一个里程碑），意味着 M9–M15 的所有新内容都将建立在未经验证的经济曲线上。</p>
+
+<h4>缺陷五：验证债已经影响判断能力</h4>
+<table>
+  <tr><th>指标</th><th class="num">数值</th><th>含义</th></tr>
+  <tr><td>标注"待试玩"的批次</td><td class="num">23 处</td><td>M3 到 M7 的多数内容从未被真人玩过</td></tr>
+  <tr><td>已知问题条目</td><td class="num">88 条</td><td>大量条目写着"我判断不了，要用户试玩"</td></tr>
+  <tr><td>未提交文件</td><td class="num">44 个</td><td>自 <code>ef8bdd4</code> 后 M7 三批与 M8 两批未提交</td></tr>
+  <tr><td>带窗口自动流程</td><td class="num">偶发丢键</td><td>日志多次记录"使用"键未被接收，原因未定位</td></tr>
+  <tr><td>单元测试 / 流程检查</td><td class="num">642 / 366</td><td>逻辑覆盖扎实，但都是脚本模拟，不产生体验数据</td></tr>
+</table>
+<p>自动流程跑一次约 8 分钟，且只验证"不报错、状态对"，不验证"想不想继续玩"。<strong>测试数量增长不能替代试玩次数</strong>，这是当前最需要纠正的度量方式。</p>
+
+<h4>缺陷六：亲和性与系统闭环</h4>
+<ul>
+  <li><strong>时长与文档不一致</strong>：设计文档第 3 节写"现实 1 秒约等于游戏 1 分钟，一天约 20 分钟"，代码实现是 1.4 游戏分钟/秒、一天约 14.3 分钟（与《星露谷物语》一天约 14 分钟相当）。对一款地图更多、系统更多的游戏，这个节奏偏紧；而"一天调慢"的设置被排到 M16。</li>
+  <li><strong>只在睡觉存档</strong>：中途退出会丢当天进度；键位不可改、无速度选项、无字号选项。</li>
+  <li><strong>断头路</strong>：26 种鱼与花目前只能卖，不能做菜、不能送礼；井里九件遗物只是收藏；鱼谱、忆簿、手账都是"记录型"系统，不反哺产出。计划把接线排到 M16，但这类改动成本极低、收益直接。</li>
+  <li><strong>调性分裂</strong>：40 层矿井 + 4 个首领 + 灯油 + 三武器连段，对"田园生活模拟"受众可能偏重；对动作玩家又偏浅（三种武器、前摇 0.45 秒、数值第一版）。同一款游戏要同时满足两类预期，需要明确主次。</li>
+</ul>
+
+<h4>缺陷七：头 30 分钟没有钩子</h4>
+<p>第一天的五步提示只覆盖"看信 → 锄地 → 播种 → 浇水 → 睡觉"这一串操作；第二天起提示消失，只多一句"翻翻手账"。没有开场（M11 第一批才做），核心谜题"信是谁寄的"要到第四幕（第一年冬）才揭晓，中间靠点灯的供品清单推动。后续计划第 2 节引用的"先验证 30 分钟"这句话，恰恰是当前最薄弱处：玩家在建立情感锚点之前，先被要求熟悉一套繁杂的日常操作。</p>
+
+<h2 id="s2">3. 吸引性：世界观是最强资产，但传达被稀释</h2>
+
+<h3>3.1 差异化资产（这是项目最值钱的部分）</h3>
+<ul>
+  <li><strong>"忘雾与记忆"</strong>：雾抹掉地方、名字与手艺；被忘掉的物件在井里变成"忘形"。这套设定把种田、钓鱼、下井、社交统一进同一个隐喻，比"又一个星露谷"有辨识度得多。</li>
+  <li><strong>以"忆"代替好感度</strong>：设计文档明确"不靠刷礼物，靠归还遗物触发记忆事件"——立意很好，可惜实现里熟悉度仍需 1500 点/人（见 2.2 缺陷三），立意在数值层被稀释了。</li>
+  <li><strong>二十四节气 + 江南山乡</strong>：茶、稻、藕、蚕、水牛、桂花、河灯、饺子宴、除夕灯会，24 个节气各有一条规则，是国产生活模拟里少见的题材密度。</li>
+  <li><strong>克制的情感设计</strong>：不做恋爱结婚（决策 004）、悲伤是底色而日常温暖好笑、"归名"把名字还给雾灵——这个结尾有真正的情感重量。</li>
+</ul>
+
+<h3>3.2 吸引性被稀释的三个位置</h3>
+<p><strong>其一，概念没有落到画面。</strong>雾是几团半透明白色、不会动；居民只有平常/雨天两套日程，动作只有站、走、坐；四季主要换配色；镇子在灯亮后几乎不变样。玩家读到的是"一座正在被遗忘的镇子"，看到的是明快、饱和、干净的田园。</p>
+<p><strong>其二，第一眼的调性与故事错位。</strong>开局农场与镇广场截图是明亮草绿、粉色花树、米黄 HUD、灰瓦白墙，整体观感接近轻松治愈；而故事内核是矿难、葬礼、失忆与告别。这不是美术质量差，而是<strong>视觉承诺与叙事承诺不一致</strong>：冲着治愈来的玩家会在第四幕遇到沉重内容，冲着叙事来的玩家可能在前两小时看不到任何"雾"的威胁。建议用光照、雾的层次、音效与开场把调性提前，而不是只靠文本。</p>
+<p><strong>其三，去掉恋爱系统后没有补上等价的留存引擎。</strong>品类里"关系推进"是主要长期动机之一，本项目用"忆"替代是正确的，但归还遗物的仪式感目前是"一段对话 + 一个功能解锁"（八折、桥、宽床……），功能性强、情感性弱。60 段忆写得很足，呈现方式却是最省的。</p>
+<p><strong>其四，情感锚点出现太晚、太散。</strong>十二位居民各 5–8 个闲聊话题，进度文档自认"玩久了还是会重复"；姜婆婆认出全家福在第一年冬，柏先生坦白在第二年，岚只在雾天出现。玩家被要求刷满熟悉度时，可能还没对任何一位居民建立感情。</p>
+
+<h2 id="s3">4. 美术风格：三层精度落差与可读性问题</h2>
+
+<h3>4.1 风格定位与管线</h3>
+<p>384×216 基础分辨率、整数倍放大、纹理不过滤；1 格 = 16 像素；大件用斜俯视投影；调色板全局唯一。三条产出管线并行：Blender 出人形/动物/房屋形体并渲染成 48×48 序列帧，代码逐像素绘制地面/树/作物/图标/界面，头像由 <code>tools/portraits.py</code> 手绘 64×64 像素。江南水乡的白墙黛瓦、木格窗、石灯、灯笼杆、乌篷式屋顶，方向明确且贯穿。</p>
+
+<h3>4.2 完成度最高的一环：头像</h3>
+<p><code>faces.png</code> 里 12 位居民 × 3 表情，人物靠发髻、斗笠、头巾、胡子、年龄与服装配色区分，三种表情（平静/高兴/不高兴）在眉眼与嘴型上差异清楚，64×64 内还做了阴影与高光。这是整个项目视觉上最成熟、最有"作品感"的部分，也印证了决策 033 把头像从 Blender 渲染改成手绘像素是对的。</p>
+
+<h3>4.3 三层精度落差（混合管线的接缝）</h3>
+<table>
+  <tr><th>层级</th><th>表现</th><th>落差</th></tr>
+  <tr><td>头像 ↔ 场景小人</td><td>64×64 精细半身像 vs 16 像素高、脸上只有两只眼睛的小人</td><td>对话时"精致的人"与"简笔的小人"同屏，注意力被头像完全吸走；进度文档也承认"人物细节主要靠头像"</td></tr>
+  <tr><td>建筑 ↔ 地面</td><td><code>town_a.png</code> 三栋房子几乎共用同一屋檐轮廓，瓦楞规整、干净色块、细描边；地面是密集噪点纹理</td><td>一个是矢量式平面，一个是像素点彩，同屏时"贴上去"的感觉明显；三栋铺子的差异主要靠门口摆设</td></tr>
+  <tr><td>季节 ↔ 不变物</td><td>草地、树、灌木整体染色；泥地、池塘、房子不变色，冬天灌木在雪地上仍是一丛绿（进度文档第 478 条自认）</td><td>换季像"套了滤镜"，不是"世界变了"</td></tr>
+</table>
+
+<h3>4.4 截图里可直接复核的可读性问题</h3>
+<table>
+  <tr><th>截图</th><th>观察到的问题</th><th>影响</th></tr>
+  <tr><td><code>shot_17b_mine_floor_1.png</code></td><td>右上角时钟木牌压住主角上半身，画面里只剩蓝色身体；左上两条提示条上下堆叠，占约四分之一屏</td><td>在战斗地图里，玩家角色与提示信息互相遮挡，属于功能性缺陷</td></tr>
+  <tr><td><code>shot_18o_mine_dark.png</code></td><td>三条提示条同时堆叠在左上；无光层几乎全黑，只能看到主角周围一小圈与几团石头暗影</td><td>"有意的黑暗"与"看不清路"边界模糊；提示条没有队列上限与去重</td></tr>
+  <tr><td><code>shot_21c_end_keep.png</code></td><td>结局画是深蓝夜色、雾带、山影与几盏窗灯，构图克制；但亮米黄对话框占据下方约四分之一且字号很大</td><td>情感高潮被 UI 抢走，正好印证后续计划 M11 要解决的"重要的事是看见的，不是被告知的"</td></tr>
+  <tr><td><code>shot_19g_dongtan_beach.png</code></td><td>冬季雪地与沙地沿一条竖直硬切线相接，沙地不积雪；大片米黄噪点留白</td><td>一眼可见的地形接缝，破坏场景可信度</td></tr>
+  <tr><td><code>shot_06c_plaza.png</code></td><td>大面积重复灰砖，三名居民，两张长凳，一盏石灯；上下绿地与石板分界笔直</td><td>"镇子"缺少生活痕迹，与"十二位居民在此生活"的设定不符</td></tr>
+  <tr><td><code>shot_22k_newyear_lanterns.png</code></td><td>冷紫夜色 + 中央暖光，二十根灯笼杆严格网格排列，居民聚在中间</td><td>氛围成立，但重复感与"杆子挡路"风险（进度文档第 399 条已列）</td></tr>
+  <tr><td><code>shot_04_inventory.png</code></td><td>窗口占屏约一半，3×8 格、详情卡大片空白、键帽提示清楚</td><td>信息层级清楚，是 UI 改版（决策 056）的正面结果；但空白比例偏高</td></tr>
+</table>
+<p class="note">另有一处 HUD 细节：开局截图里"铜锄头"三个白字直接压在草地上，只有描边没有底衬；进度文档第 391 条也把"字够不够清楚"列为待试玩项。在 384×216 的原始分辨率上，字、图标、提示条、时钟木牌争夺的是同一块有限空间，建议为 HUD 建立一套明确的层级与避让规则。</p>
+
+<h3>4.5 美术方向的判断</h3>
+<p>现状属于<strong>"可读性优先、氛围不足"</strong>：明亮、干净、图标辨识尚可，适合长时间操作，但缺少雾、光、材质与时间的层次。M9"让画面动起来"是正确且高杠杆的方向，因为它可以不新增内容就同时改善美术与"世界是活的"这一吸引性短板。唯一要防的是 384×216 上动得多了会乱——后续计划第 6.4 节已经写了这条，建议把"每张地图的动效预算"写进验收标准。</p>
+
+<h2 id="s4">5. 后续开发计划：方向对，规模与顺序需要重排</h2>
+
+<h3>5.1 值得肯定的部分</h3>
+<ul>
+  <li><strong>诊断准确。</strong>第 2 节三条差距（只有一条路 / 世界的回应多是一句话 / 世界自己的生活偏少）与我看到的截图和数据一致，不是套话。</li>
+  <li><strong>依赖顺序合理。</strong>M9 动效手段 → M11 过场播放器 → M12–M14 内容复用这些手段；M16 才统一调数值，避免规则变动期反复返工。</li>
+  <li><strong>工程纪律好。</strong>每批可玩、每批开头写"想让玩家感到什么"、旧存档测试优先、id 不改、名单先过目、数字可砍，且明确不做签到/每日任务/抽奖。</li>
+  <li><strong>方法论有闭环。</strong>第 14 节五个试玩问题，比"跑通测试"更接近体验目标。</li>
+</ul>
+
+<h3>5.2 五个风险</h3>
+<div class="risk"><b>风险一（最高）：在未经玩家验证的地基上把规模翻倍。</b>计划自述"大约是把已经做完的量再做一遍"（72 道菜、18 位居民、4 张野外、16 种异兽、6 个结局、约 20 样新食材），而现有 23 处待试玩、88 条已知问题都还没有结论。若 M3–M7 某个核心循环本身不成立（例如钓鱼手感、战斗手感、经济曲线），M9–M15 的所有内容都会继承这个缺陷，且返工面随内容量线性增长。</div>
+<div class="risk"><b>风险二：计划与执行已经脱节。</b>第 4 节把"试玩积压、修丢键、提交"列为"开工前先做的事"，但进度日志显示 M8 第一、二批（决策 067、068）已于 11-13 完成，试玩与提交仍未进行。建议把第 4 节升级为硬性关卡，而不是建议。</div>
+<p><strong>风险三：发布工程缺失或太晚。</strong>计划里"导出成独立游戏，跑一遍"排在 M16 最后；没有面向陌生玩家的试玩、没有 Demo / 垂直切片、没有商店页与宣传素材节点、没有本地化与键位/字号/速度等可访问性设置、没有性能预算（已知地图载入画地面要 1–2 秒，M9 之后动效与地图都会增加）。收音机人声的授权问题（决策 016）也拖到 M16，属于公开发布前的法务阻断项，不应与数值调整同批。</p>
+<p><strong>风险四：横向铺量优先于纵向验证。</strong>M12 一上来就排 72 道菜，M13 一上来就排 6 位新居民，M14 一上来就排 16 种异兽。这些是"名单"，不是"机制"。真正需要验证的是：饭桌请客能不能成立、结缘宠物有没有情感、镇子变样玩家会不会专程去看。每一样都可以先用 2–3 个样本验证，再决定要不要铺到 72。</p>
+<p><strong>风险五：决策与兼容成本累积。</strong>M11 明确推翻决策 039 / 060，M8 改了 041 / 045 / 046，M13 加 6 位居民但归名条件不变。每批都要写旧存档测试是对的，但随着系统数量增加，兼容矩阵会变成主要工程负担；建议在 M11 之前做一次"存档结构演进"的专项检查。</p>
+
+<h3>5.3 建议的优先级重排</h3>
+<table>
+  <tr><th>阶段</th><th>内容</th><th>与原计划的差别</th><th>完成判据</th></tr>
+  <tr><td><span class="tag t-red">P0 止血</span></td><td>五段试玩并逐条返工；定位带窗口丢键；提交；补三个亲和性开关（一天时长、手动存档/退出保存、键位与字号）；把收益模拟脚本提前</td><td>把第 4 节从"建议"变成硬性关卡；M16 的模拟脚本与速度设置前移</td><td>五段试玩记录归档；带窗口流程连续 3 次全过；六种过法的一年收益表产出</td></tr>
+  <tr><td><span class="tag t-amber">P1 体验杠杆</span></td><td>M9 第一批（水、天气、下雨与海浪声）、M11 第一批（开场 + 七盏灯点亮过场）、UI 遮挡与提示条队列修复、接上鱼/花做菜送礼、把归名门槛从"熟悉度"改为"忆的完成度"</td><td>把 M9/M11 各一批提前到内容里程碑之前；M16 的断头路提前</td><td>不新增任何内容量的前提下，"点灯有画面""雾是活的""鱼有用"三件事成立</td></tr>
+  <tr><td><span class="tag t-green">P2 深化</span></td><td>M12 前三批先做 12 道菜的垂直切片（食单、做菜动画、饭桌请客）；M10 日程例外；M13 先做"灯亮后镇子可见变化"再考虑 6 位新居民</td><td>名单先砍，验证机制后再铺量</td><td>请客一段有真人反馈；每盏灯至少一处"值得专程去看"的场景变化</td></tr>
+  <tr><td><span class="tag t-blue">P3 规模与发布</span></td><td>M14 山野、M15 新结局、M16 收尾；新增"外部试玩与发布工程"里程碑（打包、性能预算、授权音频替换、商店素材、本地化）</td><td>规模批次依 P1/P2 的试玩数据决定是否减半；发布工程不再压在最后一行</td><td>至少 5 名陌生玩家完成 30 分钟试玩并回答第 14 节五问；可独立运行的包体跑通</td></tr>
+</table>
+
+<h2 id="s5">6. 优化建议清单（按投入产出比排序）</h2>
+
+<h3>P0：不增加内容，只恢复判断能力</h3>
+<ol>
+  <li><b>五段试玩并成文。</b>按后续计划第 4 节分段（开局→广场灯 / 河灯→牧野灯 / 井 / 第四幕→结局 / 节日），每段结束记录第 14 节五个问题的答案，逐条转成返工项。<em>验收：五份记录 + 一张返工清单，不写"感觉还行"。</em></li>
+  <li><b>定位带窗口丢键。</b>该问题已跨多个里程碑反复出现，且让"看截图"这一唯一视觉校验手段变得不可靠。建议在流程脚本侧记录按键发出帧、游戏侧记录接收帧，用时间戳定位是输入缓冲、焦点还是帧丢弃。<em>验收：带窗口连续 3 次 366 项全过。</em></li>
+  <li><b>提交当前工作。</b>44 个未提交文件、自 <code>ef8bdd4</code> 起 M7 三批与 M8 两批未入库，与 AGENTS.md"项目很久没提交，丢了没处找"的担忧直接冲突。<em>验收：一次干净提交，之后每批一提交。</em></li>
+  <li><b>把收益模拟脚本提前。</b>不开窗口模拟"只种田 / 只钓鱼 / 只养殖 / 只下井 / 只做菜 / 混着来"各跑一年，输出日均收入与体力去向。<em>验收：六个数字 + 一句结论，用来决定 M12 菜的定价规则。</em></li>
+  <li><b>三个亲和性开关。</b>一天时长可调（默认保持现状）、手动存档或退出时保存、键位与字号/提示条时长设置；同步修正设计文档"一天 20 分钟"与代码 14.3 分钟的不一致。<em>验收：设置界面可用且写进存档，旧档不受影响。</em></li>
+</ol>
+
+<h3>P1：不增加内容量，显著改善体验</h3>
+<ol start="6">
+  <li><b>重构归名的达成条件。</b>把"每级 100 点熟悉度 + 逐件随机遗物"改为以忆的完成度为主：熟悉度降到辅助（例如统一 40 点门槛），遗物改为"线索指向的确定性获取"（雾天某处、某位居民提到过的地点），保留少量随机但给保底。<em>验收：11 人 × 5 级不需要每天巡礼；60 段忆的可达率提升，且不靠降低文本质量。</em></li>
+  <li><b>让点灯有画面。</b>优先做 M11 第一批的"七盏灯点亮"过场：镜头升起、雾从灯往外退、露出后面的地方、落回玩家。这是全游戏重复七次的核心动作，单次投入摊到七次回报。<em>验收：可跳过、跳过与不跳过状态一致、旧存档兼容。</em></li>
+  <li><b>补一个开场。</b>信与钥匙、车窗外的雾、到农舍门口，30–60 秒，把"信是谁寄的"这个钩子在第一分钟立起来。<em>验收：新档前 3 分钟能说出自己想做什么、为什么在这里。</em></li>
+  <li><b>修 UI 遮挡与提示条队列。</b>提示条设上限（建议 2 条）与去重、短消息合并；暗场/矿井让 HUD 半透明或缩小；结算与结局画面为对话框预留区域；开局"铜锄头"加底衬。<em>验收：以 <code>shot_17b</code>、<code>shot_18o</code>、<code>shot_21c</code> 三张同机位截图复核，主角与画面主体不被遮。</em></li>
+  <li><b>提前接断头路。</b>鱼与花能做菜、能送礼；井里九件遗物拿给老秦或白鹭各有一句话。改动集中在数据表与少量规则，不需要新美术。<em>验收：26 种鱼与花至少有 2 条产出路径；收藏品有叙事回收。</em></li>
+  <li><b>M9 第一批提前。</b>水流方向、雨落水花、下雨声、海浪声、树草摇幅随天气、雾团翻动。这些直接修补"雾不会动""世界是静的""第一眼调性偏亮"三处短板。<em>验收：每样先在一张地图做，帧条导出自查后再铺开。</em></li>
+</ol>
+
+<h3>P2：内容与美术的深化</h3>
+<ol start="12">
+  <li><b>美术统一规则。</b>制定一份书面的"光照与色阶"约定（同一光源方向、同一描边强度、同一噪点密度上限），先修三处最显眼的接缝：雪地/沙地硬切、冬天绿灌木、建筑与地面的材质差。<em>验收：同一张冬景截图里，地形过渡与植被配色不再跳。</em></li>
+  <li><b>镇子的可见成长。</b>每盏灯亮后，广场/河埠/矿工巷至少有一处"值得专程去看"的变化（招牌、井台、戏台、门上的名字），而不是先加 6 位新居民。<em>验收：玩家能不看提示说出"这盏灯让镇子多了什么"。</em></li>
+  <li><b>厨艺做垂直切片。</b>先做 12 道菜 + 八种做法中的三种 + 一次请客，验证"为了这一口值得跑一趟"是否成立，再决定要不要 72 道。<em>验收：请客段落有真人反馈，且菜不作为刷钱手段。</em></li>
+  <li><b>归还遗物的仪式感。</b>用现有过场钩子做低成本演出（画面褪成旧照片色、一件遗物的大图、一句居民的话），把 60 段忆从"文本弹窗"升级为"事件"。<em>验收：先做一位居民，看过再决定是否推广。</em></li>
+</ol>
+
+<h3>P3：规模与发布</h3>
+<ol start="16">
+  <li><b>规模名单按试玩数据砍半。</b>16 种异兽先做 3 只把"结缘"跑通，6 位新居民先做 2 位，3 个新结局先做 1 个；数字全部可砍这条原则要真的执行。</li>
+  <li><b>新增"外部试玩与发布工程"里程碑。</b>内容：独立包体导出与性能预算（地图载入、动效数量上限）、授权音频替换（收音机人声优先）、商店页与截图、本地化、可访问性复核、至少 5 名陌生玩家的 30 分钟试玩。<em>验收：不依赖作者本人也能装上运行并玩懂前 30 分钟。</em></li>
+  <li><b>每批补一条体验指标。</b>现有验收是"测试过、流程过、截图看过"，建议加一条与"想让玩家感到什么"对应的可观察指标（例如"玩家在无提示时能说出下一件想做的事"）。</li>
+</ol>
+
+<h2 id="s6">7. 本次无法验证的部分</h2>
+<p>以下项目必须靠试玩判断，本报告不作评价，也不使用"流畅""好听""自然"这类描述：</p>
+<ul>
+  <li>动作手感：挥砍连段、翻滚无敌、蓄力时长、忘形前摇可辨识度、钓鱼收放线张力节奏、遛鱼进度条。</li>
+  <li>动态观感：雾散动画、白鹿淡出、河灯漂流、萤火虫、灯笼光、头像眨眼（M9 之后）。</li>
+  <li>音频：七首代码合成音乐、动物叫声、天气声（目前下雨无声、海边无浪声）、收音机人声。</li>
+  <li>文本质量：六个节日七十多段话、三段结局旁白、四十多段忆"像不像各人说的"。</li>
+  <li>真实留存：玩家是否愿意在没有提示的情况下继续玩、会不会只重复最挣钱的做法、关游戏时是满足还是怕错过。</li>
+</ul>
+
+<h2 id="s7">8. 附录：关键数据与证据索引</h2>
+<table>
+  <tr><th>项目</th><th class="num">数值</th><th>来源</th></tr>
+  <tr><td>GDScript 文件 / 行数</td><td class="num">150 / 40375</td><td>文件系统统计（不含 addons）</td></tr>
+  <tr><td>数据表 / 图片资源</td><td class="num">24 张 / 338 张 PNG</td><td><code>data/</code>、<code>art/</code></td></tr>
+  <tr><td>对话文件 / 行数</td><td class="num">14 / 2985</td><td><code>dialogue/*.dialogue</code></td></tr>
+  <tr><td>单元测试脚本 / 最近一次 Totals</td><td class="num">66 / 642 项全过</td><td><code>tests/unit/</code>、进度日志</td></tr>
+  <tr><td>自动流程检查 / 单次耗时</td><td class="num">366 项 / 约 8 分钟</td><td>进度日志、架构第 11 节</td></tr>
+  <tr><td>作物 / 鱼 / 居民 / 遗物 / 忆</td><td class="num">27 / 26 / 12 / 77 / 60</td><td>数据表统计</td></tr>
+  <tr><td>灯 / 节日 / 菜谱 / 怪物 / 饰品 / 矿井层</td><td class="num">6 / 6 / 15 / 16 / 7 / 40</td><td>数据表统计</td></tr>
+  <tr><td>一天现实时长</td><td class="num">约 14.3 分钟</td><td><code>core/game_clock.gd</code>：<code>MINUTES_PER_SECOND = 1.4</code>、<code>DAY_START 360</code>、<code>DAY_END 1560</code></td></tr>
+  <tr><td>熟悉度门槛</td><td class="num">100 / 级，5 级累计 1500</td><td><code>features/npc/residents.gd</code>：<code>STEP = 100</code>、<code>cap = (level+1)*100</code></td></tr>
+  <tr><td>每日熟悉度来源</td><td class="num">见面 +10、首次搭话 +8、最爱礼物 +40</td><td>同上，<code>GIFT_POINTS</code></td></tr>
+  <tr><td>本事解锁 / 交钥匙门槛</td><td class="num">熟悉度 40</td><td>同上，<code>TRUST = 40</code>（决策 067）</td></tr>
+  <tr><td>遗物钓取概率 / 河底灯盏</td><td class="num">20% / 35%</td><td><code>features/fishing/fishing.gd</code></td></tr>
+  <tr><td>待试玩 / 已知问题 / 未提交文件</td><td class="num">23 处 / 88 条 / 44 个</td><td><code>docs/进度.md</code>、<code>git status</code></td></tr>
+</table>
+<p><strong>截图索引：</strong><code>shot_02_farm_start</code>（开局与 HUD）、<code>shot_06c_plaza</code>（镇广场）、<code>shot_04_inventory</code>（背包）、<code>shot_06_dialogue</code>（对话框）、<code>shot_17b_mine_floor_1</code>（矿井与遮挡）、<code>shot_18o_mine_dark</code>（无光层）、<code>shot_19g_dongtan_beach</code>（东滩地形接缝）、<code>shot_20h_shrine</code>（山祠）、<code>shot_21c_end_keep</code>（结局画）、<code>shot_22k_newyear_lanterns</code>（节日夜景）、<code>faces.png</code>（头像）、<code>town_a.png</code>（建筑素材）。均位于 <code>farm-town/_preview/</code>。</p>
+
+<div class="footer">
+  <p>本报告为静态评估，未修改任何项目文件，未运行构建或测试，未提交 git。所有数值取自 2026-11-13 当前工作区。评分与建议为评估者判断，供决策参考；涉及手感、动态、音频与文本质量的结论以真人试玩为准。</p>
+</div>
+
+</div>
+</body>
+</html>

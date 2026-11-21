@@ -5,6 +5,7 @@ const TMP_SAVES := "user://test_saves"
 const NPC_IDS: Array[StringName] = [
 	&"jiang", &"xiaoman", &"bai", &"ahe", &"shishu", &"qingzhu",
 	&"yunniang", &"laozhou", &"amu", &"laoqin", &"luyuan", &"egret",
+	&"shuoshu", &"jiangyuan", &"huolang", &"chuanniang", &"miaozhu", &"shanliren",
 ]
 
 var _old_dir := ""
@@ -62,13 +63,47 @@ func test_npc_def_from_dict() -> void:
 
 func test_npc_table_is_valid() -> void:
 	assert_eq(Database.validate(), PackedStringArray(), "数据表校验通过")
-	assert_eq(Database.npcs.size(), NPC_IDS.size(), "十二位居民")
+	assert_eq(Database.npcs.size(), NPC_IDS.size(), "十八位居民")
 	for id in NPC_IDS:
 		assert_true(Database.has_npc(id), "有居民 %s" % id)
 		assert_ne(Database.npc(id).role, "", "%s 有身份" % id)
 		assert_not_null(UiKit.face(Database.npc(id).sheet), "%s 有头像" % id)
 	assert_eq(Database.npc(&"ahe").service, &"grocery")
 	assert_eq(Database.npc(&"shishu").service, &"smith")
+
+
+func test_snow_exceptions_send_xiaoman_and_qingzhu_to_work() -> void:
+	var xm := Database.npc(&"xiaoman")
+	var spot := NpcSchedule.spot_at(xm, 720.0, &"snow")
+	assert_eq(str(spot["note"]), "snowman", "雪天小满在广场堆雪人")
+	assert_eq(str(spot["pose"]), "squat")
+	assert_eq(str(NpcSchedule.spot_at(xm, 720.0, &"sunny")["note"]), "board", "晴天还是看告示")
+	var qz := Database.npc(&"qingzhu")
+	var qspot := NpcSchedule.spot_at(qz, 600.0, &"snow")
+	assert_eq(str(qspot["note"]), "door", "雪天青竹扫门口")
+	assert_eq(str(qspot["pose"]), "sweep")
+
+
+func test_snowman_stays_until_the_snow_melts() -> void:
+	var town: OutdoorMap = load("res://maps/town/town.tscn").instantiate()
+	add_child_autofree(town)
+	var was_today := Weather.today
+	var was_yest := Weather.yesterday
+	GameState.set_flag(&"snowman_built")
+	Weather.today = Weather.SNOW
+	Weather.yesterday = Weather.SNOW
+	town._refresh_snowman()
+	assert_not_null(town._snowman, "雪还没化，雪人站着")
+	Weather.today = Weather.SUNNY
+	Weather.yesterday = Weather.SNOW
+	town._refresh_snowman()
+	assert_not_null(town._snowman, "雪停当天还不化")
+	Weather.yesterday = Weather.SUNNY
+	town._refresh_snowman()
+	assert_null(town._snowman, "化雪了收走")
+	assert_false(GameState.has_flag(&"snowman_built"))
+	Weather.today = was_today
+	Weather.yesterday = was_yest
 
 
 func test_validate_npc_catches_mistakes() -> void:
@@ -82,7 +117,7 @@ func test_validate_npc_catches_mistakes() -> void:
 		],
 	})
 	var text := "\n".join(Database.validate_npc(bad))
-	for expect: String in ["小写下划线", "没有名字", "铺子无效", "序列帧不存在", "出入口在不存在的地图", "从早到晚", "没写从哪一格进出"]:
+	for expect: String in ["小写下划线", "没有名字", "铺子无效", "序列帧不存在", "头像不存在", "出入口在不存在的地图", "从早到晚", "没写从哪一格进出"]:
 		assert_string_contains(text, expect)
 
 
@@ -107,6 +142,116 @@ func test_schedule_rainy_day() -> void:
 	assert_eq(NpcSchedule.spot_at(def, 600.0, &"fog")["tile"], Vector2i(5, 6), "雾天照常")
 	def.rain_schedule.clear()
 	assert_eq(NpcSchedule.spot_at(def, 600.0, &"rain")["tile"], Vector2i(5, 6), "没写雨天日程就照常")
+
+
+# ---------------------------------------------------------------- 平常 + 例外（决策 073）
+
+func _exc_def() -> NpcDef:
+	return NpcDef.from_dict({
+		"id": "tester", "name": "测试", "sheet": "ahe", "service": "grocery",
+		"enter": {"town": [3, 4]},
+		"schedule": [
+			{"from": "8:00", "map": "town", "tile": [5, 6]},
+			{"from": "12:00", "map": "town", "tile": [7, 7]},
+			{"from": "18:00", "map": "town", "tile": [9, 9]},
+			{"from": "20:00"},
+		],
+		"exceptions": [
+			{"season": "summer", "from": "12:00", "to": "15:00",
+				"plan": [{"from": "12:00", "map": "town", "tile": [2, 2], "note": "shade"}]},
+		],
+	})
+
+
+## 除雪天例外外，每时每刻的去处必须和“只按天气/灯亮选整套”一模一样。
+## 雪天小满堆雪人、青竹扫雪是第二批加的例外，只在那两段换去处。
+func test_non_snow_schedules_match_base() -> void:
+	for lit: bool in [false, true]:
+		SaveSystem.reset_all()
+		GameClock.day = 1
+		if lit:
+			for flag: StringName in [&"lamp_plaza", &"lamp_river", &"lamp_pasture", &"lamp_well", &"lamp_east"]:
+				GameState.set_flag(flag)
+		for id in NPC_IDS:
+			var def := Database.npc(id)
+			# 雾天会晚出门，不再和底表相同。晴、雨、雷雨在立春仍是同一套。
+			for weather: StringName in [&"sunny", &"rain", &"storm"]:
+				var base := NpcSchedule._base_plan(def, weather)
+				assert_eq(NpcSchedule.plan_for(def, weather), base, "%s %s 天还是同一套" % [id, weather])
+				for minute in range(0, 1561, 60):
+					var expect: Dictionary = NpcSchedule.HOME
+					for entry in base:
+						if int(entry["from"]) <= minute:
+							expect = entry
+					assert_eq(NpcSchedule.spot_at(def, minute, weather), expect, "%s %s %d 分去处不变" % [id, weather, minute])
+			if def.exceptions.is_empty():
+				var snow_base := NpcSchedule._base_plan(def, &"snow")
+				assert_eq(NpcSchedule.plan_for(def, &"snow"), snow_base, "%s 雪天没有例外就还是同一套" % id)
+
+
+func test_exception_replaces_only_its_time_segment() -> void:
+	var def := _exc_def()
+	var base := NpcSchedule._base_plan(def, &"sunny")
+	var summer := NpcSchedule.overlay(base, def.exceptions, &"summer", &"lixia", &"sunny")
+	assert_eq(summer.size(), 5, "8:00、12:00 树荫、15:00 接回、18:00、20:00")
+	assert_eq(summer[0]["tile"], Vector2i(5, 6), "上午不动")
+	assert_eq(summer[1]["from"], 720)
+	assert_eq(summer[1]["tile"], Vector2i(2, 2), "午后换到树荫")
+	assert_eq(summer[1]["note"], "shade")
+	assert_eq(summer[2]["from"], 900, "段末把平常的去处接回来")
+	assert_eq(summer[2]["tile"], Vector2i(7, 7))
+	assert_eq(summer[3]["from"], 1080, "傍晚不动")
+	assert_eq(summer[4]["map"], &"", "晚上回家不动")
+	# 不是夏天就原样返回，平常日程也没被改坏
+	assert_eq(NpcSchedule.overlay(base, def.exceptions, &"spring", &"lichun", &"sunny"), base, "春天不生效")
+	assert_eq(base.size(), 4)
+	assert_eq(base[1]["tile"], Vector2i(7, 7), "盖例外不动平常那份")
+
+
+func test_exception_conditions_filter() -> void:
+	var def := NpcDef.from_dict({
+		"id": "tester", "name": "测试", "sheet": "ahe",
+		"enter": {"town": [3, 4]},
+		"schedule": [{"from": "8:00", "map": "town", "tile": [5, 6]}, {"from": "20:00"}],
+		"exceptions": [
+			{"term": "xiaoshu", "weather": "sunny", "from": "12:00", "to": "15:00",
+				"plan": [{"from": "12:00", "map": "town", "tile": [2, 2]}]},
+		],
+	})
+	var base := NpcSchedule._base_plan(def, &"sunny")
+	var ex := def.exceptions
+	assert_ne(NpcSchedule.overlay(base, ex, &"summer", &"xiaoshu", &"sunny"), base, "小暑晴天生效")
+	assert_eq(NpcSchedule.overlay(base, ex, &"summer", &"dashu", &"sunny"), base, "别的节气不生效")
+	assert_eq(NpcSchedule.overlay(base, ex, &"summer", &"xiaoshu", &"rain"), base, "雨天不生效")
+
+
+func test_exception_spot_at_reads_the_calendar() -> void:
+	var def := _exc_def()
+	Weather.today = &"sunny"
+	GameClock.day = GameClock.DAYS_PER_SEASON + 1
+	assert_eq(GameClock.season_id(), &"summer")
+	assert_eq(NpcSchedule.spot_at(def, 11 * 60.0, &"sunny")["tile"], Vector2i(5, 6), "上午照常")
+	assert_eq(NpcSchedule.spot_at(def, 13 * 60.0, &"sunny")["tile"], Vector2i(2, 2), "夏天午后在树荫")
+	assert_eq(NpcSchedule.spot_at(def, 16 * 60.0, &"sunny")["tile"], Vector2i(7, 7), "三点以后接回平常")
+	GameClock.day = GameClock.DAYS_PER_SEASON * 3 + 1
+	assert_eq(NpcSchedule.spot_at(def, 13 * 60.0, &"sunny")["tile"], Vector2i(7, 7), "冬天午后照常")
+
+
+func test_validate_npc_catches_bad_exceptions() -> void:
+	assert_eq(Database.validate_npc(_exc_def()), PackedStringArray(), "写对的例外不报错")
+	var bad := NpcDef.from_dict({
+		"id": "tester", "name": "测试", "sheet": "ahe",
+		"enter": {"town": [3, 4]},
+		"schedule": [{"from": "8:00", "map": "town", "tile": [5, 6]}, {"from": "20:00"}],
+		"exceptions": [
+			{"season": "monsoon", "term": "nowhere", "weather": "hail",
+				"from": "15:00", "to": "12:00",
+				"plan": [{"from": "13:00", "map": "moon", "tile": [1, 1]}]},
+		],
+	})
+	var text := "\n".join(Database.validate_npc(bad))
+	for expect: String in ["时间段不对", "不存在的季节", "不存在的节气", "不存在的天气", "不存在的地图", "例外去处要落在"]:
+		assert_string_contains(text, expect)
 
 
 # ---------------------------------------------------------------- 寻路
@@ -246,6 +391,12 @@ func test_ground_art_paints_all_terrains() -> void:
 	assert_eq(tbuf[24 * 64 + 24], GroundArt.PAVE)
 	assert_eq(tbuf[40 * 64 + 40], GroundArt.WATER)
 	assert_eq(tbuf[40 * 64 + 8], GroundArt.GRASS)
+	var clear := 0
+	for y in img.get_height():
+		for x in img.get_width():
+			if img.get_pixel(x, y).a < 0.99:
+				clear += 1
+	assert_eq(clear, 0, "交界的格子也要铺满，不能透出黑底")
 
 
 func _town() -> OutdoorMap:

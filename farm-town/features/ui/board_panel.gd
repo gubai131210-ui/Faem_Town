@@ -183,6 +183,9 @@ func _on_row_input(event: InputEvent, i: int) -> void:
 func _rebuild_list() -> void:
 	_list.clear()
 	_states.clear()
+	if Quests.errand != null:
+		_list.append(Quests.errand)
+		_states.append("active" if Quests.errand_taken else "posted")
 	for q in Quests.posted(GameClock.day):
 		_list.append(q)
 		_states.append("posted")

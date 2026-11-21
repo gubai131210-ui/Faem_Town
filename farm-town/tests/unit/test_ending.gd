@@ -106,6 +106,45 @@ func test_keeping_the_fog_can_be_undone_but_lighting_cannot() -> void:
 	assert_eq(Story.ending(), Story.CLEAR)
 
 
+func test_clearing_the_fog_can_be_finished_as_the_true_ending() -> void:
+	GameState.set_flag(Story.TRIAL_FLAG)
+	assert_eq(Story.choose(true), Story.CLEAR)
+	var saved := GameState.save_data()
+	GameState.reset_data()
+	GameState.load_data(saved)
+	assert_eq(Story.ending(), Story.CLEAR, "旧存档里点过的灯还是散雾")
+	assert_false(Story.can_name())
+	_remember_everything()
+	GameState.set_flag(&"ending_news_bai")
+	GameState.set_flag(&"ending_news_xiaoman")
+	assert_true(Story.can_name())
+	assert_false(Story.can_choose(), "灯已经点了，不能改回留雾")
+	Mine.bosses.append(40)
+	Mine.enter(40, 1)
+	var m: GameMap = _map(&"mine")
+	m.perform(&"interact", null, Mine.current.altar)
+	assert_false(_dialogues.is_empty())
+	assert_eq(_dialogues[-1], "name_later")
+	assert_true(Story.complete_name())
+	assert_eq(Story.ending(), Story.NAME)
+	assert_false(Story.can_name())
+	assert_false(GameState.has_flag(&"ending_news_bai"), "归名多出来的那句还能再说")
+	assert_false(GameState.has_flag(&"ending_news_xiaoman"))
+	m.perform(&"interact", null, Mine.current.altar)
+	assert_eq(_dialogues.size(), 1, "补过了灯座不再问")
+
+
+func test_name_later_dialogue_finishes_the_ending() -> void:
+	GameState.set_flag(Story.TRIAL_FLAG)
+	Story.choose(true)
+	_remember_everything()
+	var said := await _say(ENDING_PATH, "name_later")
+	assert_string_contains(said, "|把名字还给她|再想想")
+	await _say(ENDING_PATH, "name_later", 0)
+	assert_eq(_endings, [Story.NAME] as Array[StringName])
+	assert_eq(Story.ending(), Story.NAME)
+
+
 func test_true_ending_needs_every_memory_and_lan() -> void:
 	GameState.set_flag(Story.TRIAL_FLAG)
 	assert_eq(Story.unfinished().size(), 11, "十一位有忆的居民都还没找全")

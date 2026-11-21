@@ -657,5 +657,167 @@
 		"level": 5,
 		"found": "fog",
 		"desc": "她的名字是青岚。镇子是跟着她叫的。"
+	},
+	{
+		"id": "story_page",
+		"name": "话本残页",
+		"shape": "page",
+		"npc": "shuoshu",
+		"level": 1,
+		"found": "fog",
+		"desc": "话本上撕下来的一页，写到半句就断了。"
+	},
+	{
+		"id": "story_sheet",
+		"name": "扇面上的字",
+		"shape": "sheet",
+		"npc": "shuoshu",
+		"level": 2,
+		"found": "fog",
+		"desc": "旧扇的扇面，四角写过字，墨淡了。"
+	},
+	{
+		"id": "story_seal",
+		"name": "话本上的印",
+		"shape": "seal",
+		"npc": "shuoshu",
+		"level": 3,
+		"found": "fog",
+		"desc": "盖在话本扉页上的一枚小印，边已经毛了。"
+	},
+	{
+		"id": "soy_recipe",
+		"name": "半张酱方",
+		"shape": "sheet",
+		"npc": "jiangyuan",
+		"level": 1,
+		"found": "fog",
+		"desc": "酱方只剩上半张，黄豆泡几天写到一半。"
+	},
+	{
+		"id": "jar_tag",
+		"name": "坛上的纸签",
+		"shape": "tag",
+		"npc": "jiangyuan",
+		"level": 2,
+		"found": "fog",
+		"desc": "从酱坛上揭下来的纸签，年份还认得。"
+	},
+	{
+		"id": "shop_seal",
+		"name": "柜上的印",
+		"shape": "seal",
+		"npc": "jiangyuan",
+		"level": 3,
+		"found": "fog",
+		"desc": "盖在卖出去的坛上。印面两个字，磨得只剩一笔。"
+	},
+	{
+		"id": "pack_list",
+		"name": "一张货单",
+		"shape": "page",
+		"npc": "huolang",
+		"level": 1,
+		"found": "fog",
+		"desc": "货单写到镇口就断了，后面是空白。"
+	},
+	{
+		"id": "pack_bell",
+		"name": "一串铃",
+		"shape": "bell",
+		"npc": "huolang",
+		"level": 2,
+		"found": "fog",
+		"desc": "挑子头上的串铃，摇一下还响。"
+	},
+	{
+		"id": "pack_rope",
+		"name": "包袱上的绳",
+		"shape": "rope",
+		"npc": "huolang",
+		"level": 3,
+		"found": "fog",
+		"desc": "解开过很多次的麻绳，结还是那个结法。"
+	},
+	{
+		"id": "oar_cloth",
+		"name": "缠桨的布",
+		"shape": "rope",
+		"npc": "chuanniang",
+		"level": 1,
+		"found": "fog",
+		"desc": "缠在桨柄上的布条，磨出了手汗的颜色。"
+	},
+	{
+		"id": "tide_tag",
+		"name": "潮位牌",
+		"shape": "tag",
+		"npc": "chuanniang",
+		"level": 2,
+		"found": "fog",
+		"desc": "船帮上拆下来的小木牌，刻着三道。"
+	},
+	{
+		"id": "ferry_lantern",
+		"name": "渡口的灯",
+		"shape": "lantern",
+		"npc": "chuanniang",
+		"level": 3,
+		"found": "fog",
+		"desc": "渡口原先挂着的那盏，玻璃还在，油干了。"
+	},
+	{
+		"id": "incense_stub",
+		"name": "半支香",
+		"shape": "wick",
+		"npc": "miaozhu",
+		"level": 1,
+		"found": "fog",
+		"desc": "香烧到一半灭了，灰还沾在上面。"
+	},
+	{
+		"id": "altar_tablet",
+		"name": "供桌上的木牌",
+		"shape": "tablet",
+		"npc": "miaozhu",
+		"level": 2,
+		"found": "fog",
+		"desc": "供桌前的小木牌，字被水冲过，只剩木头的纹。"
+	},
+	{
+		"id": "rite_bell",
+		"name": "祭铃",
+		"shape": "bell",
+		"npc": "miaozhu",
+		"level": 3,
+		"found": "fog",
+		"desc": "开山门时摇的铃。摇起来还响，响不全。"
+	},
+	{
+		"id": "trail_tag",
+		"name": "一块路标",
+		"shape": "tag",
+		"npc": "shanliren",
+		"level": 1,
+		"found": "fog",
+		"desc": "岔路口钉过的木片，钉眼还在。"
+	},
+	{
+		"id": "herb_rope",
+		"name": "一捆干药",
+		"shape": "rope",
+		"npc": "shanliren",
+		"level": 2,
+		"found": "fog",
+		"desc": "干药捆成一束，叶子碎了，绳子还是山里的结。"
+	},
+	{
+		"id": "trail_knife",
+		"name": "刻路的小刀",
+		"shape": "chisel",
+		"npc": "shanliren",
+		"level": 3,
+		"found": "fog",
+		"desc": "在杖上刻路的小刀，刃口缺了一块。"
 	}
 ]

@@ -1,0 +1,57 @@
+{
+	"name": "sparrow",
+	"body": "bird",
+	"scale": 0.66,
+	"cell": 32,
+	"foot_row": 26,
+	"bird": {
+		"comb": false,
+		"wattle": false,
+		"bill": "cone",
+		"bill_len": 0.7,
+		"cap": true,
+		"belly": 1.45,
+		"tail": 0.12,
+		"tail_len": 0.26,
+		"tail_tilt": -22,
+		"neck": 0.22,
+		"neck_up": 0.1,
+		"head_scale": 1.2,
+		"body": [
+			0.24,
+			0.27,
+			0.22
+		],
+		"leg": 0.13
+	},
+	"parts": {
+		"body": [
+			"#b8905e",
+			"#916c44"
+		],
+		"wing": [
+			"#8a5c38",
+			"#684428"
+		],
+		"head": [
+			"#e6d8c0",
+			"#c4b298"
+		],
+		"comb": [
+			"#8a5230",
+			"#6a3b21"
+		],
+		"belly": [
+			"#efe4d0",
+			"#cdbfa6"
+		],
+		"beak": [
+			"#d8b45a",
+			"#ac8a3e"
+		],
+		"leg": [
+			"#e89a4a",
+			"#bc7434"
+		]
+	}
+}

@@ -310,6 +310,31 @@ func test_forgotten_layer_drops_relics_more_often() -> void:
 	assert_eq(Mine.roll_relic(def, def.relic_chance * base + 0.01), &"")
 
 
+func test_dongzhi_boosts_deep_floor_drops() -> void:
+	# 冬至是冬天第 13–16 天
+	GameClock.day = GameClock.DAYS_PER_SEASON * 3 + 13
+	assert_eq(GameClock.term_id(), &"dongzhi")
+	Mine.enter(22, 5)
+	assert_eq(Mine.drop_mult(), Mine.DONGZHI_DROPS, "冬至深层掉落更旺")
+	Mine.enter(12, 5)
+	assert_eq(Mine.drop_mult(), 1.0, "浅层不旺")
+	# 遗物机会也跟着涨
+	var def := Database.monster(&"walking_clock")
+	Mine.enter(22, 5)
+	var chance := def.relic_chance * Database.mine_layer(22).relic_bonus * Mine.DONGZHI_DROPS
+	assert_eq(Mine.roll_relic(def, chance - 0.01), &"stopped_clock", "冬至深层遗物机会更大")
+	assert_eq(Mine.roll_relic(def, chance + 0.01), &"")
+
+
+func test_jingzhe_boosts_every_floor() -> void:
+	GameClock.day = 9
+	assert_eq(GameClock.term_id(), &"jingzhe")
+	Mine.enter(22, 5)
+	assert_eq(Mine.drop_mult(), Mine.JINGZHE_DROPS)
+	Mine.enter(2, 5)
+	assert_eq(Mine.drop_mult(), Mine.JINGZHE_DROPS, "惊蛰浅层也旺")
+
+
 func test_mine_relics_are_real_items() -> void:
 	for id: StringName in [&"frog_weight", &"hemp_rope", &"oil_umbrella", &"cloth_shoes", &"stopped_clock", &"paper_figure"]:
 		assert_true(Database.has_relic(id))

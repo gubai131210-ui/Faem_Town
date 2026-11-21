@@ -5,6 +5,15 @@
 云娘: 灶台这两天还在收拾，等开了火，你头一个来尝。说定了啊。
 => END
 
+~ rank
+do Crafting.grant_rank()
+云娘: 你这灶，我看过了。从今天起，你是{{Crafting.rank_name()}}。 [#happy]
+if Crafting.rank_name() == "大师傅"
+	云娘: 再往上，我还没想好叫什么。
+else
+	云娘: 别骄傲。下一档还早着。
+=> END
+
 ~ work
 if GameState.has_flag("lamp_plaza") and Crafting.has_lesson("yunniang")
 	do Crafting.learn("yunniang")
@@ -16,6 +25,9 @@ if Residents.owes_thanks("yunniang")
 	do Residents.thanked("yunniang")
 elif Residents.away("yunniang") >= 4
 	云娘: 哎呀你可来了！这几天上哪儿去了，脸都晒黑了。
+if Residents.weather_is("fog")
+	云娘: 雾大，我把刚才那道菜的名字忘了。你要是刚问过，再说一遍？
+	=> END
 if Residents.weather_is("rain") or Residents.weather_is("storm") or Residents.weather_is("snow")
 	% 云娘: 这天气还有客人，我高兴！灶还没收拾好，你先在檐下站会儿。
 	% 云娘: 下雨天最适合喝热汤。可惜我这汤还没开张。
@@ -128,4 +140,10 @@ else
 云娘: 整首我唱完了。给你也留一道：那晚的面。
 云娘: 面是给他的。他说明天下井，今晚把歌听完。
 云娘: 歌听完了。人没有再坐到这张凳子上。 [#sad]
+=> END
+
+~ side_feast
+do Story.begin_side("feast")
+云娘: 节气的齐了，各家的也齐了。除夕把桌子摆到广场上。 [#happy]
+云娘: 碗筷多摆几副。井下那份名单有二十八行。冲掉的那些，位子也给他们留着。
 => END

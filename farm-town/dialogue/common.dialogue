@@ -9,6 +9,10 @@
 收音机: 今天{{GameClock.term_name()}}，{{Weather.today_text()}}。明天，{{Weather.forecast_text()}}。
 => END
 
+~ errand
+{{Residents.errand_thanks()}}
+=> END
+
 ~ gift_offer
 把手里的{{Residents.offer_item_name()}}送给{{Residents.offer_name()}}？
 - 送

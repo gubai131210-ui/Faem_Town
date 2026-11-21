@@ -3,14 +3,21 @@
 	"anims": [
 		"idle",
 		"walk",
-		"sit"
+		"sit",
+		"umbrella_walk",
+		"fan",
+		"rub",
+		"sweep",
+		"squat"
 	],
 	"hat": false,
 	"hair": "long",
 	"outfit": "apron",
 	"bulk": 1.06,
+	"costume_detail": "cook",
 	"parts": {
-		"shirt": "pink",
+		"shirt": ["#be7968", "#7f504f"],
+		"band": ["#619482", "#386461"],
 		"blue": "purple",
 		"apron": "white",
 		"hair": "hair_black",

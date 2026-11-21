@@ -31,6 +31,8 @@ var rain_schedule: Array[Dictionary] = []
 var early_until: StringName = &""
 var early_schedule: Array[Dictionary] = []
 var early_rain_schedule: Array[Dictionary] = []
+## 一串例外：符合条件的日子，换掉日程里某一段时间的去处。每项见 parse_exceptions。
+var exceptions: Array[Dictionary] = []
 
 
 static func from_dict(d: Dictionary) -> NpcDef:
@@ -60,6 +62,9 @@ static func from_dict(d: Dictionary) -> NpcDef:
 	var early_rain_plan: Variant = d.get("early_rain_schedule", [])
 	if early_rain_plan is Array:
 		def.early_rain_schedule = parse_schedule(early_rain_plan)
+	var ex: Variant = d.get("exceptions", [])
+	if ex is Array:
+		def.exceptions = parse_exceptions(ex)
 	return def
 
 
@@ -79,8 +84,9 @@ func taste_of(item_id: StringName) -> StringName:
 	return &"ok"
 
 
-## 把表里的日程转成 {"from": 分钟, "map": StringName, "tile": Vector2i, "facing": int, "work": bool, "note": String}。
+## 把表里的日程转成 {"from": 分钟, "map": StringName, "tile": Vector2i, "facing": int, "work": bool, "note": String, "pose": String}。
 ## note 是这段时间在干什么（"bench" 坐长凳、"board" 看告示……），对话文件用 Residents.at() 查，可以不写。
+## pose 是站定时播的动作（"fish" 持竿、"sweep" 扫地……），序列帧里有才播，可以不写。
 ## 表里的写法：{"from": "8:00", "map": "town", "tile": [10, 12], "facing": "down", "work": true}；
 ## map 不写或为空表示回家（不在任何地图上）。
 static func parse_schedule(list: Array) -> Array[Dictionary]:
@@ -96,6 +102,28 @@ static func parse_schedule(list: Array) -> Array[Dictionary]:
 			"facing": int(FACINGS.get(str(e.get("facing", "down")), 0)),
 			"work": bool(e.get("work", false)),
 			"note": str(e.get("note", "")),
+			"pose": str(e.get("pose", "")),
+		})
+	return out
+
+
+## 把表里的例外转成 {"season": StringName, "term": StringName, "weather": StringName,
+## "from": 分钟, "to": 分钟, "plan": Array[Dictionary]}。条件不写表示不限；
+## plan 是这段时间换上的去处，写法同日程。不写 to 表示一直到收工（26:00）。
+static func parse_exceptions(list: Array) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for v: Variant in list:
+		if not v is Dictionary:
+			continue
+		var e: Dictionary = v
+		var plan: Variant = e.get("plan", [])
+		out.append({
+			"season": StringName(str(e.get("season", ""))),
+			"term": StringName(str(e.get("term", ""))),
+			"weather": StringName(str(e.get("weather", ""))),
+			"from": parse_time(str(e.get("from", "6:00"))),
+			"to": parse_time(str(e.get("to", "26:00"))),
+			"plan": parse_schedule(plan if plan is Array else []),
 		})
 	return out
 

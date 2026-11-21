@@ -18,7 +18,7 @@ const KIND_TAGS: Dictionary[StringName, Array] = {
 	&"misc": ["杂物", "8a8078"], &"relic": ["旧物", "7a6a9a"], &"fish": ["鱼", "3a7a9a"],
 	&"gear": ["器具", "6a6a7a"], &"feed": ["饲料", "a8843a"], &"product": ["加工品", "b8683a"],
 	&"food": ["吃食", "c8483c"], &"ore": ["矿石", "6a7480"], &"weapon": ["武器", "9a3a3a"],
-	&"accessory": ["饰品", "3a8a84"],
+	&"accessory": ["饰品", "3a8a84"], &"decor": ["摆设", "a0603a"],
 }
 
 static var _theme: Theme

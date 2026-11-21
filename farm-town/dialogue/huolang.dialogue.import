@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://c74uavjuul5pw"
+path="res://.godot/imported/huolang.dialogue-4ff709ab3b0a647718278a21c4376a9a.tres"
+
+[deps]
+
+source_file="res://dialogue/huolang.dialogue"
+dest_files=["res://.godot/imported/huolang.dialogue-4ff709ab3b0a647718278a21c4376a9a.tres"]
+
+[params]
+
+defaults=true

@@ -62,7 +62,25 @@
 		"icon": "product:feed",
 		"stack": 99,
 		"price": 12,
-		"desc": "碎玉米和谷糠。拿着它对着鸡鸭按一下就是喂，一天喂一次。"
+		"desc": "碎玉米和谷糠。拿着它对着鸡鸭按一下就是喂，一天喂一次。立冬那四天它们改吃干草。"
+	},
+	{
+		"id": "hay",
+		"name": "干草",
+		"kind": "feed",
+		"icon": "product:hay",
+		"stack": 99,
+		"price": 10,
+		"desc": "立冬那四天，鸡鸭羊牛只吃这个。拿着它对着它们按一下，一天喂一次。"
+	},
+	{
+		"id": "straw",
+		"name": "稻草",
+		"kind": "misc",
+		"icon": "product:straw",
+		"stack": 99,
+		"price": 0,
+		"desc": "收水稻时留下的。盖在一格庄稼上，夜里的霜冻不着，一直盖到收成为止。"
 	},
 	{
 		"id": "egg",
@@ -205,7 +223,7 @@
 		"kind": "product",
 		"icon": "product:white_rice",
 		"stack": 99,
-		"price": 120,
+		"price": 240,
 		"desc": "石磨碾出来的新米。"
 	},
 	{
@@ -214,7 +232,7 @@
 		"kind": "product",
 		"icon": "product:flour",
 		"stack": 99,
-		"price": 160,
+		"price": 320,
 		"desc": "石磨磨的面，细得粘手。"
 	},
 	{
@@ -223,7 +241,7 @@
 		"kind": "product",
 		"icon": "product:cooking_oil",
 		"stack": 99,
-		"price": 150,
+		"price": 300,
 		"desc": "榨出来的清油，炒菜用。"
 	},
 	{
@@ -232,7 +250,7 @@
 		"kind": "product",
 		"icon": "product:lamp_oil",
 		"stack": 99,
-		"price": 180,
+		"price": 360,
 		"desc": "雾铃草榨的灯油，点起来火苗发青，不怕潮。"
 	},
 	{
@@ -241,7 +259,7 @@
 		"kind": "product",
 		"icon": "product:dried_tea",
 		"stack": 99,
-		"price": 110,
+		"price": 220,
 		"desc": "茶焙里焙了一夜的茶叶。"
 	},
 	{
@@ -270,6 +288,15 @@
 		"stack": 9,
 		"price": 200,
 		"desc": "拿着它对着农场的空地立起来，周围六格的田乌鸦不敢来。大风天可能被吹倒，扶一下就好。"
+	},
+	{
+		"id": "fence",
+		"name": "栅栏",
+		"kind": "gear",
+		"icon": "product:fence",
+		"stack": 99,
+		"price": 20,
+		"desc": "一段木栅栏。拿着它对着农场的空地摆下去，挨着的会自己连起来；空手对着栅栏按一下收回来。"
 	},
 	{
 		"id": "radish_soup",
@@ -309,7 +336,7 @@
 		"kind": "food",
 		"icon": "food:fried_egg",
 		"stack": 99,
-		"price": 70,
+		"price": 50,
 		"energy": 25,
 		"desc": "两面金黄的煎蛋。"
 	},
@@ -329,7 +356,7 @@
 		"kind": "food",
 		"icon": "food:fish_soup",
 		"stack": 99,
-		"price": 170,
+		"price": 76,
 		"energy": 55,
 		"hot": true,
 		"desc": "汤熬得发白。云娘说它今天叫“白云出岫”。"
@@ -353,7 +380,7 @@
 		"kind": "food",
 		"icon": "food:tea_egg",
 		"stack": 99,
-		"price": 240,
+		"price": 228,
 		"energy": 45,
 		"buff": "swift",
 		"buff_minutes": 120,
@@ -390,7 +417,7 @@
 		"kind": "food",
 		"icon": "food:milk_cake",
 		"stack": 99,
-		"price": 480,
+		"price": 460,
 		"energy": 100,
 		"buff": "swift",
 		"buff_minutes": 360,
@@ -424,7 +451,7 @@
 		"kind": "ore",
 		"icon": "mine:stone",
 		"stack": 99,
-		"price": 2,
+		"price": 1,
 		"desc": "井里敲下来的碎石。"
 	},
 	{
@@ -433,7 +460,7 @@
 		"kind": "ore",
 		"icon": "mine:copper_ore",
 		"stack": 99,
-		"price": 25,
+		"price": 5,
 		"desc": "浅坑里的铜矿，石头上一点一点橙红色。"
 	},
 	{
@@ -442,7 +469,7 @@
 		"kind": "ore",
 		"icon": "mine:coal",
 		"stack": 99,
-		"price": 15,
+		"price": 3,
 		"desc": "浅坑里的煤块，黑得发亮。"
 	},
 	{
@@ -451,7 +478,7 @@
 		"kind": "ore",
 		"icon": "mine:iron_ore",
 		"stack": 99,
-		"price": 45,
+		"price": 9,
 		"desc": "水渍层的铁矿，石头上一点一点青黑色，摸着发潮。"
 	},
 	{
@@ -460,7 +487,7 @@
 		"kind": "ore",
 		"icon": "mine:quartz",
 		"stack": 99,
-		"price": 60,
+		"price": 11,
 		"desc": "水渍层的石英，淡紫色，对着灯看是透的。"
 	},
 	{
@@ -469,7 +496,7 @@
 		"kind": "ore",
 		"icon": "mine:silver_ore",
 		"stack": 99,
-		"price": 95,
+		"price": 18,
 		"desc": "遗落层的银矿，石头里嵌着发白的亮点。"
 	},
 	{
@@ -478,7 +505,7 @@
 		"kind": "ore",
 		"icon": "mine:gold_ore",
 		"stack": 99,
-		"price": 160,
+		"price": 30,
 		"desc": "无光层的金矿。灯照上去才看得见那一点黄。"
 	},
 	{
@@ -487,7 +514,7 @@
 		"kind": "ore",
 		"icon": "mine:lan_crystal",
 		"stack": 99,
-		"price": 260,
+		"price": 49,
 		"desc": "无光层石头里结的晶，青白色，像一小块冻住的雾。握久了手心发凉。"
 	},
 	{
@@ -535,7 +562,7 @@
 		"kind": "crop",
 		"icon": "crop:bok_choy",
 		"stack": 99,
-		"price": 22,
+		"price": 44,
 		"desc": "水灵灵的小白菜，长得快。"
 	},
 	{
@@ -554,7 +581,7 @@
 		"kind": "crop",
 		"icon": "turnip",
 		"stack": 99,
-		"price": 35,
+		"price": 70,
 		"desc": "脆生生的白萝卜。"
 	},
 	{
@@ -573,7 +600,7 @@
 		"kind": "crop",
 		"icon": "crop:potato",
 		"stack": 99,
-		"price": 45,
+		"price": 90,
 		"desc": "沉甸甸的土豆，有时一窝能刨出两个。"
 	},
 	{
@@ -592,7 +619,7 @@
 		"kind": "crop",
 		"icon": "crop:pea",
 		"stack": 99,
-		"price": 22,
+		"price": 44,
 		"desc": "嫩豌豆荚，摘了还会再结。"
 	},
 	{
@@ -611,7 +638,7 @@
 		"kind": "crop",
 		"icon": "crop:strawberry",
 		"stack": 99,
-		"price": 55,
+		"price": 110,
 		"desc": "红透了的草莓。"
 	},
 	{
@@ -630,7 +657,7 @@
 		"kind": "crop",
 		"icon": "crop:rapeseed",
 		"stack": 99,
-		"price": 40,
+		"price": 80,
 		"desc": "开满黄花的油菜，籽可以榨灯油。",
 		"flower": "spring"
 	},
@@ -650,7 +677,7 @@
 		"kind": "crop",
 		"icon": "crop:tomato",
 		"stack": 99,
-		"price": 38,
+		"price": 76,
 		"desc": "酸甜的番茄，摘了还会再结。"
 	},
 	{
@@ -669,7 +696,7 @@
 		"kind": "crop",
 		"icon": "crop:chili",
 		"stack": 99,
-		"price": 30,
+		"price": 60,
 		"desc": "红辣椒，看着就冒汗。"
 	},
 	{
@@ -688,7 +715,7 @@
 		"kind": "crop",
 		"icon": "crop:corn",
 		"stack": 99,
-		"price": 45,
+		"price": 90,
 		"desc": "颗粒饱满的玉米，夏秋两季都能长。"
 	},
 	{
@@ -707,7 +734,7 @@
 		"kind": "crop",
 		"icon": "crop:watermelon",
 		"stack": 99,
-		"price": 190,
+		"price": 380,
 		"desc": "又大又圆的西瓜。"
 	},
 	{
@@ -726,7 +753,7 @@
 		"kind": "crop",
 		"icon": "crop:pumpkin",
 		"stack": 99,
-		"price": 210,
+		"price": 420,
 		"desc": "金灿灿的大南瓜。"
 	},
 	{
@@ -745,7 +772,7 @@
 		"kind": "crop",
 		"icon": "crop:sweet_potato",
 		"stack": 99,
-		"price": 55,
+		"price": 110,
 		"desc": "红皮的红薯，有时一窝能刨出两个。"
 	},
 	{
@@ -764,7 +791,7 @@
 		"kind": "crop",
 		"icon": "crop:soybean",
 		"stack": 99,
-		"price": 42,
+		"price": 84,
 		"desc": "晒干的豆荚，一摇哗啦响。"
 	},
 	{
@@ -783,7 +810,7 @@
 		"kind": "crop",
 		"icon": "crop:napa_cabbage",
 		"stack": 99,
-		"price": 75,
+		"price": 150,
 		"desc": "一层一层包得很紧的大白菜。"
 	},
 	{
@@ -802,7 +829,7 @@
 		"kind": "crop",
 		"icon": "crop:cotton",
 		"stack": 99,
-		"price": 48,
+		"price": 96,
 		"desc": "雪白的棉桃，可以纺线。"
 	},
 	{
@@ -821,7 +848,7 @@
 		"kind": "crop",
 		"icon": "crop:sesame",
 		"stack": 99,
-		"price": 55,
+		"price": 110,
 		"desc": "一粒一粒的芝麻，可以榨灯油。"
 	},
 	{
@@ -840,7 +867,7 @@
 		"kind": "crop",
 		"icon": "crop:potherb_mustard",
 		"stack": 99,
-		"price": 48,
+		"price": 96,
 		"desc": "不怕冷的雪里蕻，腌了最香。"
 	},
 	{
@@ -859,7 +886,7 @@
 		"kind": "crop",
 		"icon": "crop:fog_bell",
 		"stack": 99,
-		"price": 120,
+		"price": 240,
 		"desc": "只在雾天生长的草，花像一串小铃铛。"
 	},
 	{
@@ -878,7 +905,7 @@
 		"kind": "crop",
 		"icon": "crop:rice",
 		"stack": 99,
-		"price": 80,
+		"price": 160,
 		"desc": "金黄的稻穗，沉得弯了腰。"
 	},
 	{
@@ -897,7 +924,7 @@
 		"kind": "crop",
 		"icon": "crop:lotus_root",
 		"stack": 99,
-		"price": 150,
+		"price": 300,
 		"desc": "一节一节的莲藕，带着泥。"
 	},
 	{
@@ -906,7 +933,7 @@
 		"kind": "crop",
 		"icon": "lotus_flower",
 		"stack": 99,
-		"price": 40,
+		"price": 80,
 		"desc": "挖藕时摘下的荷花。",
 		"flower": "summer"
 	},
@@ -926,7 +953,7 @@
 		"kind": "crop",
 		"icon": "crop:winter_wheat",
 		"stack": 99,
-		"price": 110,
+		"price": 220,
 		"desc": "熬过一个冬天的麦子。"
 	},
 	{
@@ -945,7 +972,7 @@
 		"kind": "crop",
 		"icon": "crop:tea",
 		"stack": 99,
-		"price": 32,
+		"price": 64,
 		"desc": "新采的嫩芽。"
 	},
 	{
@@ -964,7 +991,7 @@
 		"kind": "crop",
 		"icon": "crop:sunflower",
 		"stack": 99,
-		"price": 70,
+		"price": 140,
 		"desc": "跟着太阳转的大花盘。",
 		"flower": "summer"
 	},
@@ -984,7 +1011,7 @@
 		"kind": "crop",
 		"icon": "crop:chrysanthemum",
 		"stack": 99,
-		"price": 60,
+		"price": 120,
 		"desc": "金黄的秋菊，可以泡茶。",
 		"flower": "autumn"
 	},
@@ -1004,7 +1031,7 @@
 		"kind": "crop",
 		"icon": "crop:osmanthus",
 		"stack": 99,
-		"price": 45,
+		"price": 90,
 		"desc": "米粒大的小花，隔着院子都闻得到。",
 		"flower": "autumn"
 	},
@@ -1024,7 +1051,7 @@
 		"kind": "crop",
 		"icon": "crop:wintersweet",
 		"stack": 99,
-		"price": 70,
+		"price": 140,
 		"desc": "光秃秃的枝上开着蜡黄的花。",
 		"flower": "winter"
 	},
@@ -1044,7 +1071,7 @@
 		"kind": "crop",
 		"icon": "crop:camellia",
 		"stack": 99,
-		"price": 85,
+		"price": 170,
 		"desc": "雪里开的大红花。",
 		"flower": "winter"
 	},
@@ -1304,5 +1331,870 @@
 		"buff": "swift",
 		"buff_minutes": 180,
 		"desc": "云娘那晚没来得及上的面。吃完脚步轻快。"
+	},
+	{
+		"id": "tomato_egg",
+		"name": "番茄炒蛋",
+		"kind": "food",
+		"icon": "food:tomato_egg",
+		"stack": 99,
+		"price": 70,
+		"energy": 28,
+		"desc": "夏天的番茄和鸡蛋一起下锅。"
+	},
+	{
+		"id": "oil_shrimp",
+		"name": "油爆虾",
+		"kind": "food",
+		"icon": "food:oil_shrimp",
+		"stack": 99,
+		"price": 14,
+		"energy": 32,
+		"desc": "河虾过油，壳还是脆的。",
+		"hot": true
+	},
+	{
+		"id": "steamed_crab",
+		"name": "清蒸蟹",
+		"kind": "food",
+		"icon": "food:steamed_crab",
+		"stack": 99,
+		"price": 16,
+		"energy": 40,
+		"desc": "秋天的蟹，原只上桌。",
+		"hot": true
+	},
+	{
+		"id": "pea_egg",
+		"name": "豌豆炒蛋",
+		"kind": "food",
+		"icon": "food:pea_egg",
+		"stack": 99,
+		"price": 60,
+		"energy": 26,
+		"desc": "惊蛰前后的豌豆，和蛋一起炒。"
+	},
+	{
+		"id": "strawberry_bowl",
+		"name": "草莓酪",
+		"kind": "food",
+		"icon": "food:strawberry_bowl",
+		"stack": 99,
+		"price": 80,
+		"energy": 24,
+		"desc": "春分的草莓，用羊奶拌开。"
+	},
+	{
+		"id": "qingming_tea",
+		"name": "清明茶",
+		"kind": "food",
+		"icon": "food:qingming_tea",
+		"stack": 99,
+		"price": 50,
+		"energy": 18,
+		"desc": "清明前后的新茶，杯里是绿的。",
+		"hot": true
+	},
+	{
+		"id": "mandarin_steam",
+		"name": "清蒸鳜鱼",
+		"kind": "food",
+		"icon": "food:mandarin_steam",
+		"stack": 99,
+		"price": 24,
+		"energy": 45,
+		"desc": "春分的鳜鱼。桃花水正肥。",
+		"hot": true
+	},
+	{
+		"id": "peach_soup",
+		"name": "桃花鱼羹",
+		"kind": "food",
+		"icon": "food:peach_soup",
+		"stack": 99,
+		"price": 30,
+		"energy": 30,
+		"desc": "雨水时节才有的小鱼，煮成一碗粉汤。",
+		"hot": true
+	},
+	{
+		"id": "lixia_egg",
+		"name": "立夏蛋",
+		"kind": "food",
+		"icon": "food:lixia_egg",
+		"stack": 99,
+		"price": 55,
+		"energy": 22,
+		"desc": "立夏吃一颗鸭蛋，这一夏有劲。"
+	},
+	{
+		"id": "cold_noodles",
+		"name": "夏至凉面",
+		"kind": "food",
+		"icon": "food:cold_noodles",
+		"stack": 99,
+		"price": 60,
+		"energy": 30,
+		"desc": "夏至的面，过凉再拌。"
+	},
+	{
+		"id": "lotus_slices",
+		"name": "糖藕",
+		"kind": "food",
+		"icon": "food:lotus_slices",
+		"stack": 99,
+		"price": 90,
+		"energy": 28,
+		"desc": "大暑的藕，孔里填了蜜。"
+	},
+	{
+		"id": "corn_cob",
+		"name": "煮玉米",
+		"kind": "food",
+		"icon": "food:corn_cob",
+		"stack": 99,
+		"price": 50,
+		"energy": 26,
+		"desc": "处暑的玉米，整根煮。",
+		"hot": true
+	},
+	{
+		"id": "perch_steam",
+		"name": "清蒸鲈鱼",
+		"kind": "food",
+		"icon": "food:perch_steam",
+		"stack": 99,
+		"price": 18,
+		"energy": 42,
+		"desc": "秋风起时的鲈鱼，清蒸。",
+		"hot": true
+	},
+	{
+		"id": "napa_pot",
+		"name": "白菜汤",
+		"kind": "food",
+		"icon": "food:napa_pot",
+		"stack": 99,
+		"price": 50,
+		"energy": 24,
+		"desc": "寒露的大白菜，煮成一锅。",
+		"hot": true
+	},
+	{
+		"id": "mustard_fry",
+		"name": "炒雪里蕻",
+		"kind": "food",
+		"icon": "food:mustard_fry",
+		"stack": 99,
+		"price": 40,
+		"energy": 20,
+		"desc": "小雪腌的雪里蕻，下粥。"
+	},
+	{
+		"id": "silver_soup",
+		"name": "银鱼羹",
+		"kind": "food",
+		"icon": "food:silver_soup",
+		"stack": 99,
+		"price": 14,
+		"energy": 28,
+		"desc": "大雪以后冰下的银鱼，煮成一羹。",
+		"hot": true
+	},
+	{
+		"id": "winter_balls",
+		"name": "冬至团",
+		"kind": "food",
+		"icon": "food:winter_balls",
+		"stack": 99,
+		"price": 70,
+		"energy": 30,
+		"desc": "冬至的汤团。吃了，又大一岁。",
+		"hot": true
+	},
+	{
+		"id": "laba_porridge",
+		"name": "腊八粥",
+		"kind": "food",
+		"icon": "food:laba_porridge",
+		"stack": 99,
+		"price": 80,
+		"energy": 36,
+		"desc": "小寒的粥。豆子是秋天收的，留到这一天。",
+		"hot": true
+	},
+	{
+		"id": "eight_treasure",
+		"name": "桂花八宝饭",
+		"kind": "food",
+		"icon": "food:eight_treasure",
+		"stack": 99,
+		"price": 120,
+		"energy": 40,
+		"desc": "大寒的八宝饭。桂花是秋天晾的。",
+		"hot": true
+	},
+	{
+		"id": "soy_sauce",
+		"name": "酱油",
+		"kind": "product",
+		"icon": "product:soy_sauce",
+		"stack": 99,
+		"price": 70,
+		"desc": "酱缸里大豆酿出来的，色深。"
+	},
+	{
+		"id": "rice_vinegar",
+		"name": "米醋",
+		"kind": "product",
+		"icon": "product:rice_vinegar",
+		"stack": 99,
+		"price": 60,
+		"desc": "酱缸里米酿出来的，酸。"
+	},
+	{
+		"id": "rice_wine",
+		"name": "米酒",
+		"kind": "product",
+		"icon": "product:rice_wine",
+		"stack": 99,
+		"price": 80,
+		"desc": "酒坛里闷出来的，有一股甜香。"
+	},
+	{
+		"id": "malt_sugar",
+		"name": "麦芽糖",
+		"kind": "product",
+		"icon": "product:malt_sugar",
+		"stack": 99,
+		"price": 50,
+		"desc": "酒坛边熬的麦芽糖，能拉丝。"
+	},
+	{
+		"id": "soy_greens",
+		"name": "酱青菜",
+		"kind": "food",
+		"icon": "food:soy_greens",
+		"stack": 99,
+		"price": 55,
+		"desc": "春天的小白菜，淋了酱油。",
+		"energy": 22
+	},
+	{
+		"id": "vinegar_napa",
+		"name": "醋溜白菜",
+		"kind": "food",
+		"icon": "food:vinegar_napa",
+		"stack": 99,
+		"price": 60,
+		"desc": "秋天的大白菜，醋一溜就亮了。",
+		"energy": 24
+	},
+	{
+		"id": "wine_perch",
+		"name": "酒香鲈鱼",
+		"kind": "food",
+		"icon": "food:wine_perch",
+		"stack": 99,
+		"price": 98,
+		"desc": "秋风里的鲈鱼，蒸的时候淋了米酒。",
+		"energy": 42,
+		"hot": true
+	},
+	{
+		"id": "sugar_roast",
+		"name": "拔丝红薯",
+		"kind": "food",
+		"icon": "food:sugar_roast",
+		"stack": 99,
+		"price": 70,
+		"desc": "烤软的红薯，糖丝拉得开。",
+		"energy": 30,
+		"hot": true
+	},
+	{
+		"id": "bamboo_stir",
+		"name": "炒春笋",
+		"kind": "food",
+		"icon": "food:bamboo_stir",
+		"stack": 99,
+		"price": 190,
+		"hot": true,
+		"energy": 28,
+		"desc": "立春的笋，下了油，切成斜片。"
+	},
+	{
+		"id": "fern_salad",
+		"name": "凉拌蕨菜",
+		"kind": "food",
+		"icon": "food:fern_salad",
+		"stack": 99,
+		"price": 85,
+		"energy": 16,
+		"desc": "谷雨的蕨菜，拌了米醋。"
+	},
+	{
+		"id": "bayberry_drink",
+		"name": "杨梅饮",
+		"kind": "food",
+		"icon": "food:bayberry_drink",
+		"stack": 99,
+		"price": 160,
+		"energy": 18,
+		"desc": "小满的杨梅煮过，兑了蜜。"
+	},
+	{
+		"id": "wheat_rice",
+		"name": "新麦饭",
+		"kind": "food",
+		"icon": "food:wheat_rice",
+		"stack": 99,
+		"price": 220,
+		"hot": true,
+		"energy": 32,
+		"desc": "芒种头一茬麦子蒸的饭。"
+	},
+	{
+		"id": "mint_drink",
+		"name": "薄荷饮",
+		"kind": "food",
+		"icon": "food:mint_drink",
+		"stack": 99,
+		"price": 110,
+		"energy": 14,
+		"desc": "小暑的薄荷，拌了蜜，冰凉。"
+	},
+	{
+		"id": "chestnut_porridge",
+		"name": "栗子粥",
+		"kind": "food",
+		"icon": "food:chestnut_porridge",
+		"stack": 99,
+		"price": 155,
+		"hot": true,
+		"energy": 30,
+		"desc": "立秋的栗子和大米熬在一处。"
+	},
+	{
+		"id": "salted_soybean",
+		"name": "盐水毛豆",
+		"kind": "food",
+		"icon": "food:salted_soybean",
+		"stack": 99,
+		"price": 84,
+		"hot": true,
+		"energy": 20,
+		"desc": "白露的毛豆，盐水煮过。"
+	},
+	{
+		"id": "baked_persimmon",
+		"name": "烘柿",
+		"kind": "food",
+		"icon": "food:baked_persimmon",
+		"stack": 99,
+		"price": 130,
+		"hot": true,
+		"energy": 24,
+		"desc": "霜降的柿子，灶膛边烘软了。"
+	},
+	{
+		"id": "oyster_egg",
+		"name": "牡蛎煎蛋",
+		"kind": "food",
+		"icon": "food:oyster_egg",
+		"stack": 99,
+		"price": 120,
+		"hot": true,
+		"energy": 30,
+		"desc": "立冬的牡蛎，摊在蛋里。"
+	},
+	{
+		"id": "scallion_cake",
+		"name": "葱油饼",
+		"kind": "food",
+		"icon": "food:scallion_cake",
+		"stack": 99,
+		"price": 310,
+		"hot": true,
+		"energy": 34,
+		"desc": "油和面烙的饼，面上是葱。"
+	},
+	{
+		"id": "wine_balls",
+		"name": "酒酿圆子",
+		"kind": "food",
+		"icon": "food:wine_balls",
+		"stack": 99,
+		"price": 240,
+		"hot": true,
+		"energy": 28,
+		"desc": "米酒里煮的小圆子。"
+	},
+	{
+		"id": "stir_purse",
+		"name": "清炒荠菜",
+		"kind": "food",
+		"icon": "food:stir_purse",
+		"stack": 99,
+		"price": 170,
+		"hot": true,
+		"energy": 22,
+		"desc": "春天的荠菜，油里翻两下。"
+	},
+	{
+		"id": "roast_mushroom",
+		"name": "烤野菇",
+		"kind": "food",
+		"icon": "food:roast_mushroom",
+		"stack": 99,
+		"price": 80,
+		"hot": true,
+		"energy": 24,
+		"desc": "秋天的野菇，架在火上。"
+	},
+	{
+		"id": "loquat_honey",
+		"name": "蜜渍枇杷",
+		"kind": "food",
+		"icon": "food:loquat_honey",
+		"stack": 99,
+		"price": 210,
+		"energy": 18,
+		"desc": "春天的枇杷，蜜里渍过。"
+	},
+	{
+		"id": "watermelon_cup",
+		"name": "西瓜盅",
+		"kind": "food",
+		"icon": "food:watermelon_cup",
+		"stack": 99,
+		"price": 280,
+		"energy": 20,
+		"desc": "小满爱的西瓜，挖成一盅。"
+	},
+	{
+		"id": "wintersweet_tea",
+		"name": "腊梅茶",
+		"kind": "food",
+		"icon": "food:wintersweet_tea",
+		"stack": 99,
+		"price": 180,
+		"hot": true,
+		"energy": 16,
+		"desc": "柏先生那盏，腊梅和干茶。"
+	},
+	{
+		"id": "sesame_pumpkin",
+		"name": "芝麻南瓜饼",
+		"kind": "food",
+		"icon": "food:sesame_pumpkin",
+		"stack": 99,
+		"price": 425,
+		"hot": true,
+		"energy": 36,
+		"desc": "阿禾的南瓜，和了芝麻面。"
+	},
+	{
+		"id": "chestnut_yam",
+		"name": "栗子煨红薯",
+		"kind": "food",
+		"icon": "food:chestnut_yam",
+		"stack": 99,
+		"price": 90,
+		"hot": true,
+		"energy": 30,
+		"desc": "石叔的吃法，栗子和红薯一起煨。"
+	},
+	{
+		"id": "pan_loach",
+		"name": "干煎泥鳅",
+		"kind": "food",
+		"icon": "food:pan_loach",
+		"stack": 99,
+		"price": 305,
+		"hot": true,
+		"energy": 32,
+		"desc": "泥鳅用油煎到两面黄。"
+	},
+	{
+		"id": "vinegar_carp",
+		"name": "醋溜鲤鱼",
+		"kind": "food",
+		"icon": "food:vinegar_carp",
+		"stack": 99,
+		"price": 69,
+		"hot": true,
+		"energy": 28,
+		"desc": "鲤鱼淋上米醋。"
+	},
+	{
+		"id": "steam_grass_carp",
+		"name": "清蒸草鱼",
+		"kind": "food",
+		"icon": "food:steam_grass_carp",
+		"stack": 99,
+		"price": 11,
+		"hot": true,
+		"energy": 30,
+		"desc": "整条草鱼，清蒸。"
+	},
+	{
+		"id": "steam_sharpbelly",
+		"name": "清蒸白条",
+		"kind": "food",
+		"icon": "food:steam_sharpbelly",
+		"stack": 99,
+		"price": 4,
+		"hot": true,
+		"energy": 18,
+		"desc": "两条小白条，清蒸。"
+	},
+	{
+		"id": "clam_soup",
+		"name": "蛤蜊萝卜汤",
+		"kind": "food",
+		"icon": "food:clam_soup",
+		"stack": 99,
+		"price": 100,
+		"hot": true,
+		"energy": 36,
+		"desc": "蛤蜊和白萝卜一起煮。"
+	},
+	{
+		"id": "winter_shoot",
+		"name": "炒冬笋",
+		"kind": "food",
+		"icon": "food:winter_shoot",
+		"stack": 99,
+		"price": 355,
+		"hot": true,
+		"energy": 30,
+		"desc": "冬笋切片，下油锅。"
+	},
+	{
+		"id": "chili_potato",
+		"name": "辣椒炒土豆",
+		"kind": "food",
+		"icon": "food:chili_potato",
+		"stack": 99,
+		"price": 150,
+		"hot": true,
+		"energy": 30,
+		"desc": "辣椒和土豆同炒。"
+	},
+	{
+		"id": "pickle_rice",
+		"name": "腌菜炒饭",
+		"kind": "food",
+		"icon": "food:pickle_rice",
+		"stack": 99,
+		"price": 420,
+		"hot": true,
+		"energy": 45,
+		"desc": "腌菜、米饭和鸡蛋一起炒。"
+	},
+	{
+		"id": "caltrop_porridge",
+		"name": "菱角粥",
+		"kind": "food",
+		"icon": "food:caltrop_porridge",
+		"stack": 99,
+		"price": 280,
+		"hot": true,
+		"energy": 40,
+		"desc": "菱角和大米熬成粥。"
+	},
+	{
+		"id": "hawthorn_cake",
+		"name": "山楂糕",
+		"kind": "food",
+		"icon": "food:hawthorn_cake",
+		"stack": 99,
+		"price": 75,
+		"hot": true,
+		"energy": 22,
+		"desc": "山楂加麦芽糖蒸成糕。"
+	},
+	{
+		"id": "kelp_soup",
+		"name": "海带汤",
+		"kind": "food",
+		"icon": "food:kelp_soup",
+		"stack": 99,
+		"price": 25,
+		"hot": true,
+		"energy": 20,
+		"desc": "海带煮成一碗汤。"
+	},
+	{
+		"id": "chrys_tea",
+		"name": "菊花茶",
+		"kind": "food",
+		"icon": "food:chrys_tea",
+		"stack": 99,
+		"price": 340,
+		"hot": true,
+		"energy": 16,
+		"desc": "菊花配干茶。"
+	},
+	{
+		"id": "steam_fog_carp",
+		"name": "清蒸雾鲤王",
+		"kind": "food",
+		"icon": "food:steam_fog_carp",
+		"stack": 99,
+		"price": 160,
+		"hot": true,
+		"energy": 48,
+		"desc": "雾天河里的白鲤，清蒸。"
+	},
+	{
+		"id": "catfish_soup",
+		"name": "井鲶萝卜汤",
+		"kind": "food",
+		"icon": "food:catfish_soup",
+		"stack": 99,
+		"price": 250,
+		"hot": true,
+		"energy": 48,
+		"desc": "井底的老鲶，配白萝卜。"
+	},
+	{
+		"id": "tide_soup",
+		"name": "潮生鱼羹",
+		"kind": "food",
+		"icon": "food:tide_soup",
+		"stack": 99,
+		"price": 240,
+		"hot": true,
+		"energy": 50,
+		"desc": "冬至夜里的鱼，煮成羹。"
+	},
+	{
+		"id": "giant_melon",
+		"name": "整瓜盏",
+		"kind": "food",
+		"icon": "food:giant_melon",
+		"stack": 99,
+		"price": 1520,
+		"energy": 36,
+		"desc": "要四个西瓜。巨型的那颗一次收四个。"
+	},
+	{
+		"id": "odd_bowl",
+		"name": "说不上来的东西",
+		"kind": "food",
+		"icon": "food:odd_bowl",
+		"stack": 99,
+		"price": 8,
+		"desc": "三样东西胡乱下了锅，说不上是什么。",
+		"energy": 8
+	},
+	{
+		"id": "stool",
+		"name": "方凳",
+		"kind": "decor",
+		"icon": "prop:stool",
+		"stack": 99,
+		"price": 60,
+		"desc": "一只木方凳。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "bench",
+		"name": "长凳",
+		"kind": "decor",
+		"icon": "prop:bench",
+		"stack": 99,
+		"price": 150,
+		"desc": "一条能坐两个人的长凳。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "jar_clay",
+		"name": "陶罐",
+		"kind": "decor",
+		"icon": "prop:jar_clay",
+		"stack": 99,
+		"price": 80,
+		"desc": "粗陶罐子，装米装豆都行。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "jar_jade",
+		"name": "青瓷瓶",
+		"kind": "decor",
+		"icon": "prop:jar_jade",
+		"stack": 99,
+		"price": 200,
+		"desc": "釉色像雨后的山。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "wine_jar",
+		"name": "酒坛",
+		"kind": "decor",
+		"icon": "prop:wine_jar",
+		"stack": 99,
+		"price": 120,
+		"desc": "空酒坛，封口的红布还在。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "bonsai",
+		"name": "盆景",
+		"kind": "decor",
+		"icon": "prop:bonsai",
+		"stack": 99,
+		"price": 300,
+		"desc": "一盆小松，长得慢，比人有耐心。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "fish_bowl",
+		"name": "鱼缸",
+		"kind": "decor",
+		"icon": "prop:fish_bowl",
+		"stack": 99,
+		"price": 500,
+		"desc": "青瓷大缸，里头两尾红鱼。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "floor_lamp",
+		"name": "宫灯",
+		"kind": "decor",
+		"icon": "prop:floor_lamp",
+		"stack": 99,
+		"price": 250,
+		"desc": "木架子上一盏红边的纸灯。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "tea_table",
+		"name": "茶几",
+		"kind": "decor",
+		"icon": "prop:tea_table",
+		"stack": 99,
+		"price": 400,
+		"desc": "矮茶几，摆着一壶两杯。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "bookshelf",
+		"name": "书架",
+		"kind": "decor",
+		"icon": "prop:bookshelf",
+		"stack": 99,
+		"price": 600,
+		"desc": "一架子书，有几本是镇上人借给你的。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "wardrobe",
+		"name": "衣柜",
+		"kind": "decor",
+		"icon": "prop:wardrobe",
+		"stack": 99,
+		"price": 700,
+		"desc": "樟木衣柜，开门一股樟脑味。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "screen",
+		"name": "屏风",
+		"kind": "decor",
+		"icon": "prop:folding_screen",
+		"stack": 99,
+		"price": 800,
+		"desc": "三扇纸屏风，画着远山。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "rug",
+		"name": "毯子",
+		"kind": "decor",
+		"icon": "prop:rug",
+		"stack": 99,
+		"price": 350,
+		"desc": "一块红毯子，人能踩在上面走。拿着它对着屋里的空地放下；空手对着它按一下收起来。"
+	},
+	{
+		"id": "wall_scroll",
+		"name": "山水挂轴",
+		"kind": "decor",
+		"icon": "prop:wall_scroll",
+		"stack": 99,
+		"price": 300,
+		"desc": "挂在墙上的一幅山水。拿着它对着屋里的墙用，挂上去；空手对着它按一下取下来。"
+	},
+	{
+		"id": "wall_fu",
+		"name": "福字",
+		"kind": "decor",
+		"icon": "prop:wall_fu",
+		"stack": 99,
+		"price": 50,
+		"desc": "红纸福字，贴在墙上。拿着它对着屋里的墙用，挂上去；空手对着它按一下取下来。"
+	},
+	{
+		"id": "paper_plaster",
+		"name": "白灰墙",
+		"kind": "decor",
+		"icon": "paper:plaster",
+		"stack": 99,
+		"price": 100,
+		"desc": "老屋原来的白灰墙。拿着它对着屋里的墙用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "paper_timber",
+		"name": "木板墙",
+		"kind": "decor",
+		"icon": "paper:timber",
+		"stack": 99,
+		"price": 400,
+		"desc": "整面墙钉上木板。拿着它对着屋里的墙用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "paper_indigo",
+		"name": "蓝印花布",
+		"kind": "decor",
+		"icon": "paper:indigo",
+		"stack": 99,
+		"price": 600,
+		"desc": "蓝底白花的布，糊满一面墙。拿着它对着屋里的墙用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "paper_bamboo",
+		"name": "竹编墙",
+		"kind": "decor",
+		"icon": "paper:bamboo",
+		"stack": 99,
+		"price": 500,
+		"desc": "细竹篾编的墙面。拿着它对着屋里的墙用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "floor_plank",
+		"name": "旧木地板",
+		"kind": "decor",
+		"icon": "floor:plank",
+		"stack": 99,
+		"price": 100,
+		"desc": "老屋原来的木地板。拿着它对着屋里的地用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "floor_dark",
+		"name": "深色木地板",
+		"kind": "decor",
+		"icon": "floor:dark",
+		"stack": 99,
+		"price": 800,
+		"desc": "上过桐油的深色木板。拿着它对着屋里的地用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "floor_brick",
+		"name": "青砖地",
+		"kind": "decor",
+		"icon": "floor:brick",
+		"stack": 99,
+		"price": 600,
+		"desc": "一块块青砖铺的地。拿着它对着屋里的地用，整屋换上，换下来的收进背包。"
+	},
+	{
+		"id": "floor_mat",
+		"name": "竹席地",
+		"kind": "decor",
+		"icon": "floor:mat",
+		"stack": 99,
+		"price": 500,
+		"desc": "满屋铺上竹席，夏天凉快。拿着它对着屋里的地用，整屋换上，换下来的收进背包。"
 	}
 ]

@@ -87,11 +87,12 @@ func test_north_fog_stays_after_the_pasture_lamp_and_laoqin_shouts() -> void:
 	assert_true(GameState.has_flag(&"well_warned"))
 
 
-func test_north_fog_is_plain_before_the_pasture_lamp() -> void:
+func test_north_fog_is_laoqins_before_the_pasture_lamp() -> void:
 	var town := _map(&"town")
 	town.perform(&"interact", null, NORTH_FOG)
-	assert_string_contains(_banners[-1], "雾太浓")
-	assert_false(GameState.has_flag(&"well_warned"))
+	assert_string_contains(_banners[-1], "老秦")
+	assert_true(GameState.has_flag(&"well_warned"))
+	assert_false(GameState.has_flag(&"lamp_pasture"), "井不用等牧野灯")
 
 
 func test_laoqin_hands_over_the_key_once_he_knows_you() -> void:
@@ -131,12 +132,16 @@ func test_laoqin_keeps_the_key_while_the_bag_is_full() -> void:
 	assert_eq(GameState.inventory.count_of(&"well_key"), 1, "当天再说一次也能拿到")
 
 
-func test_laoqin_says_nothing_about_the_well_before_the_pasture_lamp() -> void:
+func test_laoqin_gives_the_key_without_the_pasture_lamp() -> void:
 	Residents.met[&"laoqin"] = true
-	Residents.add_familiarity(&"laoqin", 100)
 	var said := await _say("daily")
 	assert_eq(GameState.inventory.count_of(&"well_key"), 0)
-	assert_false(said.contains("钥匙"))
+	assert_false(said.contains("钥匙"), "不熟、也没被喝住，不提井")
+	Residents.add_familiarity(&"laoqin", 40)
+	said = await _say("daily")
+	assert_string_contains(said, "钥匙")
+	assert_eq(GameState.inventory.count_of(&"well_key"), 1)
+	assert_false(GameState.has_flag(&"lamp_pasture"))
 
 
 # ---------------------------------------------------------------- 井口灯

@@ -36,6 +36,7 @@ Mine="*res://features/mine/mine.gd"
 Lamps="*res://features/lamps/lamps.gd"
 Quests="*res://features/npc/quests.gd"
 Residents="*res://features/npc/residents.gd"
+Home="*res://features/home/home.gd"
 
 [display]
 
@@ -156,7 +157,7 @@ slot8={
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://tests/fixtures/smoke.dialogue", "res://dialogue/common.dialogue", "res://dialogue/intro.dialogue", "res://dialogue/ahe.dialogue", "res://dialogue/jiang.dialogue", "res://dialogue/shishu.dialogue", "res://dialogue/xiaoman.dialogue", "res://dialogue/amu.dialogue", "res://dialogue/bai.dialogue", "res://dialogue/egret.dialogue", "res://dialogue/laoqin.dialogue", "res://dialogue/laozhou.dialogue", "res://dialogue/luyuan.dialogue", "res://dialogue/qingzhu.dialogue", "res://dialogue/yunniang.dialogue", "res://dialogue/lan.dialogue", "res://dialogue/ending.dialogue", "res://dialogue/festival.dialogue")
+locale/translations_pot_files=PackedStringArray("res://tests/fixtures/smoke.dialogue", "res://dialogue/common.dialogue", "res://dialogue/intro.dialogue", "res://dialogue/ahe.dialogue", "res://dialogue/jiang.dialogue", "res://dialogue/shishu.dialogue", "res://dialogue/xiaoman.dialogue", "res://dialogue/amu.dialogue", "res://dialogue/bai.dialogue", "res://dialogue/egret.dialogue", "res://dialogue/laoqin.dialogue", "res://dialogue/laozhou.dialogue", "res://dialogue/luyuan.dialogue", "res://dialogue/qingzhu.dialogue", "res://dialogue/yunniang.dialogue", "res://dialogue/lan.dialogue", "res://dialogue/ending.dialogue", "res://dialogue/festival.dialogue", "res://dialogue/chuanniang.dialogue", "res://dialogue/huolang.dialogue", "res://dialogue/jiangyuan.dialogue", "res://dialogue/miaozhu.dialogue", "res://dialogue/shanliren.dialogue", "res://dialogue/shuoshu.dialogue")
 
 [physics]
 

@@ -148,3 +148,39 @@ else
 白鹭: 你点亮一盏灯，纸上就多实一截。还没实的，我念给你听。
 白鹭: {{Residents.uncharted()}} [#happy]
 => END
+
+~ mine_frog_weight
+白鹭: 青苔底下还有半个字。我画不出来。
+=> END
+
+~ mine_hemp_rope
+白鹭: 一个结接着一个。像怕它散。
+=> END
+
+~ mine_oil_umbrella
+白鹭: 伞破了。红绳还在。
+=> END
+
+~ mine_cloth_shoes
+白鹭: 这么小的鞋。底是新的。
+=> END
+
+~ mine_stopped_clock
+白鹭: 针停在那儿。我画过停着的钟。
+=> END
+
+~ mine_paper_figure
+白鹭: 没有五官。背面一个「替」。
+=> END
+
+~ mine_lamp_shade
+白鹭: 罩子里有一点粉。蛾子留下的。
+=> END
+
+~ mine_old_photo
+白鹭: 一排影子。笑还在，脸不在。
+=> END
+
+~ mine_name_tag
+白鹭: 铜牌是平的。名字画不回去。
+=> END

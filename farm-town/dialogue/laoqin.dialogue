@@ -11,13 +11,16 @@
 ~ daily
 if Residents.lamp_news("laoqin", "well")
 	=> well_lamp_news
-if Residents.lamp_lit("pasture") and not Residents.lamp_lit("well")
+if not Residents.lamp_lit("well") and (Residents.knows("laoqin", 40) or Residents.has_flag("well_warned"))
 	=> well_matter
 if Residents.owes_thanks("laoqin")
 	老秦: 上回那{{Residents.gift_name("laoqin")}}……咳。还行。别以为我就欠你的了。
 	do Residents.thanked("laoqin")
 if Residents.lamp_lit("well")
 	=> at_the_well
+if Residents.weather_is("fog")
+	老秦: 雾大。你谁啊？……算了。别往北边走。
+	=> END
 if Residents.topic("laoqin", 6) == 0
 	老秦: 我来打酒，打完就走。别跟着我。
 elif Residents.topic("laoqin", 6) == 1
@@ -59,7 +62,7 @@ if Residents.has_flag("well_warned") and not Residents.has_flag("laoqin_warned")
 
 ~ well_key
 老秦: 你。站着。
-老秦: 北边路口那盏灯，你是不是想点。别装，西边那盏就是你点的。
+老秦: 北边那口井，你是不是想下去。别装。
 老秦: 那口井我守了三十年。为什么守，我说不上来。就知道不能让人下去。 [#sad]
 老秦: 可你这人……地种得踏实，说话也不绕。我看了你这些日子。
 if Residents.can_hold("well_key")
@@ -80,6 +83,9 @@ else
 => END
 
 ~ at_the_well
+if Residents.weather_is("fog")
+	老秦: 雾大。井口的绳子我摸得到，人我得看两眼才认得。
+	=> END
 if Residents.at("laoqin", "teahouse")
 	=> old_talk
 if Residents.topic("laoqin_well", 5) == 0
@@ -100,6 +106,9 @@ else
 => END
 
 ~ old_talk
+if Residents.weather_is("fog")
+	老秦: 雾大。你谁啊？……算了。别往北边走。
+	=> END
 if Residents.topic("laoqin", 6) == 0
 	老秦: 我来打酒，打完就走。别跟着我。
 elif Residents.topic("laoqin", 6) == 1
@@ -120,7 +129,7 @@ else
 ~ again
 if Residents.lamp_news("laoqin", "well")
 	=> well_lamp_news
-if Residents.lamp_lit("pasture") and not Residents.lamp_lit("well") and not Residents.has_flag("got_well_key") and Residents.knows("laoqin", 40)
+if not Residents.lamp_lit("well") and not Residents.has_flag("got_well_key") and Residents.knows("laoqin", 40)
 	=> well_key
 if Residents.nth("laoqin") == 2
 	% 老秦: 又是你。
@@ -185,4 +194,52 @@ else
 老秦: 推我的那一下没有手。是雾。雾说它叫……它没说完。
 老秦: 它让我上去报信。我上来以后把信也忘了。 [#sad]
 老秦: 东西我还是会丢。你要是在底下晕倒，我少给你丢一点。算我补的。
+=> END
+
+~ trade_mine_1
+老秦: 井下到过第五层。梯子还在，人得自己下。
+=> END
+
+~ trade_mine_2
+老秦: 工具升过，井也深了。锤子认你的手。
+=> END
+
+~ trade_mine_3
+老秦: 井下到过三十层，镐子也跟得上。
+=> END
+
+~ mine_frog_weight
+老秦: 学堂的镇纸。井底下不该有这个。
+=> END
+
+~ mine_hemp_rope
+老秦: 这种结，下井的人都会打。
+=> END
+
+~ mine_oil_umbrella
+老秦: 红绳还系着。怕和别人的拿混。
+=> END
+
+~ mine_cloth_shoes
+老秦: 鞋底是新的。没来得及穿。
+=> END
+
+~ mine_stopped_clock
+老秦: 三点一刻。钥匙还插着，拧不动。
+=> END
+
+~ mine_paper_figure
+老秦: 戏班的纸人。脸上没画。
+=> END
+
+~ mine_lamp_shade
+老秦: 矿灯的罩。熏黑了一半。
+=> END
+
+~ mine_old_photo
+老秦: 井口的人。脸看不清。
+=> END
+
+~ mine_name_tag
+老秦: 名牌是平的。名字摸掉了。
 => END

@@ -1,0 +1,68 @@
+{
+	"name": "kui",
+	"body": "quadruped",
+	"scale": 1.25,
+	"cell": 48,
+	"foot_row": 40,
+	"quad": {
+		"body": [
+			0.3,
+			0.42,
+			0.3
+		],
+		"leg": 0.3,
+		"leg_r": 0.13,
+		"neck": 0.18,
+		"neck_up": 0.14,
+		"head": [
+			0.2,
+			0.25,
+			0.2
+		],
+		"snout": 0.15,
+		"ears": "side",
+		"tail": "long",
+		"one_leg": true,
+		"belly": true,
+		"ridge": 4
+	},
+	"parts": {
+		"body": [
+			"#4f7f9a",
+			"#3a6078"
+		],
+		"head": [
+			"#4f7f9a",
+			"#3a6078"
+		],
+		"leg": [
+			"#3a6078",
+			"#2b4860"
+		],
+		"ear": [
+			"#3a6078",
+			"#2b4860"
+		],
+		"tail": [
+			"#3a6078",
+			"#2b4860"
+		],
+		"belly": [
+			"#bfe0e6",
+			"#93bcc8"
+		],
+		"mane": [
+			"#f7dc80",
+			"#e2b84e"
+		],
+		"snout": [
+			"#bfe0e6",
+			"#93bcc8"
+		],
+		"hoof": "charcoal",
+		"eye": [
+			"#f7dc80",
+			"#f7dc80"
+		]
+	}
+}
